@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Build and setup safety
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+      - name: Check build and release logic
+        run: |
+          python3 -m compileall -q scripts tests/ci
+          python3 -m unittest discover -s tests/ci -v
+      - name: Build and verify module
+        run: |
+          python3 scripts/build.py
+          python3 scripts/verify_apk.py
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: launcherx-local-ci
+          path: |
+            build/apps/launcherx-local.apk
+            build/apps/SHA256SUMS
+            build/apps/receipt.json
+          if-no-files-found: error
+      - name: Allow emulator acceleration
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y acl
+          sudo setfacl -m "u:$(id -un):rw" /dev/kvm
+      - name: Test setup refusal on stock Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          avd-name: launcherx_ci
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: python3 scripts/ci_smoke.py --serial emulator-5554
+      - name: Upload setup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: setup-safety-evidence
+          path: artifacts/ci-smoke/
+          if-no-files-found: ignore

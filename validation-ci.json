@@ -1,0 +1,60 @@
+{
+  "result": "passed locally",
+  "verified_date": "2026-10-23",
+  "source_base_commit": "c83a8243461472ca53ddde7d551a66f09f98cc00",
+  "scope": "CI changes validated in an isolated checkout; unrelated in-progress feature edits were excluded.",
+  "github_actions_run": false,
+  "github_run_note": "gh is not authenticated on this host; workflows are committed locally, not pushed or dispatched.",
+  "toolchain": {
+    "java": "Temurin 25.0.5+8",
+    "python_ci_build_and_smoke": "3.12.14",
+    "python_release_upgrade_check": "3.14.7",
+    "android_platform": 34,
+    "android_build_tools": "37.0.0",
+    "emulator": "API 35 google_apis x86_64, launcherx_ci",
+    "actionlint": "1.7.12"
+  },
+  "checks": [
+    "Workflow actionlint and embedded-shell checks passed",
+    "Six version/manifest unit tests passed on Python 3.12",
+    "Fresh dependency download matched pinned SHA-256",
+    "Default APK build, signature, manifest, receipt and DEX contents verified",
+    "Real stock Android setup and DPAD refusal checks passed",
+    "Explicit release key/password failure paths passed",
+    "Signed version override preserved source manifest and launcher compatibility pins",
+    "Real APK upgrade accepted with unchanged signing certificate"
+  ],
+  "setup": {
+    "result": "passed",
+    "apk_sha256": "29f44d7565d75198db0abd04a9806b7263565c69bbeffaf61d3cb35eb1aaa7d9",
+    "checks": [
+      "missing launcher refusal",
+      "wrong version refusal",
+      "wrong executable refusal",
+      "DPAD Enable and channel chooser refuse without switching Home",
+      "no fatal exception"
+    ],
+    "coverage": "stock Android setup safety only; no Xposed, root, real launcher or Home integration"
+  },
+  "release": {
+    "result": "passed",
+    "version_name": "26.10.23.22.38",
+    "version_code": 4,
+    "sha256": "1a2885adc73b12e5530e858b485a9b9f448751dfdad4e334186c394e18c0502a",
+    "signing": "Disposable validation key only; production signing secret not uploaded"
+  },
+  "limitations": [
+    "Stock emulator validates setup safety, not native Google TV Home hooks.",
+    "No private launcher APK, rooted fixture, existing emulator, or physical TV was used.",
+    "GitHub runner provisioning and release publication are not live-verified."
+  ],
+  "evidence": [
+    "artifacts/ci-validation/ci-smoke/result.json",
+    "artifacts/ci-validation/ci-smoke/logcat.txt",
+    "artifacts/ci-validation/ci-smoke/dex-enable.png",
+    "artifacts/ci-validation/ci-smoke/release-upgrade.png",
+    "artifacts/ci-validation/ci-host/release-result.json",
+    "artifacts/ci-validation/ci-host/smoke-run.txt"
+  ],
+  "cleanup": "Verified test packages removed; own emulator, private ADB server and temporary AVD data removed; existing lab and TV untouched."
+}

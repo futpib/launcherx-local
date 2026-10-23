@@ -163,3 +163,14 @@ negative compatibility tests, and the separate full-feed experiment.
 The installation artifacts and full logs are excluded from Git. Normal installation
 uses only the module APK and the separately obtained framework; never install the
 emulator system overlay or its network-workaround research build on a TV.
+
+## GitHub CI and releases
+
+[![Test](https://github.com/futpib/launcherx-local/actions/workflows/test.yml/badge.svg)](https://github.com/futpib/launcherx-local/actions/workflows/test.yml)
+
+Pushes and pull requests run the **Test** workflow. The manual **Build APK**
+workflow publishes a signed universal `launcherx-local.apk`, checksums and a
+build receipt to [GitHub Releases](https://github.com/futpib/launcherx-local/releases).
+Configure the persistent signing key before publishing; see [CI setup, signing
+and local reproduction](docs/ci.md). Public CI verifies building and setup
+refusal on stock Android; full Home integration uses the private rooted lab.

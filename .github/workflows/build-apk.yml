@@ -1,0 +1,71 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+      - name: Check build and release logic
+        run: python3 -m unittest discover -s tests/ci -v
+      - name: Prepare signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          : "${KEYSTORE_BASE64:?Configure KEYSTORE_BASE64 before publishing}"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/launcherx-release.jks"
+      - name: Set version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name' > "$RUNNER_TEMP/release-tags"
+          python3 scripts/release_version.py "$RUNNER_TEMP/release-tags" --output "$GITHUB_OUTPUT"
+      - name: Build signed APK
+        env:
+          LAUNCHERX_STORE_PASS: ${{ secrets.KEYSTORE_PASSWORD || 'android' }}
+          LAUNCHERX_KEY_PASS: ${{ secrets.KEY_PASSWORD || secrets.KEYSTORE_PASSWORD || 'android' }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'local' }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+        run: |
+          python3 scripts/build.py \
+            --keystore "$RUNNER_TEMP/launcherx-release.jks" --key-alias "$KEY_ALIAS" \
+            --version-name "$VERSION_NAME" --version-code "$VERSION_CODE"
+          python3 scripts/verify_apk.py
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.version.outputs.tag }}
+          make_latest: true
+          body: |
+            Install **launcherx-local.apk**. It is universal and contains no native CPU-specific libraries.
+            In Obtainium, add https://github.com/${{ github.repository }}.
+
+            Requires Magisk/Zygisk, LSPosed, and the launcher build pinned in compatibility.json.
+            This is a regular module APK, not a ZIP to install in Magisk.
+
+            Built from ${{ github.sha }}. SHA256SUMS and receipt.json describe this APK.
+            Public CI checks building and setup refusal; full Home integration uses the separate private rooted lab.
+          fail_on_unmatched_files: true
+          files: |
+            build/apps/launcherx-local.apk
+            build/apps/SHA256SUMS
+            build/apps/receipt.json
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/launcherx-release.jks"

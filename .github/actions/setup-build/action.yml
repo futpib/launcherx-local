@@ -1,0 +1,18 @@
+name: Set up module build
+description: Install the pinned Android build dependencies without a proprietary launcher APK.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '25'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - uses: android-actions/setup-android@v3
+      with:
+        packages: 'platform-tools platforms;android-34 build-tools;37.0.0'
+    - name: Fetch pinned Xposed API
+      shell: bash
+      run: python3 scripts/fetch_api.py
