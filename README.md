@@ -80,6 +80,9 @@ Signed-in account behavior has not been tested.
 The `full` research build preserves the cloud feed; real requests returned
 `UNAUTHENTICATED` and `PERMISSION_DENIED`. It is not the normal install artifact.
 
+The [account-free Home feature inventory](docs/account-free-home.md) lists local
+features, candidates for further work, and account-dependent services.
+
 ## Build and signing
 
 Requires Python 3, a JDK, Android SDK platform 34 and build-tools 37.0.0.
