@@ -38,6 +38,7 @@ account-free yet.**
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
 | 23 | **Custom remote-button shortcuts** | App/input shortcut code exists. Potentially local; depends on compatible remote hardware and feature flags. |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
+| 25 | **Top navigation tabs and destinations** | **Home only in 0.5.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 
 **Continue watching** and **app-provided content rows** are now connected to Home.
 See [local-content implementation and validation](local-content.md) for the data
@@ -45,6 +46,39 @@ sources, supported behavior and test boundaries.
 
 **Add apps** now discovers installed stores through `APP_MARKET`. See the
 [store-picker notes](store-picker.md) for matching rules and test evidence.
+
+## Top navigation tabs
+
+The pills beside Home are containers for the features above. Their stock
+availability varies by country, language and device; Home may be labelled
+**For you**. They do not all appear together, and the exact signed-in set has
+not been measured on the tested TV. See Google's [layout guide](https://support.google.com/googletv/answer/10467234?hl=en)
+and [tab descriptions](https://support.google.com/googletv/answer/10267283).
+
+Our account-free setup retains the launcher's existing pseudonymous profile
+(feature **15**); it supplies no Google authentication credentials. In the
+earlier full-feed emulator experiment, the request to load destinations returned
+`UNAUTHENTICATED`. The default module supplies Home locally. The app-channel
+visibility settings in **5** control rows inside Home, not top navigation tabs.
+
+| # | Tab | Related feature rows | Account-free status and remaining work |
+|---|---|---|---|
+| 1 | **Home / For you** | **1–9** | Local Home already contains installed apps and nonempty local content rows. Google's personalized For you feed remains unavailable in the tested setup. |
+| 2 | **Apps** | **1–3** | Strongest candidate for another useful tab: reuse installed apps and the store picker. Separate-tab integration and navigation are unimplemented; Google app discovery is not supplied by the picker. Reordering retains the test limits in **2**. |
+| 3 | **Library** | **12–13** | A local watchlist and saved app links would need new storage and controls. Google purchases, rentals and synchronized watchlists remain account-dependent. |
+| 4 | **Live** | **10–11** | Local tuner channels and compatible app-provided channels are candidates; guide integration and playback need investigation. Freeplay requires separate testing. |
+| 5 | **Movies / Shows** | **7**, **9**; potentially **5** | No working anonymous Google feed established. App-published entries or another catalogue could supply content, subject to available metadata and playback links. |
+| 6 | **Free** | **11**; potentially **5** | Freeplay remains unresolved. Aggregating other free providers would extend the existing inventory and require a usable content source; free access cannot be inferred from an app's preview entries alone. |
+| 7 | **Shop** | **13** | No working account-free Google purchase or rental flow established. Exposing a tab would not provide account entitlements. |
+| 8 | **Manufacturer tab** | **24** | Depends on the manufacturer's content source and device integration; no account-free tab implementation verified. |
+
+Feature **25** tracks the navigation work shared by these proposals. **Apps
+first, then a local Library** is a proposed implementation order: Apps would
+mostly reorganize existing functionality, while Library would implement the
+local-watchlist candidate in **12**. Neither is a newly verified stock-tab
+unlock. Supplying a tab label alone does not supply its content or service access.
+
+## Validation scope
 
 “Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The signed-out
 dashboard inspection ran only in the emulator. See the [initial physical-device
