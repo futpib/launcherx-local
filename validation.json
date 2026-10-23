@@ -1,6 +1,6 @@
 {
   "result": "passed",
-  "apk_sha256": "2614b59b28aecc2b53f8d77bfa41331e9cd46300d1e833672d07bea2a993a162",
+  "apk_sha256": "82af4d40dc0db0c33f23c1fcecf29a337145ecae7500b66ed84b66c70b6c0df3",
   "accounts": 0,
   "apps": [
     "Live TV",
@@ -9,7 +9,7 @@
     "TV Bro",
     "LauncherX Local"
   ],
-  "reboot": true,
+  "reboot": false,
   "checks": [
     "clean official Home",
     "native DPAD app launch",
@@ -18,17 +18,22 @@
     "no launcher fatal exception"
   ],
   "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
-  "module_version": "0.2",
+  "verified_date": "2026-10-23",
+  "module_version": "0.3",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "framework": {
     "magisk": "30.7",
     "lsposed": "1.9.2 (7024) Zygisk"
   },
-  "physical_tv_tested": true,
-  "physical_tv_record": "validation-tv.json",
+  "physical_tv_tested": false,
+  "physical_tv_record": {
+    "path": "validation-tv.json",
+    "module_version": "0.2",
+    "note": "Historical device validation; 0.3 was not installed on the physical TV."
+  },
   "setup": {
     "result": "passed",
-    "apk_sha256": "2614b59b28aecc2b53f8d77bfa41331e9cd46300d1e833672d07bea2a993a162",
+    "apk_sha256": "82af4d40dc0db0c33f23c1fcecf29a337145ecae7500b66ed84b66c70b6c0df3",
     "checks": [
       "DPAD setup controls",
       "Restore Basic TV",
@@ -38,27 +43,30 @@
     ],
     "fixture": "isolated emulator; negative variants alter module compatibility metadata only"
   },
-  "manual_negative_checks": [
-    "Magisk root denial left Home unchanged",
-    "LSPosed module disabled: activation refused without switching Basic TV"
-  ],
-  "full_feed": "real requests rejected with UNAUTHENTICATED and PERMISSION_DENIED",
+  "local_content_record": "validation-content.json",
+  "local_content_reboot": "passed",
+  "historical_manual_negative_checks": {
+    "module_version": "0.2",
+    "checks": [
+      "Magisk root denial left Home unchanged",
+      "LSPosed module disabled: activation refused without switching Basic TV"
+    ]
+  },
+  "prior_full_feed_experiment": "real requests rejected with UNAUTHENTICATED and PERMISSION_DENIED",
   "evidence": [
+    "artifacts/smoke-result.json",
     "artifacts/smoke-home.png",
     "artifacts/smoke-native-focus.png",
     "artifacts/smoke-browser-focus.png",
     "artifacts/smoke-browser.png",
     "artifacts/smoke-browser-activity.txt",
     "artifacts/smoke-return-home.png",
-    "artifacts/smoke-rebooted.png",
-    "artifacts/smoke-rebooted-accounts.txt",
+    "artifacts/smoke-restarted.png",
     "artifacts/smoke-logcat.txt",
-    "artifacts/rollback-stock.png",
-    "artifacts/rollback-stock-logcat.txt",
-    "artifacts/full-emulator-logcat.txt",
-    "artifacts/reorder-no-inspector.png",
     "artifacts/setup-result.json",
-    "artifacts/setup-hook-refused.xml",
-    "artifacts/setup-after-prompt.xml"
+    "artifacts/setup-restored-basic.png",
+    "artifacts/setup-refuse-version-result.xml",
+    "artifacts/setup-refuse-dex-result.xml",
+    "artifacts/setup-roundtrip-home.png"
   ]
 }

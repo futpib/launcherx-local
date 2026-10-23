@@ -112,6 +112,12 @@ refuses to switch Home. A `finally` block restores the normal module APK.
 The source compatibility manifest and original launcher APK remain unchanged.
 The negative builds also exercise building without a proprietary launcher APK.
 
+For the local-content features, run `python3 scripts/content_smoke.py`. Its
+separate publisher inserts real Watch Next and preview-channel entries, exercises
+the setup chooser and native DPAD playback links, and removes its records and
+package afterward. It temporarily blocks only the launcher's network traffic
+inside the emulator. See [local-content test notes](local-content.md).
+
 A disabled-framework-module test was performed separately through LSPosed's UI:
 with LauncherX Local disabled, Enable refused to change Basic TV; re-enabling
 only Google TV scope allowed Enable to restart the launcher and activate Home.

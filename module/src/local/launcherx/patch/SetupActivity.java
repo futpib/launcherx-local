@@ -1,10 +1,12 @@
 package local.launcherx.patch;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -14,6 +16,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public final class SetupActivity extends Activity {
     private static final String TARGET = Compatibility.TARGET;
@@ -51,6 +58,7 @@ public final class SetupActivity extends Activity {
             }
         });
         button("Check compatibility", this::check);
+        button("Choose app content", () -> channels(null));
         check();
     }
 
@@ -137,19 +145,75 @@ public final class SetupActivity extends Activity {
         }, "launcherx-setup").start();
     }
 
-    private static void root(String command) throws Exception {
-        Process process = new ProcessBuilder("su", "-c", command).redirectErrorStream(true).start();
-        try {
-            if (!process.waitFor(90, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Root request timed out. Check Magisk's Superuser page.");
+    private void channels(String changes) {
+        busy(true, "Reading app content choices. Allow Magisk root access if prompted…");
+        new Thread(() -> {
+            try {
+                verifyUser();
+                Compatibility.verify(this);
+                String command = "am broadcast --user 0 --receiver-include-background -a " + AppChannels.ACTION
+                        + " -p " + TARGET;
+                if (changes != null) command += " --es changes " + changes;
+                Matcher match = Pattern.compile("data=\"([A-Za-z0-9+/=]+)\"").matcher(root(command));
+                if (!match.find()) throw new IllegalStateException("Enable local Home first, then reopen this chooser.");
+                JSONObject result = new JSONObject(new String(Base64.decode(match.group(1), Base64.DEFAULT), StandardCharsets.UTF_8));
+                if (result.has("error")) throw new IllegalStateException(result.getString("error"));
+                JSONArray entries = result.getJSONArray("channels");
+                String[] labels = new String[entries.length()];
+                boolean[] checked = new boolean[entries.length()];
+                long[] ids = new long[entries.length()];
+                for (int i = 0; i < entries.length(); i++) {
+                    JSONObject entry = entries.getJSONObject(i);
+                    labels[i] = entry.getString("title") + " — " + entry.getString("app");
+                    checked[i] = entry.getBoolean("enabled");
+                    ids[i] = entry.getLong("id");
+                }
+                runOnUiThread(() -> {
+                    busy(false, changes == null ? "Choose the app rows to show on Home." : "App content choices saved. Press Home to see them.");
+                    if (changes != null) return;
+                    if (labels.length == 0) {
+                        status.setText("No app content channels yet. Open a compatible TV app and enable its Home recommendations.");
+                        return;
+                    }
+                    boolean[] original = checked.clone();
+                    new AlertDialog.Builder(this).setTitle("App content on Home")
+                            .setMultiChoiceItems(labels, checked, (dialog, index, value) -> checked[index] = value)
+                            .setNegativeButton("Cancel", null)
+                            .setPositiveButton("Save", (dialog, which) -> {
+                                StringBuilder update = new StringBuilder();
+                                for (int i = 0; i < ids.length; i++) {
+                                    if (checked[i] == original[i]) continue;
+                                    if (update.length() > 0) update.append(',');
+                                    update.append(ids[i]).append(':').append(checked[i] ? '1' : '0');
+                                }
+                                if (update.length() > 0) channels(update.toString());
+                            }).show();
+                });
+            } catch (Exception error) {
+                runOnUiThread(() -> busy(false, "Cannot change app content: " + error.getMessage()));
             }
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
+        }, "launcherx-channels").start();
+    }
+
+    private static String root(String command) throws Exception {
+        Process process = new ProcessBuilder("su", "-c", command).redirectErrorStream(true).start();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Thread reader = new Thread(() -> {
             try (InputStream input = process.getInputStream()) {
                 byte[] buffer = new byte[4096];
                 int count;
                 while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+            } catch (java.io.IOException ignored) {}
+        }, "launcherx-root-output");
+        reader.start();
+        try {
+            if (!process.waitFor(90, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Root request timed out. Check Magisk's Superuser page.");
             }
+            reader.join(5000);
+            if (reader.isAlive()) throw new IllegalStateException("Root output did not finish");
             if (process.exitValue() != 0) throw new IllegalStateException(output.toString("UTF-8").trim());
+            return output.toString("UTF-8").trim();
         } finally {
             process.destroy();
         }

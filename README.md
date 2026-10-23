@@ -1,8 +1,9 @@
 # LauncherX Local
 
-Use the official Google TV Home as a local app launcher without a Google account.
-The original app tiles, remote navigation, app launching and quick settings stay
-inside Google's launcher. The launcher APK is not modified or re-signed.
+Use the official Google TV Home without a Google account, with installed apps,
+Continue watching, and content rows published by TV apps. The original app tiles,
+cards, remote navigation, app launching and quick settings stay inside Google's
+launcher. The launcher APK is not modified or re-signed.
 
 This is an **LSPosed module APK**, hosted by Magisk and Zygisk. It is not a ZIP to
 flash directly in Magisk. The setup app has TV remote controls for enabling local
@@ -17,6 +18,9 @@ Home and restoring Basic TV. No ADB commands are needed for normal setup.
   Android 14 emulator running the same original launcher APK.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
 - Owner user only, with no Google account visible to the launcher.
+
+Physical-device validation covers version **0.2**. Version **0.3** adds local
+content rows and the channel chooser; its validation uses the isolated emulator.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -40,6 +44,10 @@ number. Restore Basic TV remains available when the launcher is incompatible.
    root request. Setup checks the launcher, restarts it to load the module, checks
    the live hook and account state, and then opens local Home.
 
+To update an existing installation, install the new APK signed with the same key,
+then choose **Enable local Home** again. With Magisk and LSPosed already active,
+this restarts only the launcher; a TV reboot is not needed.
+
 On TVs where Magisk's file picker silently closes, install
 [Material Files from F-Droid](https://f-droid.org/packages/me.zhanghai.android.files/)
 first. It supplies a working file picker. This was necessary on the tested Xiaomi
@@ -48,9 +56,37 @@ Downloads or obtained using a TV browser. Magisk and LSPosed's phone-oriented
 interfaces may need a pointer; the LauncherX Local setup screen works with DPAD.
 
 This follows the [standard LSPosed installation and module activation flow](https://github.com/LSPosed/LSPosed/wiki/How-to-use-it).
-No framework databases, system files, or Google account records are edited.
-Root is used by the setup app to switch and restart Home; the running hooks use
-LSPosed. Root permission can be revoked afterward and granted again for rollback.
+No framework databases, system files, or Google account records are edited directly.
+Root is used by the setup app to switch and restart Home and authorize changes
+to app-channel visibility through Android's TV provider. Running hooks use
+LSPosed. Root permission can be revoked afterward and granted again for setup.
+
+## Local content
+
+Open a compatible TV app and enable its Home recommendations or Watch Next
+integration. **Continue watching** reads the app-published Watch Next entries,
+ordered by most recent engagement, and shows native artwork, episode information,
+and resume progress. Selecting a card opens the app's playback link with its
+extras intact. The app is responsible for resuming playback and updating entries.
+
+In LauncherX Local, choose **Choose app content**, select the published channels
+you want, and press **Save**. This works with the remote. It changes only the
+selected preview channels' visibility through Android's TV provider. Hidden
+programs stay hidden. An empty chooser means no installed app has published
+preview channels yet.
+
+The module shows up to 40 local rows and 40 cards per row. It refreshes after
+provider changes and when returning Home, skips invalid/unavailable playback
+links and duplicate links within a row, and hides empty rows. Apps remain first.
+Local metadata needs no Google feed; app artwork may still load from URLs
+published by the app.
+
+These are Android TV's local **Watch Next** and **preview-channel** APIs. Apps
+that publish only to Google's cloud/Engage feed do not gain local rows. The test
+publisher verifies the real provider, native UI and playback-link handoff; it
+does not establish which third-party apps currently publish compatible data or
+verify video playback inside those apps. See the [implementation and test
+notes](docs/local-content.md).
 
 ## Restore or uninstall
 
@@ -66,8 +102,9 @@ reported in the setup screen; enable does not switch Home in those cases.
 ## What works and what does not
 
 The default build selects the launcher's built-in apps-only Home, uses its bundled
-fallback destination, keeps `apps_channel`, removes the cloud-loading error panel,
-and labels the existing pseudonymous profile **Local TV**. Every behavior change
+fallback destination, keeps `apps_channel`, appends nonempty local content rows,
+removes the cloud-loading error panel, and labels the existing pseudonymous
+profile **Local TV**. Every behavior change
 requires local Home to be selected and the launcher's account view to contain zero
 Google accounts. An account lookup error leaves the original behavior.
 
@@ -118,6 +155,8 @@ by these scripts.
 
 [`validation.json`](validation.json) records emulator results;
 [`validation-tv.json`](validation-tv.json) records physical-device evidence.
+[`validation-content.json`](validation-content.json) records the local-content
+tests with the real emulator UI and a separate TV-provider publisher.
 The [lab guide](docs/lab.md) describes the guarded emulator, smoke tests, rollback,
 negative compatibility tests, and the separate full-feed experiment.
 

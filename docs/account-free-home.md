@@ -1,10 +1,11 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401** and LauncherX Local **0.2**.
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.3**; physical TV
+validation remains at **0.2**.
 
-The current apps-only screen is the first version implemented and verified, not
-the limit. More local features look feasible; Google's account-backed feeds need
+The original apps-only screen now also supports local content rows. More local
+features look feasible; Google's account-backed feeds need
 authentication or a replacement data source. The inspected launcher contains 69
 row-renderer types, mostly layout variations, grouped below into user-facing
 features. **“Candidate” means code exists, but we haven't made it work
@@ -15,8 +16,8 @@ account-free yet.**
 | 1 | **Your apps** | **Working on your TV:** display installed TV apps, navigate, and launch them. |
 | 2 | **Reorder and app menus** | Local functionality. Reorder UI was observed; persistent reordering wasn’t tested. |
 | 3 | **Add apps / app catalogue** | Stock installation uses Google Play. F-Droid and Obtainium work separately; we could redirect this button. |
-| 4 | **Continue watching / Watch Next** | **Strong candidate.** There is a reader for Android’s local watch-history database. Requires participating apps to publish entries. |
-| 5 | **App-provided content rows** | **Strong candidate.** The launcher has a local TV-provider channel loader. Could show content published by compatible apps. |
+| 4 | **Continue watching / Watch Next** | **Implemented in 0.3; emulator verified.** Native cards, artwork, episode information, resume progress and app playback links from browsable local Watch Next entries. Requires participating apps to publish entries; not yet tested on the physical TV. |
+| 5 | **App-provided content rows** | **Implemented in 0.3; emulator verified.** Native rows from enabled local preview channels, with a remote-controlled channel chooser in setup. Refreshes after app changes and opens app playback links; not yet tested on the physical TV. |
 | 6 | **Featured banners, trailers, promotions** | Rendering exists, but stock content is supplied remotely. We could populate these with another source; merely exposing the UI won’t supply content. |
 | 7 | **For You, Movies, Shows, genre rows, top picks/charts** | Google’s feed requests failed authentication in our emulator experiment. No working anonymous feed established. |
 | 8 | **Sports, news and themed collections** | Renderers exist. Their individual services haven’t been tested anonymously; they need content feeds. |
@@ -37,11 +38,9 @@ account-free yet.**
 | 23 | **Custom remote-button shortcuts** | App/input shortcut code exists. Potentially local; depends on compatible remote hardware and feature flags. |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
 
-The most promising next additions are **Continue watching** and **app-provided
-content rows**. This APK includes a `TvContractWatchNextProvider` reader
-(`defpackage.lhr`, querying `content://android.media.tv/watch_next_program`) and
-a `LocalChannelsDataServiceImpl` loader (`defpackage.lju` / `defpackage.ljt`).
-Connecting these sources to Home remains implementation and verification work.
+**Continue watching** and **app-provided content rows** are now connected to Home.
+See [local-content implementation and validation](local-content.md) for the data
+sources, supported behavior and test boundaries.
 
 “Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The additional
 signed-out dashboard inspection ran only in the emulator; the physical TV was

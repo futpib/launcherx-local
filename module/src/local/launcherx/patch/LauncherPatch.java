@@ -114,6 +114,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         cacheResult.getDeclaredMethod("a", Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
+        LocalContent content = BuildConfig.APPS_ONLY ? new LocalContent(context, loader, this::anonymous) : null;
         List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
         try {
             if (BuildConfig.EMULATOR_NETWORK) hooks.add(EmulatorNetwork.install(context, loader));
@@ -131,6 +132,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 }
             }));
             if (BuildConfig.APPS_ONLY) {
+                hooks.add(content.install());
                 XC_MethodHook localDestinations = new XC_MethodHook() {
                     @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                         if (!anonymous()) return;
