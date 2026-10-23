@@ -47,7 +47,7 @@ def check_home(name, timeout=30):
         if time.monotonic() >= deadline:
             raise AssertionError("Home did not finish rendering")
         time.sleep(2)
-    for expected in ["Your apps", "TV Bro", "Local TV"]:
+    for expected in ["Your apps", "TV Bro", "Incognito"]:
         assert expected in xml, expected
     for unexpected in ["Loading error", "Unable to load Home", "Set up Google TV", "UNHANDLED ACCOUNT"]:
         assert unexpected not in xml, unexpected
@@ -71,7 +71,6 @@ def main():
     apk = ROOT / "build/apps/launcherx-local.apk"
     print(adb("install", "--no-incremental", "-r", apk), flush=True)
     time.sleep(2)
-    root("pm enable " + HOME)
     root("am force-stop " + BROWSER)
     adb("logcat", "-c")
     fresh_home()

@@ -131,7 +131,7 @@ def main():
         publish('clear')
         adb('logcat', '-c')
         fresh_home()
-        inspect('content-empty', ['Your apps', 'Local TV'], ['Continue watching', 'Fixture recommendations'])
+        inspect('content-empty', ['Your apps', 'Incognito'], ['Continue watching', 'Fixture recommendations'])
         checks.append('empty providers keep apps-only Home')
         # A UIAutomator inspection can leave a stale accessibility focus in stock Android 14.
         # Restart after inspection, then perform each live mutation/navigation uninterrupted.
@@ -148,7 +148,7 @@ def main():
         shell('am force-stop local.launcherx.patch')
         shell('am start -W -n local.launcherx.patch/.SetupActivity')
         time.sleep(2)
-        shell('input keyevent ' + ' '.join(['KEYCODE_DPAD_UP'] * 5 + ['KEYCODE_DPAD_DOWN'] * 4))
+        shell('input keyevent ' + ' '.join(['KEYCODE_DPAD_UP'] * 5))
         screen('content-chooser-focus')
         shell('input keyevent KEYCODE_DPAD_CENTER')
         inspect('content-chooser', ['App content on Home', 'Fixture recommendations'])

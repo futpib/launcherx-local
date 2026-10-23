@@ -3,12 +3,8 @@ package local.launcherx.patch;
 import android.accounts.AccountManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.BroadcastReceiver;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.util.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -28,17 +24,19 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
     private static final Set<String> logged = new HashSet<>();
     private Context context;
     private boolean installed;
+    private Profiles profiles;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
         if (!TARGET.equals(param.packageName) || !TARGET.equals(param.processName)) return;
+        if (android.os.Process.myUid() / 100000 != 0) return;
         XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam hook) {
                 if (installed) return;
                 context = (Context) hook.args[0];
                 try {
                     Compatibility.verify(context);
-                    installHooks(param.classLoader);
+                    installHooks(param.classLoader, (Application) hook.thisObject);
                     installed = true;
                     event("installed mode=" + BuildConfig.MODE + " version=" + BuildConfig.VERSION_CODE);
                 } catch (Throwable error) {
@@ -46,28 +44,13 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                     XposedBridge.log(error);
                     return;
                 }
-                try {
-                    BroadcastReceiver probe = new BroadcastReceiver() {
-                        @Override public void onReceive(Context receiverContext, Intent intent) {
-                            setResultData(BuildConfig.APPS_ONLY && noGoogleAccount()
-                                    ? Compatibility.READY : "launcherx-local:unavailable");
-                        }
-                    };
-                    IntentFilter filter = new IntentFilter(Compatibility.PROBE);
-                    if (Build.VERSION.SDK_INT >= 33) {
-                        context.registerReceiver(probe, filter, "android.permission.DUMP", null,
-                                Context.RECEIVER_EXPORTED);
-                    } else {
-                        context.registerReceiver(probe, filter, "android.permission.DUMP", null);
-                    }
-                } catch (Throwable error) {
-                    Log.e(TAG, "Setup probe unavailable", error);
-                }
+
             }
         });
     }
 
     private boolean anonymous() {
+        if (profiles != null) return profiles.incognito();
         return context.getPackageManager().getComponentEnabledSetting(new ComponentName(TARGET,
                 TARGET + ".home.HomeActivity")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 && noGoogleAccount();
@@ -82,7 +65,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         }
     }
 
-    private void installHooks(ClassLoader loader) throws Exception {
+    private void installHooks(ClassLoader loader, Application application) throws Exception {
         Class<?> activityPeer = loader.loadClass("isa");
         Class<?> rootPeer = loader.loadClass("isn");
         Class<?> appsOnlyObserver = loader.loadClass("isf");
@@ -116,20 +99,18 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         channels.getDeclaredConstructor(List.class);
         LocalContent content = BuildConfig.APPS_ONLY ? new LocalContent(context, loader, this::anonymous) : null;
         StorePicker stores = BuildConfig.APPS_ONLY ? new StorePicker(loader, this::anonymous) : null;
+        profiles = BuildConfig.APPS_ONLY ? new Profiles(context, loader) : null;
         List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
         try {
             if (BuildConfig.EMULATOR_NETWORK) hooks.add(EmulatorNetwork.install(context, loader));
+            if (profiles != null) profiles.install(hooks);
             hooks.add(XposedBridge.hookMethod(profile, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                     if (!anonymous()) return;
                     Object item = hook.args[0];
                     if (!"pseudonymous".equals(XposedHelpers.getObjectField(item, "k"))) return;
-                    Object builder = XposedHelpers.callMethod(item, "toBuilder");
-                    Object value = XposedHelpers.getObjectField(builder, "b");
-                    XposedHelpers.setObjectField(value, "d", "Local TV");
-                    XposedHelpers.setObjectField(value, "g", "");
-                    hook.args[0] = XposedHelpers.callMethod(builder, "r");
-                    event("named the existing pseudonymous profile Local TV");
+                    if (profiles != null) hook.args[0] = profiles.label(item);
+                    event("named the existing pseudonymous profile Incognito");
                 }
             }));
             if (BuildConfig.APPS_ONLY) {
@@ -207,6 +188,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                     }
                 }
             }));
+            if (BuildConfig.APPS_ONLY) HomeActivation.install(application, context);
         } catch (Throwable error) {
             for (XC_MethodHook.Unhook hook : hooks) hook.unhook();
             throw error;

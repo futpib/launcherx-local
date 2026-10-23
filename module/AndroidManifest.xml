@@ -1,11 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="local.launcherx.patch" android:versionCode="5" android:versionName="0.5">
+    package="local.launcherx.patch" android:versionCode="6" android:versionName="0.6">
     <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <queries>
         <package android:name="com.google.android.apps.tv.launcherx" />
-        <package android:name="org.lsposed.manager" />
     </queries>
     <application android:label="LauncherX Local" android:allowBackup="false"
         android:icon="@drawable/icon" android:banner="@drawable/banner"

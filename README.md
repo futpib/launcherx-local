@@ -1,13 +1,15 @@
 # LauncherX Local
 
-Use the official Google TV Home without a Google account, with installed apps,
-Continue watching, content rows published by TV apps, and an app-store picker.
+Use the official Google TV Home with **Incognito as the default profile**, installed
+apps, Continue watching, app-published content rows, and an app-store picker.
+Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
 
 This is an **LSPosed module APK**, hosted by Magisk and Zygisk. It is not a ZIP to
-flash directly in Magisk. The setup app has TV remote controls for enabling local
-Home and restoring Basic TV. No ADB commands are needed for normal setup.
+flash directly in Magisk. Enabling it in LSPosed activates Home on the next
+launcher start. The companion app only has **Choose app content**, plus setup
+instructions and automatic compatibility status. No ADB commands are needed.
 
 ## Compatibility
 
@@ -17,19 +19,22 @@ Home and restoring Basic TV. No ADB commands are needed for normal setup.
 - Tested on a Xiaomi **MiTV-MOEU0**, Android 14, ARM32, and an isolated Google TV
   Android 14 emulator running the same original launcher APK.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
-- Owner user only, with no Google account visible to the launcher.
+- Owner user only. Version **0.6** supports choosing Incognito while retaining
+  Google accounts; the authenticated switching round trip remains untested.
 
 Physical-device validation covers the initial **0.2** setup, the **0.4** store
 picker, and the **0.5** update that enables app channels by default. The complete
 content-row suite runs in the isolated emulator. At the latest TV check,
 SmartTube's channels were enabled but its local program tables were empty, so
 third-party content cards and playback links remain unverified on that TV.
+Version **0.6** profile switching and automatic activation are tested in the
+emulator only; they have not been installed on the physical TV.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
-before hooks are installed or setup switches Home. Keep launcher updates in mind:
+before hooks are installed or Home is activated. Keep launcher updates in mind:
 a new launcher build needs a new compatibility review, not just an edited version
-number. Restore Basic TV remains available when the launcher is incompatible.
+number. Disable the module in LSPosed and restart Google TV to use stock behavior.
 
 ## Install
 
@@ -43,26 +48,45 @@ number. Restore Basic TV remains available when the launcher is incompatible.
    your chosen file manager in Android Settings when prompted.
 5. In LSPosed's **Modules** page, enable **LauncherX Local**. Leave only its
    recommended **Google TV** scope checked. Do not select System Framework.
-6. Open **LauncherX Local**, select **Enable local Home**, and grant its Magisk
-   root request. Setup checks the launcher, restarts it to load the module, checks
-   the live hook and account state, and then opens local Home.
+6. Restart Google TV (force stop it in Android Settings, then press Home), or
+   reboot. The verified module selects Home automatically inside the launcher.
+   There is no separate activation button or Magisk root prompt for this step.
 
-To update an existing installation, install the new APK signed with the same key,
-then choose **Enable local Home** again. With Magisk and LSPosed already active,
-this restarts only the launcher; a TV reboot is not needed.
+To update, install the new APK signed with the same key and restart Google TV.
+Magisk and LSPosed do not need to be reinstalled. The companion app's compatibility
+status checks the installed launcher; it does not certify that LSPosed is active.
 
 On TVs where Magisk's file picker silently closes, install
 [Material Files from F-Droid](https://f-droid.org/packages/me.zhanghai.android.files/)
 first. It supplies a working file picker. This was necessary on the tested Xiaomi
 TV, whose built-in picker resolves to a stub. APKs and ZIPs can be transferred to
 Downloads or obtained using a TV browser. Magisk and LSPosed's phone-oriented
-interfaces may need a pointer; the LauncherX Local setup screen works with DPAD.
+interfaces may need a pointer; the LauncherX Local content chooser works with DPAD.
 
 This follows the [standard LSPosed installation and module activation flow](https://github.com/LSPosed/LSPosed/wiki/How-to-use-it).
 No framework databases, system files, or Google account records are edited directly.
-Root is used by the setup app to switch and restart Home and authorize changes
-to app-channel visibility through Android's TV provider. Running hooks use
-LSPosed. Root permission can be revoked afterward and granted again for setup.
+Running hooks use LSPosed. Home activation uses the launcher's own permission
+to select its activities. The companion app requests root only for **Choose app
+content**, to reach the launcher's protected channel-visibility receiver.
+
+## Profiles
+
+Select the profile icon next to Home to open the native account chooser.
+**Incognito** is selected initially. Choose **Add account** for Google's normal
+sign-in screen, choose a saved Google profile, or choose **Incognito** again.
+The module remembers whether Incognito is selected; Google's native selector
+remembers the Google profile. Cancelling sign-in leaves the selection unchanged.
+
+Incognito uses the launcher's existing pseudonymous account. It does not remove
+Google accounts from the TV or sign other apps out. Apps keep their own history,
+and local TV-provider rows and channel visibility are shared within the Android
+user. This is not a private browsing session or a telemetry blocker.
+
+Local Home overrides apply only to Incognito. Google profile selections retain
+stock account authentication and profile-lock handling. Child and forced-lock
+chooser flows do not receive an Incognito shortcut. Real Google sign-in completion,
+Google-to-Incognito switching, and kids/profile locks still need authenticated
+testing. See [profile implementation and test boundaries](docs/profiles.md).
 
 ## Local content
 
@@ -111,29 +135,25 @@ See the [store-picker implementation and validation](docs/store-picker.md).
 
 ## Restore or uninstall
 
-Open LauncherX Local and choose **Restore Basic TV**. This disables local Home,
-restores the stock Basic TV activity, and restarts the launcher. The hooks become
-inactive even while the module remains enabled in LSPosed.
+Disable **LauncherX Local** in LSPosed and restart Google TV, or reboot. With
+no Google accounts, the stock launcher shows its signed-out setup screen. This
+disable/re-enable flow is tested in the emulator. With a Google account, stock
+account selection applies, but that path has not been tested here.
 
-Then disable LauncherX Local in LSPosed and uninstall its APK if desired. Restore
-Basic TV **before uninstalling** the setup app. There is no launcher APK to restore
-and no firmware flash is needed. Denied root access or an unavailable hook is
-reported in the setup screen; enable does not switch Home in those cases.
+You can then uninstall the module APK. No launcher APK restoration or firmware
+flash is needed. Channel visibility choices and Google accounts remain intact.
 
 ## What works and what does not
 
-The default build selects the launcher's built-in apps-only Home, uses its bundled
-fallback destination, keeps `apps_channel`, appends nonempty local content rows,
-removes the cloud-loading error panel, and labels the existing pseudonymous
-profile **Local TV**. Every behavior change
-requires local Home to be selected and the launcher's account view to contain zero
-Google accounts. An account lookup error leaves the original behavior.
+While Incognito is selected, the default build uses the launcher's bundled
+apps-only Home destination, keeps `apps_channel`, appends nonempty local content
+rows, and removes the cloud-loading error panel. Selecting a Google profile stops
+these overrides and leaves Google's Home feeds and tabs to the stock launcher.
 
 There is no forged Google account, credential injection, or signature-check
-bypass. Personalized recommendations, purchases, Google account services, and
-Google Play itself still require Google authentication. This is not
-a telemetry blocker; unrelated background Google-service requests may continue.
-Signed-in account behavior has not been tested.
+bypass. Incognito does not provide Google recommendations, purchases, or account
+services. The emulator tests reach Google's actual sign-in screen and cancel
+without adding an account; signed-in behavior remains unverified.
 
 The `full` research build preserves the cloud feed; real requests returned
 `UNAUTHENTICATED` and `PERMISSION_DENIED`. It is not the normal install artifact.
@@ -178,6 +198,8 @@ by these scripts.
 [`validation-tv.json`](validation-tv.json) records physical-device evidence.
 [`validation-tv-update.json`](validation-tv-update.json) records the later store
 picker check and the **0.5** channel-default update on the TV.
+[`validation-profiles.json`](validation-profiles.json) records Incognito selection,
+Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content
 tests with the real emulator UI and a separate TV-provider publisher.
 [`validation-market.json`](validation-market.json) records store discovery and

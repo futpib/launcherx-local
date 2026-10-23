@@ -38,7 +38,11 @@ class Device:
         return self.adb('shell', command)
 
     def home(self):
-        return self.shell('cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME')
+        result = self.shell('cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME')
+        # Compare the selected component, not PackageManager's mutable match metadata.
+        component = result.splitlines()[-1]
+        assert '/' in component, result
+        return component
 
     def inspect(self, name, expected):
         deadline = time.monotonic() + 35
@@ -93,6 +97,7 @@ def main():
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     apk = ROOT / 'build/apps/launcherx-local.apk'
     home = device.home()
+    (ARTIFACTS / 'home-before.txt').write_text(home + '\n')
     installed = []
     try:
         device.adb('install', '--no-incremental', apk)
@@ -109,16 +114,17 @@ def main():
                     installed.append(TARGET)
             device.shell('am force-stop ' + MODULE)
             device.shell('am start -W -n ' + MODULE + '/.SetupActivity')
-            device.inspect(name + '-initial', 'Cannot enable local Home: ' + expected)
-            device.choose(0, 'Enable local Home', name + '-enable', 'No switch completed: ' + expected)
-            device.choose(4, 'Choose app content', name + '-channels', 'Cannot change app content: ' + expected)
-            assert device.home() == home, 'Setup changed the default Home on an incompatible installation'
-            print(name + ': compatibility, Enable and channel chooser refused; Home unchanged', flush=True)
+            device.inspect(name + '-initial', 'Unsupported launcher: ' + expected)
+            device.choose(0, 'Choose app content', name + '-channels', 'Cannot change app content: ' + expected)
+            after = device.home()
+            (ARTIFACTS / (name + '-home-after.txt')).write_text(after + '\n')
+            assert after == home, ('Setup changed the default Home on an incompatible installation', home, after)
+            print(name + ': compatibility and channel chooser refused; Home unchanged', flush=True)
         logs = device.adb('logcat', '-d', '-s', 'AndroidRuntime:E')
         assert 'FATAL EXCEPTION' not in logs, logs
         result = {'result': 'passed', 'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
                   'checks': ['missing launcher refusal', 'wrong version refusal', 'wrong executable refusal',
-                             'DPAD Enable and channel chooser refuse without switching Home', 'no fatal exception'],
+                             'DPAD channel chooser refuses without switching Home', 'no fatal exception'],
                   'coverage': 'stock Android setup safety only; no Xposed, root, real launcher or Home integration'}
         (ARTIFACTS / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
         print(json.dumps(result, indent=2), flush=True)

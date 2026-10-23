@@ -1,8 +1,8 @@
 {
   "result": "passed",
-  "module_version": "0.5",
-  "apk_sha256": "306d49e13b74cb94f94d3da4b7ae66a53b5d8d2f9b01bcbba89471cf0fe612cf",
-  "publisher_sha256": "01b6e3b551a2a6c721002027f31629a2c06f0c11ad4a61598b891440d8fd82b6",
+  "module_version": "0.6",
+  "apk_sha256": "f7411318cc93e15addd6c9cce6bf9270214de98e97e165690feaff68a0d84900",
+  "publisher_sha256": "9a13a468476c5b3bde5980412be16e74ac77266283849603205024234a2d1151",
   "accounts": 0,
   "checks": [
     "empty providers keep apps-only Home",
@@ -26,9 +26,15 @@
   "verified_date": "2026-10-23",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "cleanup": "Passed: test publisher uninstalled, its three provider tables empty, temporary IPv4/IPv6 rules removed.",
+  "limitations": [
+    "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
+    "Complete content suite uses the pinned launcher in the Android 14 emulator; physical TV channel defaults are recorded separately in validation-tv-update.json.",
+    "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
+    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
+  ],
   "evidence": [
     "artifacts/content-result.json",
-    "artifacts/content-smoke-0.5-run.txt",
+    "artifacts/content-smoke-0.6-run.txt",
     "artifacts/content-populated.png",
     "artifacts/content-watch-focus.png",
     "artifacts/content-preview-focus.png",
@@ -55,11 +61,5 @@
     "artifacts/content-final-logcat.txt",
     "artifacts/content-new-channel.png",
     "artifacts/content-new-channel.txt"
-  ],
-  "limitations": [
-    "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
-    "Complete content suite uses the pinned launcher in the Android 14 emulator; physical TV channel defaults are recorded separately in validation-tv-update.json.",
-    "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
-    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
   ]
 }

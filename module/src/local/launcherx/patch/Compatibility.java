@@ -11,8 +11,6 @@ import java.util.zip.ZipFile;
 
 public final class Compatibility {
     public static final String TARGET = "com.google.android.apps.tv.launcherx";
-    public static final String PROBE = "local.launcherx.patch.PROBE";
-    public static final String READY = "launcherx-local:apps:" + BuildConfig.VERSION_CODE + ":anonymous";
 
     public static void verify(Context context) throws Exception {
         PackageInfo info = context.getPackageManager().getPackageInfo(TARGET, 0);

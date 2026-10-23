@@ -12,7 +12,7 @@ serialized release, complete release-history and checksum conventions.
 The **Test** workflow runs on pushes and pull requests to `main`, and can also be
 started manually. It builds and verifies the APK, tests release versioning, and
 uses a stock Android 15 emulator to verify that setup refuses a missing launcher,
-an unsupported version and incorrect executable code. DPAD actions must leave
+an unsupported version and incorrect executable code. The sole **Choose app content** button must refuse via DPAD, leaving
 the default Home unchanged. Test APKs and emulator evidence are uploaded as
 workflow artifacts. These test APKs use temporary keys; use releases for updates.
 
@@ -80,7 +80,7 @@ name. The test refuses an existing launcher/module installation, installs the
 module, and checks missing-launcher rejection. It then installs two deliberately
 incompatible code-free packages to exercise version and executable rejection.
 These packages supply no launcher UI or behavior. Real setup UI and DPAD actions
-must refuse Enable and Choose app content, preserve the default Home, and avoid
+must refuse Choose app content, preserve the default Home, and avoid
 fatal exceptions. Installed test packages are removed in `finally`.
 
 Evidence is saved in `artifacts/ci-smoke/` and uploaded even when a test fails.

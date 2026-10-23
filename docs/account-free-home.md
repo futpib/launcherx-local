@@ -1,9 +1,10 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.5**. The TV has
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.6**. The TV has
 received the store picker and automatic channel defaults; complete content-row
-and playback-link coverage remains emulator-based.
+and playback-link coverage remains emulator-based. The 0.6 Incognito chooser
+and automatic activation have only been tested in the emulator.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -28,7 +29,7 @@ account-free yet.**
 | 12 | **Watchlist, likes, watched markers** | Google’s versions are account-backed. A local watchlist could be implemented with separate storage. |
 | 13 | **Library, purchases, rentals, Family Library, DVR rows** | Google purchases and family access need account entitlements. Provider DVR access depends on that provider. Local media remains accessible through apps. |
 | 14 | **Search and voice assistant** | Disabled by stock apps-only mode. Local app search or another search/voice provider could be added; Google search isn’t proven account-free. [Google’s restrictions](https://support.google.com/googletv/answer/10070784?hl=en) |
-| 15 | **Profile chooser and kids profiles** | Our “Local TV” label works. It is a pseudonymous local profile, not a Google identity. Google profiles, family controls and synchronization remain account-backed. |
+| 15 | **Profile chooser and kids profiles** | **Incognito chooser implemented in 0.6; emulator verified.** Incognito is the initial default and uses the native pseudonymous account. Home opens the stock chooser with Incognito, Google profiles and Add account. Sign-in handoff, cancellation and Incognito persistence are tested with zero accounts; a real Google switching round trip and kids/lock behavior remain unverified. See [profile notes](profiles.md). |
 | 16 | **Clock and date** | **Confirmed in the signed-out emulator dashboard.** Uses local system time. |
 | 17 | **Quick settings** | Network, Bluetooth, accessibility, audio output, display and input shortcuts are local functions. Signed-out dashboard confirmed in the emulator; available tiles depend on the TV. |
 | 18 | **Sleep timer** | Local alarm/power implementation exists. Feature availability and operation haven’t been tested. |
@@ -38,7 +39,7 @@ account-free yet.**
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
 | 23 | **Custom remote-button shortcuts** | App/input shortcut code exists. Potentially local; depends on compatible remote hardware and feature flags. |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
-| 25 | **Top navigation tabs and destinations** | **Home only in 0.5.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
+| 25 | **Top navigation tabs and destinations** | **Home only while Incognito is selected in 0.6.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 
 **Continue watching** and **app-provided content rows** are now connected to Home.
 See [local-content implementation and validation](local-content.md) for the data
@@ -58,7 +59,9 @@ and [tab descriptions](https://support.google.com/googletv/answer/10267283).
 Our account-free setup retains the launcher's existing pseudonymous profile
 (feature **15**); it supplies no Google authentication credentials. In the
 earlier full-feed emulator experiment, the request to load destinations returned
-`UNAUTHENTICATED`. The default module supplies Home locally. The app-channel
+`UNAUTHENTICATED`. In 0.6 the module supplies Home locally while Incognito is selected; choosing a
+Google profile leaves native destinations and feeds to Google, with signed-in UX
+still untested. The app-channel
 visibility settings in **5** control rows inside Home, not top navigation tabs.
 
 | # | Tab | Related feature rows | Account-free status and remaining work |

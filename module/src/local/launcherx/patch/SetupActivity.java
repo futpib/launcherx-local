@@ -24,8 +24,6 @@ import org.json.JSONObject;
 
 public final class SetupActivity extends Activity {
     private static final String TARGET = Compatibility.TARGET;
-    private static final String HOME = TARGET + "/.home.HomeActivity";
-    private static final String BASIC = TARGET + "/.home.VanillaModeHomeActivity";
     private final List<Button> buttons = new ArrayList<>();
     private TextView status;
     private LinearLayout content;
@@ -40,24 +38,13 @@ public final class SetupActivity extends Activity {
         scroll.addView(content);
         setContentView(scroll);
         text("LauncherX Local", 28);
-        text("Account-free Google TV Home for launcher 1.0.785572138 (702401).\n"
-                + "Enable Zygisk in Magisk, install LSPosed and reboot. In LSPosed, enable "
-                + "LauncherX Local and select only Google TV. Then enable local Home below.\n"
-                + "Magisk will ask for root access to switch Home. Google recommendations "
-                + "and the Play Store still need an account.", 17);
+        text("Incognito and Google profiles for launcher 1.0.785572138 (702401).\n"
+                + "Enable Zygisk in Magisk and install LSPosed. In LSPosed, enable LauncherX Local "
+                + "with only Google TV selected, then restart Google TV or reboot. Home activates automatically.\n"
+                + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
+                + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
+                + "To return to stock behavior, disable the module in LSPosed and restart Google TV or reboot.", 17);
         status = text("Checking compatibility…", 18);
-        button("Enable local Home", () -> work(true));
-        button("Restore Basic TV", () -> work(false));
-        button("Open LSPosed", () -> {
-            try {
-                startActivity(new Intent().setComponent(new ComponentName("org.lsposed.manager",
-                        "org.lsposed.manager.ui.activity.MainActivity")));
-            } catch (RuntimeException error) {
-                status.setText("Open LSPosed from its notification, or install its manager APK. "
-                        + "Enable LauncherX Local with only Google TV selected.");
-            }
-        });
-        button("Check compatibility", this::check);
         button("Choose app content", () -> channels(null));
         check();
     }
@@ -100,49 +87,14 @@ public final class SetupActivity extends Activity {
                 Compatibility.verify(this);
                 boolean enabled = getPackageManager().getComponentEnabledSetting(new ComponentName(
                         TARGET, TARGET + ".home.HomeActivity")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-                message = "Compatible launcher. Local Home is " + (enabled ? "selected" : "not selected")
-                        + ". Enable checks the running LSPosed hook before switching.";
+                message = "Compatible launcher. Home is " + (enabled ? "selected" : "not selected")
+                        + ". This checks the installed launcher; activation follows the module in LSPosed.";
             } catch (Exception error) {
-                message = "Cannot enable local Home: " + error.getMessage();
+                message = "Unsupported launcher: " + error.getMessage();
             }
             final String result = message;
             runOnUiThread(() -> busy(false, result));
         }, "launcherx-check").start();
-    }
-
-    private void work(boolean enable) {
-        busy(true, "Waiting for Magisk root access. Allow LauncherX Local when prompted…");
-        new Thread(() -> {
-            try {
-                verifyUser();
-                if (enable) Compatibility.verify(this);
-                String basic = "pm enable --user 0 " + BASIC + " && pm disable --user 0 " + HOME
-                        + " && am force-stop --user 0 " + TARGET + " && am start --user 0 -W -n " + BASIC;
-                String command = basic;
-                if (enable) {
-                    command = "am force-stop --user 0 " + TARGET + " && "
-                            + "am start --user 0 -W -a android.intent.action.MAIN "
-                            + "-c android.intent.category.HOME -p " + TARGET + " >/dev/null 2>&1; "
-                            + "ready=0; for attempt in 1 2 3 4 5; do "
-                            + "probe=$(am broadcast --user 0 --receiver-include-background -a "
-                            + Compatibility.PROBE + " -p " + TARGET + " 2>&1); "
-                            + "case \"$probe\" in *'data=\"" + Compatibility.READY + "\"'*) ready=1; break;; esac; "
-                            + "sleep 1; done; "
-                            + "if [ \"$ready\" != 1 ]; then echo 'Hook not ready. Enable this module in LSPosed, "
-                            + "select only Google TV, restart the launcher, and use a profile without a Google account.'; exit 1; fi; "
-                            + "if pm enable --user 0 " + HOME + " && pm disable --user 0 " + BASIC
-                            + " && am force-stop --user 0 " + TARGET + " && am start --user 0 -W -n " + HOME
-                            + "; then exit 0; else " + basic + "; exit 1; fi";
-                }
-                root(command);
-                runOnUiThread(this::finish);
-            } catch (Exception error) {
-                runOnUiThread(() -> {
-                    startActivity(new Intent(this, SetupActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    busy(false, "No switch completed: " + error.getMessage());
-                });
-            }
-        }, "launcherx-setup").start();
     }
 
     private void channels(String changes) {
@@ -155,7 +107,7 @@ public final class SetupActivity extends Activity {
                         + " -p " + TARGET;
                 if (changes != null) command += " --es changes " + changes;
                 Matcher match = Pattern.compile("data=\"([A-Za-z0-9+/=]+)\"").matcher(root(command));
-                if (!match.find()) throw new IllegalStateException("Enable local Home first, then reopen this chooser.");
+                if (!match.find()) throw new IllegalStateException("Select Incognito in Home, then reopen this chooser. If Home is still Basic TV, enable the module in LSPosed and restart Google TV.");
                 JSONObject result = new JSONObject(new String(Base64.decode(match.group(1), Base64.DEFAULT), StandardCharsets.UTF_8));
                 if (result.has("error")) throw new IllegalStateException(result.getString("error"));
                 JSONArray entries = result.getJSONArray("channels");

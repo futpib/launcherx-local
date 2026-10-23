@@ -60,7 +60,7 @@ final class AppChannels {
                 worker.post(() -> {
                     JSONObject response = new JSONObject();
                     try {
-                        if (!enabled.getAsBoolean()) throw new IllegalStateException("Enable local Home first, without a Google account.");
+                        if (!enabled.getAsBoolean()) throw new IllegalStateException("Select Incognito in Home first.");
                         enableNew(context);
                         JSONArray channels = list(context);
                         String changes = intent.getStringExtra("changes");

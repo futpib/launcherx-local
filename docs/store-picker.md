@@ -1,8 +1,9 @@
 # Add apps through APP_MARKET
 
-LauncherX Local 0.4 redirects the official **Add apps** tile to installed Android
+Introduced in LauncherX Local 0.4, the module redirects the official **Add apps** tile to installed Android
 app stores. It runs only in the default apps build, with local Home enabled and
-no Google account visible to the launcher, under the existing version/DEX guard.
+**Incognito selected** (since 0.6), under the existing version/DEX guard.
+Saved Google accounts do not disable it; selecting a Google profile does.
 The picker and F-Droid handoff were verified on the physical TV with 0.4. The
 larger discovery and store matrix below uses the isolated emulator.
 

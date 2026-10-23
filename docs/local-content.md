@@ -2,8 +2,9 @@
 
 LauncherX Local connects Android's local TV provider to the pinned launcher's
 existing row and card renderer. This does not unlock Google's recommendation
-backend. It works only while local Home is selected and the launcher sees no
-Google account.
+backend. Since 0.6 it works while Home is active and **Incognito** is selected,
+even when Google accounts are saved on the TV. Google profiles use stock Home.
+These provider rows and visibility settings are shared within the Android user.
 
 ## Data and rendering
 
@@ -16,8 +17,7 @@ Google account.
   by descending weight. Channels default to enabled on first discovery. Google's
   `ljf` converter formats the published cards.
 - Cards are wrapped in native `aagk` / `lfs` / `lft` objects and appended after the
-  bundled apps row at `igc.w`. No replacement launcher UI or remote-navigation
-  hooks are installed. These obfuscated names are supported only for the exact
+  bundled apps row at `igc.w`. The content integration uses native remote navigation and card UI. These obfuscated names are supported only for the exact
   executable hashes in `compatibility.json`.
 
 Provider reads and conversion run on a worker thread. Debounced content observers
@@ -48,12 +48,12 @@ The setup app's **Choose app content** dialog lists up to 80 published preview
 channels. Saving changes updates only the selected channels' `browsable` flags
 through `ContentResolver`. The launcher-side receiver requires the sender to hold
 `android.permission.DUMP`; setup reaches it through its existing Magisk root
-grant. It also checks that local Home is enabled and no Google account is visible.
+grant. It also checks that Home is enabled and Incognito is selected.
 Channel IDs and values are validated before writes. The chooser also initializes
 any newly discovered channels, so its initial checkboxes match Home's defaults.
 
 Watch Next entries appear when apps publish them. Hidden Watch Next entries and
-hidden preview programs are respected. Restoring Basic TV makes these hooks
+hidden preview programs are respected. Disabling the module makes these hooks
 inactive; channel visibility choices remain in the ordinary Android TV provider.
 
 ## Verification

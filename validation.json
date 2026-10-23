@@ -1,9 +1,8 @@
 {
   "result": "passed",
-  "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
+  "apk_sha256": "f7411318cc93e15addd6c9cce6bf9270214de98e97e165690feaff68a0d84900",
   "accounts": 0,
   "apps": [
-    "Live TV",
     "YouTube",
     "YouTube Music",
     "TV Bro",
@@ -18,8 +17,8 @@
     "no launcher fatal exception"
   ],
   "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
+  "module_version": "0.6",
   "verified_date": "2026-10-23",
-  "module_version": "0.4",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "framework": {
     "magisk": "30.7",
@@ -27,47 +26,55 @@
   },
   "physical_tv_tested": false,
   "physical_tv_record": {
-    "path": "validation-tv.json",
-    "module_version": "0.2",
-    "note": "Historical device validation; 0.3 and 0.4 were tested only in the emulator."
+    "path": "validation-tv-update.json",
+    "module_version": "0.5",
+    "note": "Historical device validation; 0.6 is emulator-tested only and was not installed on the TV."
   },
   "setup": {
     "result": "passed",
-    "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
+    "apk_sha256": "f7411318cc93e15addd6c9cce6bf9270214de98e97e165690feaff68a0d84900",
     "checks": [
-      "DPAD setup controls",
-      "Restore Basic TV",
-      "version mismatch refused before switching Home",
-      "dex mismatch refused before switching Home",
-      "Enable local Home"
+      "Basic TV automatically becomes Incognito Home when the module loads",
+      "disabling in LSPosed and restarting restores stock signed-out setup UI with zero accounts",
+      "re-enabling in LSPosed and restarting automatically restores Incognito Home",
+      "settings app has only Choose app content and passive compatibility status",
+      "version mismatch refuses hooks, automatic activation and channel changes",
+      "dex mismatch refuses hooks, automatic activation and channel changes"
     ],
-    "fixture": "isolated emulator; negative variants alter module compatibility metadata only"
+    "physical_tv_tested": false,
+    "fixture": "isolated emulator; actual LSPosed UI; negative module metadata variants"
   },
+  "profiles_record": "validation-profiles.json",
+  "authenticated_google_roundtrip_tested": false,
   "local_content_record": "validation-content.json",
-  "local_content_reboot": "passed",
-  "historical_manual_negative_checks": {
-    "module_version": "0.2",
-    "checks": [
-      "Magisk root denial left Home unchanged",
-      "LSPosed module disabled: activation refused without switching Basic TV"
-    ]
+  "store_picker_record": {
+    "path": "validation-market.json",
+    "note": "Historical full store matrix; store discovery code unchanged in 0.6, but its guard now follows the active Incognito profile."
   },
+  "stock_ci_record": "validation-ci.json",
   "prior_full_feed_experiment": "real requests rejected with UNAUTHENTICATED and PERMISSION_DENIED",
   "evidence": [
     "artifacts/smoke-result.json",
+    "artifacts/profile-base-smoke.txt",
     "artifacts/smoke-home.png",
-    "artifacts/smoke-native-focus.png",
-    "artifacts/smoke-browser-focus.png",
-    "artifacts/smoke-browser.png",
     "artifacts/smoke-browser-activity.txt",
     "artifacts/smoke-return-home.png",
     "artifacts/smoke-restarted.png",
     "artifacts/smoke-logcat.txt",
     "artifacts/setup-result.json",
-    "artifacts/setup-restored-basic.png",
-    "artifacts/setup-refuse-version-result.xml",
-    "artifacts/setup-refuse-dex-result.xml",
-    "artifacts/setup-roundtrip-home.png"
+    "artifacts/setup-auto-run.txt",
+    "artifacts/setup-auto-home.png",
+    "artifacts/setup-module-disabled.png",
+    "artifacts/setup-module-disabled-activity.txt",
+    "artifacts/setup-module-reenabled.png",
+    "artifacts/setup-one-control.png",
+    "artifacts/setup-refuse-version-logcat.txt",
+    "artifacts/setup-refuse-dex-logcat.txt"
   ],
-  "store_picker_record": "validation-market.json"
+  "limitations": [
+    "The disabled module shows the stock signed-out setup UI inside HomeActivity in this emulator; restoring the original component flags is not claimed.",
+    "Real Google authentication, account switching, child/lock behavior and signed-in removal remain unverified.",
+    "UIAutomator can trigger a stock accessibility-focus exception; uninterrupted remote profile tests use screenshots/OCR."
+  ],
+  "local_content_reboot": "passed"
 }

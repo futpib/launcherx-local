@@ -46,9 +46,9 @@ The actual fixture setup was:
 7. Set `device_provisioned`, `user_setup_complete`, and `tv_user_setup_complete`
    to 1, without adding an account. Install the built module APK. In LSPosed,
    enable **LauncherX Local** with only **Google TV** selected (user 0).
-8. Enable `com.google.android.apps.tv.launcherx/.home.HomeActivity` with root,
-   force-stop the launcher, and launch that activity. The launcher itself
-   disables its alternative VanillaMode component on this path.
+8. Restart Google TV and press Home. Starting with 0.6, the verified module
+   selects Home automatically, including when the previous selection was Basic TV.
+   No separate companion-app activation or root grant is needed for that switch.
 
 These fixture operations are specific to the isolated emulator. Do not copy the
 emulator system overlay to the TV.
@@ -95,22 +95,29 @@ credentials. It refuses to load outside this named emulator. The default apps
 build and its UI smoke test do **not** enable this workaround.
 
 
-## Setup and compatibility tests
+## Activation, profiles and compatibility tests
 
-The fixture must have LauncherX Local enabled in LSPosed and root granted to
-LauncherX Local through Magisk's Superuser UI. Run:
+The fixture must have LauncherX Local enabled in LSPosed. The companion app only
+needs a Magisk root grant for its **Choose app content** action. Run:
 
 ```sh
 python3 scripts/setup_smoke.py
-python3 scripts/smoke.py --reboot
+python3 scripts/profile_smoke.py
+python3 scripts/smoke.py
 ```
 
-The setup test uses DPAD to restore Basic TV and enable local Home. It also
-builds isolated negative variants with an incorrect launcher version and DEX
-hash, installs them only in the guarded emulator, and verifies that setup
-refuses to switch Home. A `finally` block restores the normal module APK.
-The source compatibility manifest and original launcher APK remain unchanged.
-The negative builds also exercise building without a proprietary launcher APK.
+The setup test verifies automatic activation from Basic TV without opening the
+companion app, then uses the real LSPosed UI to disable the module, check the stock
+signed-out screen, re-enable it and check automatic Home activation again. It
+asserts the companion app has only Choose app content and passive status text.
+Negative variants with incorrect version and DEX metadata must refuse hooks,
+activation and channel changes. A `finally` block restores the normal APK and
+enabled module. These variants also exercise builds without a proprietary APK.
+
+The profile test uses Tesseract, screenshots and DPAD to select Incognito, open
+Google's actual sign-in screen, cancel, restart Home and reboot. It asserts zero
+accounts throughout. It does not complete authentication or test switching among
+real Google profiles. See [profile test boundaries](profiles.md).
 
 For the local-content features, run `python3 scripts/content_smoke.py`. Its
 separate publisher inserts real Watch Next and preview-channel entries, exercises
@@ -134,11 +141,6 @@ It temporarily disables only emulator Google Play for the empty-list case and
 restores its exact enabled state in `finally`. Test packages are uninstalled and
 the initial handler list is checked after cleanup. The physical TV is never
 selected. See [store-picker test notes](store-picker.md).
-
-A disabled-framework-module test was performed separately through LSPosed's UI:
-with LauncherX Local disabled, Enable refused to change Basic TV; re-enabling
-only Google TV scope allowed Enable to restart the launcher and activate Home.
-A denied Magisk root request also left Home unchanged.
 
 UIAutomator can disturb this launcher's accessibility focus. On the physical TV,
 a ViewRootImpl accessibility-focus exception occurred before this patch was
