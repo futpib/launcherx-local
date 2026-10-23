@@ -11,7 +11,6 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 API_SHA256 = "f48c635f1c7469fdec0e00ad2ea0b7a6b2f5b55065784a35b7ca3a84615e8e25"
-LAUNCHER_SHA256 = "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5"
 
 
 def run(*args):
@@ -20,13 +19,19 @@ def run(*args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--launcher", type=Path, default=ROOT / "artifacts/launcher-original.apk")
+    parser.add_argument("--launcher", type=Path, help="Optionally verify a privately obtained launcher APK")
     parser.add_argument("--api", type=Path, default=ROOT / "artifacts/xposed-api-82.jar")
     parser.add_argument("--mode", choices=["apps", "full"], default="apps")
     parser.add_argument("--emulator-network", action="store_true",
                         help="Use Android HttpEngine in the ARM-on-x86 emulator fixture")
+    parser.add_argument("--keystore", type=Path, help="Release key; passwords come from LAUNCHERX_STORE_PASS and LAUNCHERX_KEY_PASS")
+    parser.add_argument("--key-alias", default="local")
     args = parser.parse_args()
-    for path, expected in [(args.launcher, LAUNCHER_SHA256), (args.api, API_SHA256)]:
+    compatibility = json.loads((ROOT / "compatibility.json").read_text())
+    inputs = [(args.api, API_SHA256)]
+    if args.launcher:
+        inputs.append((args.launcher, compatibility["apk_sha256"]))
+    for path, expected in inputs:
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise SystemExit(f"Unexpected input SHA-256: {path}")
     sdk = Path(os.environ.get("ANDROID_HOME", str(Path.home() / "Android/Sdk")))
@@ -37,18 +42,23 @@ def main():
     for name in ["classes", "dex"]:
         shutil.rmtree(build / name, ignore_errors=True)
         (build / name).mkdir()
-    with zipfile.ZipFile(args.launcher) as apk:
-        hashes = [(name, hashlib.sha256(apk.read(name)).hexdigest())
-                  for name in sorted(apk.namelist()) if name.endswith(".dex") and "/" not in name]
+    hashes = compatibility["dex_sha256"]
+    if args.launcher:
+        with zipfile.ZipFile(args.launcher) as apk:
+            actual = [[name, hashlib.sha256(apk.read(name)).hexdigest()]
+                      for name in sorted(apk.namelist()) if name.endswith(".dex") and "/" not in name]
+        if actual != hashes:
+            raise SystemExit("Launcher DEX hashes differ from compatibility.json")
     generated = build / "BuildConfig.java"
     entries = ",\n".join("{" + json.dumps(name) + "," + json.dumps(digest) + "}" for name, digest in hashes)
     generated.write_text("package local.launcherx.patch;\npublic final class BuildConfig {\n"
-                         "public static final long VERSION_CODE = 702401L;\n"
+                         f"public static final long VERSION_CODE = {compatibility['version_code']}L;\n"
                          f'public static final String MODE = "{args.mode}";\n'
                          f"public static final boolean APPS_ONLY = {str(args.mode == 'apps').lower()};\n"
                          f"public static final boolean EMULATOR_NETWORK = {str(args.emulator_network).lower()};\n"
                          "public static final String[][] DEX_HASHES = {" + entries + "};\n}\n")
-    run("javac", "-source", "8", "-target", "8", "-Xlint:-options", "-bootclasspath", android,
+    run("javac", "-source", "8", "-target", "8", "-Xlint:-options", "-bootclasspath",
+        f"{android}:{tools / 'core-lambda-stubs.jar'}",
         "-classpath", f"{android}:{args.api}", "-d", build / "classes", generated,
         *sorted((ROOT / "module/src").rglob("*.java")))
     run(tools / "d8", "--min-api", "29", "--lib", android, "--classpath", args.api,
@@ -59,19 +69,26 @@ def main():
     with zipfile.ZipFile(build / "unsigned.apk", "a", compression=zipfile.ZIP_DEFLATED) as apk:
         apk.write(build / "dex/classes.dex", "classes.dex")
     run(tools / "zipalign", "-f", "4", build / "unsigned.apk", build / "aligned.apk")
-    key = ROOT / ".cache/local.keystore"
+    key = args.keystore or ROOT / ".cache/local.keystore"
     key.parent.mkdir(exist_ok=True)
+    if args.keystore and not key.exists():
+        raise SystemExit("Release keystore does not exist")
+    if args.keystore and not all(os.environ.get(name) for name in ["LAUNCHERX_STORE_PASS", "LAUNCHERX_KEY_PASS"]):
+        raise SystemExit("Set LAUNCHERX_STORE_PASS and LAUNCHERX_KEY_PASS for release signing")
     if not key.exists():
         run("keytool", "-genkeypair", "-keystore", key, "-alias", "local", "-storepass", "android",
             "-keypass", "android", "-keyalg", "RSA", "-keysize", "2048", "-validity", "3650",
             "-dname", "CN=LauncherX Local Experiment")
     output = build / "launcherx-local.apk"
-    run(tools / "apksigner", "sign", "--ks", key, "--ks-key-alias", "local", "--ks-pass", "pass:android",
-        "--key-pass", "pass:android", "--out", output, build / "aligned.apk")
+    run(tools / "apksigner", "sign", "--ks", key, "--ks-key-alias", args.key_alias,
+        "--ks-pass", "env:LAUNCHERX_STORE_PASS" if args.keystore else "pass:android",
+        "--key-pass", "env:LAUNCHERX_KEY_PASS" if args.keystore else "pass:android",
+        "--out", output, build / "aligned.apk")
     run(tools / "apksigner", "verify", output)
     (build / "receipt.json").write_text(json.dumps({"mode": args.mode,
         "emulator_network": args.emulator_network, "apk": str(output),
         "sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "launcher_dex": hashes}, indent=2) + "\n")
+    (build / "SHA256SUMS").write_text(hashlib.sha256(output.read_bytes()).hexdigest() + "  " + output.name + "\n")
     print(output)
 
 

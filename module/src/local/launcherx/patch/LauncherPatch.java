@@ -3,23 +3,24 @@ package local.launcherx.patch;
 import android.accounts.AccountManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageInfo;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public final class LauncherPatch implements IXposedHookLoadPackage {
     private static final String TARGET = "com.google.android.apps.tv.launcherx";
@@ -36,56 +37,48 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 if (installed) return;
                 context = (Context) hook.args[0];
                 try {
-                    verifyBuild(context);
+                    Compatibility.verify(context);
                     installHooks(param.classLoader);
                     installed = true;
                     event("installed mode=" + BuildConfig.MODE + " version=" + BuildConfig.VERSION_CODE);
                 } catch (Throwable error) {
                     Log.e(TAG, "Patch refused; launcher remains unmodified", error);
                     XposedBridge.log(error);
+                    return;
+                }
+                try {
+                    BroadcastReceiver probe = new BroadcastReceiver() {
+                        @Override public void onReceive(Context receiverContext, Intent intent) {
+                            setResultData(BuildConfig.APPS_ONLY && noGoogleAccount()
+                                    ? Compatibility.READY : "launcherx-local:unavailable");
+                        }
+                    };
+                    IntentFilter filter = new IntentFilter(Compatibility.PROBE);
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        context.registerReceiver(probe, filter, "android.permission.DUMP", null,
+                                Context.RECEIVER_EXPORTED);
+                    } else {
+                        context.registerReceiver(probe, filter, "android.permission.DUMP", null);
+                    }
+                } catch (Throwable error) {
+                    Log.e(TAG, "Setup probe unavailable", error);
                 }
             }
         });
     }
 
     private boolean anonymous() {
+        return context.getPackageManager().getComponentEnabledSetting(new ComponentName(TARGET,
+                TARGET + ".home.HomeActivity")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                && noGoogleAccount();
+    }
+
+    private boolean noGoogleAccount() {
         try {
             return AccountManager.get(context).getAccountsByType("com.google").length == 0;
         } catch (RuntimeException error) {
             Log.e(TAG, "Cannot verify account state; leaving original behavior", error);
             return false;
-        }
-    }
-
-    private static void verifyBuild(Context context) throws Exception {
-        PackageInfo info = context.getPackageManager().getPackageInfo(TARGET, 0);
-        if (info.getLongVersionCode() != BuildConfig.VERSION_CODE) {
-            throw new IllegalStateException("Unsupported launcher version " + info.getLongVersionCode());
-        }
-        // Gate on executable code, allowing separately documented emulator ABI adaptation.
-        try (ZipFile apk = new ZipFile(info.applicationInfo.sourceDir)) {
-            Set<String> dexNames = new HashSet<>();
-            java.util.Enumeration<? extends ZipEntry> entries = apk.entries();
-            while (entries.hasMoreElements()) {
-                String name = entries.nextElement().getName();
-                if (name.endsWith(".dex") && !name.contains("/")) dexNames.add(name);
-            }
-            if (dexNames.size() != BuildConfig.DEX_HASHES.length) {
-                throw new IllegalStateException("Unexpected executable code entries");
-            }
-            for (String[] expected : BuildConfig.DEX_HASHES) {
-                ZipEntry entry = apk.getEntry(expected[0]);
-                if (entry == null) throw new IllegalStateException("Missing " + expected[0]);
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                try (InputStream input = apk.getInputStream(entry)) {
-                    byte[] buffer = new byte[32768];
-                    int count;
-                    while ((count = input.read(buffer)) != -1) digest.update(buffer, 0, count);
-                }
-                StringBuilder hex = new StringBuilder();
-                for (byte value : digest.digest()) hex.append(String.format("%02x", value & 255));
-                if (!expected[1].contentEquals(hex)) throw new IllegalStateException("Code mismatch: " + expected[0]);
-            }
         }
     }
 

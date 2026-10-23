@@ -1,12 +1,13 @@
 {
   "result": "passed",
-  "apk_sha256": "1d64b6ee7eed7ae97afcccec4379f19d3e86864970e00356ca2be43d2d5f12d1",
+  "apk_sha256": "2614b59b28aecc2b53f8d77bfa41331e9cd46300d1e833672d07bea2a993a162",
   "accounts": 0,
   "apps": [
     "Live TV",
     "YouTube",
     "YouTube Music",
-    "TV Bro"
+    "TV Bro",
+    "LauncherX Local"
   ],
   "reboot": true,
   "checks": [
@@ -17,13 +18,30 @@
     "no launcher fatal exception"
   ],
   "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
+  "module_version": "0.2",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
-  "rollback": "passed: original setup prompt with module disabled; re-enabled for final smoke",
   "framework": {
     "magisk": "30.7",
     "lsposed": "1.9.2 (7024) Zygisk"
   },
-  "physical_tv_tested": false,
+  "physical_tv_tested": true,
+  "physical_tv_record": "validation-tv.json",
+  "setup": {
+    "result": "passed",
+    "apk_sha256": "2614b59b28aecc2b53f8d77bfa41331e9cd46300d1e833672d07bea2a993a162",
+    "checks": [
+      "DPAD setup controls",
+      "Restore Basic TV",
+      "version mismatch refused before switching Home",
+      "dex mismatch refused before switching Home",
+      "Enable local Home"
+    ],
+    "fixture": "isolated emulator; negative variants alter module compatibility metadata only"
+  },
+  "manual_negative_checks": [
+    "Magisk root denial left Home unchanged",
+    "LSPosed module disabled: activation refused without switching Basic TV"
+  ],
   "full_feed": "real requests rejected with UNAUTHENTICATED and PERMISSION_DENIED",
   "evidence": [
     "artifacts/smoke-home.png",
@@ -38,6 +56,9 @@
     "artifacts/rollback-stock.png",
     "artifacts/rollback-stock-logcat.txt",
     "artifacts/full-emulator-logcat.txt",
-    "artifacts/reorder-no-inspector.png"
+    "artifacts/reorder-no-inspector.png",
+    "artifacts/setup-result.json",
+    "artifacts/setup-hook-refused.xml",
+    "artifacts/setup-after-prompt.xml"
   ]
 }

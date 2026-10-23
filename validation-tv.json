@@ -1,0 +1,86 @@
+{
+  "result": "passed",
+  "module_version": "0.2",
+  "apk_sha256": "2614b59b28aecc2b53f8d77bfa41331e9cd46300d1e833672d07bea2a993a162",
+  "device": {
+    "model": "MiTV-MOEU0",
+    "device": "ladybird",
+    "android": 14,
+    "abi": "armeabi-v7a",
+    "firmware": "UKN1.240806.017/V816.0.25.8.19.03.1.ULBMIXM"
+  },
+  "launcher": {
+    "package": "com.google.android.apps.tv.launcherx",
+    "version_name": "1.0.785572138",
+    "version_code": 702401,
+    "apk_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
+    "dex_sha256": [
+      [
+        "classes.dex",
+        "cdd044ad560b5fe5b4c37804e44bd797791459f412d7a949c3765677ab5c5dce"
+      ],
+      [
+        "classes2.dex",
+        "a32569a96162538062e11b5f89bdf6abd45106b307da61318a73355d61b28c24"
+      ],
+      [
+        "classes3.dex",
+        "6c557e33f4b18951b05bc3364a3f3a64a6c431ecc2a82018ed3af001b8d216f1"
+      ],
+      [
+        "classes4.dex",
+        "0beb2f768845139e153c5040e71afb7ea0ab686348aa26a181665e1a06610188"
+      ]
+    ]
+  },
+  "framework": {
+    "magisk": "30.7",
+    "lsposed": "1.9.2 (7024) Zygisk"
+  },
+  "accounts": 0,
+  "checks": [
+    "Magisk UI enabled Zygisk and installed official LSPosed ZIP",
+    "Material Files obtained through F-Droid supplied the missing file picker",
+    "Patch installed and updated through the Android package installer",
+    "LSPosed module enabled with only Google TV selected",
+    "Setup app received root through the Magisk prompt",
+    "Native DPAD launched TV Bro from Google TV",
+    "Home key returned to official HomeActivity",
+    "DPAD Restore Basic TV and Enable local Home round trip",
+    "Official local Home and live hook persisted after reboot",
+    "Zero accounts before and after reboot",
+    "Original launcher APK SHA-256 unchanged",
+    "Installed patch APK matches the final emulator-tested artifact",
+    "Crash log buffer empty after final reboot"
+  ],
+  "limitations": [
+    "Only this exact launcher build and owner user tested",
+    "Signed-in account behavior untested",
+    "Personalized Google feeds and Play Store authentication remain unavailable",
+    "Framework manager UIs may need a pointer; setup app DPAD verified"
+  ],
+  "observations": [
+    "A ViewRootImpl accessibility-focus exception was recorded before patch activation while UIAutomator was in use; original log retained",
+    "The 256 KiB main log buffer overwrote early boot hook messages; reboot verification used the live probe, saved LSPosed startup log, rendered Home, and empty crash buffer"
+  ],
+  "evidence": [
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/lsposed-install-result.xml",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/patch-tv-enabled.xml",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/installed-module-package.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/installed-module-sha256.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-native-focus-10.png",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-native-browser-activity.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-home-return-activity.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-restored-basic.png",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-reenabled-home.png",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-rebooted-home.png",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-rebooted-activities.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/tv-rebooted-accounts.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/postboot-probe.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/postboot-framework-log.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/postboot-crash-buffer.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/original-hash-after.txt",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/reboot-result.json",
+    "/home/claude/code/launcherx-local/artifacts/tv-deploy-20261023-205545/patch-hooks.txt"
+  ]
+}
