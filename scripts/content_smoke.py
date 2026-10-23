@@ -228,7 +228,8 @@ def main():
         checks.append('deleting the last entries removes empty rows live')
         assert 'Accounts: 0' in shell('dumpsys account')
         check_logs('content')
-        result = {'result': 'passed', 'module_version': '0.3',
+        result = {'result': 'passed', 'module_version': ET.parse(ROOT / 'module/AndroidManifest.xml').getroot().get(
+                      '{http://schemas.android.com/apk/res/android}versionName'),
                   'apk_sha256': digest,
                   'publisher_sha256': hashlib.sha256(fixture.read_bytes()).hexdigest(),
                   'accounts': 0, 'checks': checks, 'physical_tv_tested': False,

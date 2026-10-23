@@ -1,7 +1,7 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.3**; physical TV
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.4**; physical TV
 validation remains at **0.2**.
 
 The original apps-only screen now also supports local content rows. More local
@@ -15,7 +15,7 @@ account-free yet.**
 |---|---|---|
 | 1 | **Your apps** | **Working on your TV:** display installed TV apps, navigate, and launch them. |
 | 2 | **Reorder and app menus** | Local functionality. Reorder UI was observed; persistent reordering wasn’t tested. |
-| 3 | **Add apps / app catalogue** | Stock installation uses Google Play. F-Droid and Obtainium work separately; we could redirect this button. |
+| 3 | **Add apps / app catalogue** | **Implemented in 0.4; emulator verified.** Opens Android's chooser for installed `MAIN` + `APP_MARKET` handlers, including F-Droid and Aurora. One store opens directly; an empty list shows an explanation. Each store retains its own account requirements. Not yet installed on the physical TV. |
 | 4 | **Continue watching / Watch Next** | **Implemented in 0.3; emulator verified.** Native cards, artwork, episode information, resume progress and app playback links from browsable local Watch Next entries. Requires participating apps to publish entries; not yet tested on the physical TV. |
 | 5 | **App-provided content rows** | **Implemented in 0.3; emulator verified.** Native rows from enabled local preview channels, with a remote-controlled channel chooser in setup. Refreshes after app changes and opens app playback links; not yet tested on the physical TV. |
 | 6 | **Featured banners, trailers, promotions** | Rendering exists, but stock content is supplied remotely. We could populate these with another source; merely exposing the UI won’t supply content. |
@@ -41,6 +41,9 @@ account-free yet.**
 **Continue watching** and **app-provided content rows** are now connected to Home.
 See [local-content implementation and validation](local-content.md) for the data
 sources, supported behavior and test boundaries.
+
+**Add apps** now discovers installed stores through `APP_MARKET`. See the
+[store-picker notes](store-picker.md) for matching rules and emulator evidence.
 
 “Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The additional
 signed-out dashboard inspection ran only in the emulator; the physical TV was

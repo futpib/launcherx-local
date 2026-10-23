@@ -1,6 +1,6 @@
 {
   "result": "passed",
-  "apk_sha256": "82af4d40dc0db0c33f23c1fcecf29a337145ecae7500b66ed84b66c70b6c0df3",
+  "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
   "accounts": 0,
   "apps": [
     "Live TV",
@@ -19,7 +19,7 @@
   ],
   "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
   "verified_date": "2026-10-23",
-  "module_version": "0.3",
+  "module_version": "0.4",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "framework": {
     "magisk": "30.7",
@@ -29,11 +29,11 @@
   "physical_tv_record": {
     "path": "validation-tv.json",
     "module_version": "0.2",
-    "note": "Historical device validation; 0.3 was not installed on the physical TV."
+    "note": "Historical device validation; 0.3 and 0.4 were tested only in the emulator."
   },
   "setup": {
     "result": "passed",
-    "apk_sha256": "82af4d40dc0db0c33f23c1fcecf29a337145ecae7500b66ed84b66c70b6c0df3",
+    "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
     "checks": [
       "DPAD setup controls",
       "Restore Basic TV",
@@ -68,5 +68,6 @@
     "artifacts/setup-refuse-version-result.xml",
     "artifacts/setup-refuse-dex-result.xml",
     "artifacts/setup-roundtrip-home.png"
-  ]
+  ],
+  "store_picker_record": "validation-market.json"
 }

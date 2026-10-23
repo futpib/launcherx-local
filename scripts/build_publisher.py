@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the separate emulator-only TvContract test publisher, never shipped in the module."""
+"""Build emulator-only fixture APKs, never shipped in the module."""
 import shutil
 import zipfile
 
@@ -7,11 +7,13 @@ from build import ROOT, run
 from lab import SDK
 
 
-def build():
+def build(kind='publisher'):
+    if kind not in ('publisher', 'markets'):
+        raise ValueError(kind)
     tools = SDK / 'build-tools/37.0.0'
     android = SDK / 'platforms/android-34/android.jar'
-    source = ROOT / 'tests/publisher'
-    output = ROOT / 'build/publisher'
+    source = ROOT / 'tests' / kind
+    output = ROOT / 'build' / kind
     shutil.rmtree(output, ignore_errors=True)
     for directory in ('classes', 'dex'):
         (output / directory).mkdir(parents=True)
@@ -24,7 +26,7 @@ def build():
     with zipfile.ZipFile(output / 'unsigned.apk', 'a', compression=zipfile.ZIP_DEFLATED) as apk:
         apk.write(output / 'dex/classes.dex', 'classes.dex')
     run(tools / 'zipalign', '-f', '4', output / 'unsigned.apk', output / 'aligned.apk')
-    apk = output / 'publisher.apk'
+    apk = output / (kind + '.apk')
     run(tools / 'apksigner', 'sign', '--ks', ROOT / '.cache/local.keystore', '--ks-key-alias', 'local',
         '--ks-pass', 'pass:android', '--out', apk, output / 'aligned.apk')
     return apk

@@ -1,0 +1,52 @@
+{
+  "result": "passed",
+  "module_version": "0.4",
+  "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
+  "fixture_sha256": "3391e7251febe6473af5fc466ae0402f9f718a18be93f353f56b5010482c4b59",
+  "checks": [
+    "one store opens directly; Back returns to Home",
+    "five choices include a handler without DEFAULT; disabled, private, permission-gated and non-market activities excluded",
+    "DPAD can select the fifth choice; actual receiver confirms component, action and category",
+    "install and component disabling refresh choices without restarting Home; Back cancels chooser",
+    "uninstall and app disabling refresh live; zero stores shows a dismissible explanation",
+    "real F-Droid and Aurora appear automatically and both launch through DPAD selection",
+    "zero Google accounts and no fatal exceptions or picker errors"
+  ],
+  "stores": {
+    "org.fdroid.fdroid": {
+      "version_name": "2.0.2",
+      "apk_sha256": "19d51fad482239f6df6a99120e34513667e9a86d136dafdc4a211a68c3327b52"
+    },
+    "com.aurora.store": {
+      "version_name": "4.8.4",
+      "apk_sha256": "fd9c75d90d0f4a7c132b9b4a5a2cf1992a45e03b8d8ff988b7dcfbc0db2c4d11"
+    }
+  },
+  "accounts": 0,
+  "physical_tv_tested": false,
+  "fixture": "isolated Google TV API 34 emulator; original launcher; actual system chooser and DPAD",
+  "cleanup": "fixture and real store apps removed; original Play Store state and handler list restored",
+  "limitations": "Store entry screens tested; store onboarding, downloads and installation inside stores not exercised.",
+  "verified_date": "2026-10-23",
+  "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
+  "evidence": [
+    "artifacts/market-result.json",
+    "artifacts/market-smoke-run.txt",
+    "artifacts/market-single.png",
+    "artifacts/market-many.png",
+    "artifacts/market-alpha.png",
+    "artifacts/market-alpha-receipt.txt",
+    "artifacts/market-gamma.png",
+    "artifacts/market-gamma-receipt.txt",
+    "artifacts/market-disabled.png",
+    "artifacts/market-empty.png",
+    "artifacts/market-real-handlers.txt",
+    "artifacts/market-real-chooser.png",
+    "artifacts/market-real-aurora.png",
+    "artifacts/market-real-aurora-activity.txt",
+    "artifacts/market-real-fdroid.png",
+    "artifacts/market-real-fdroid-activity.txt",
+    "artifacts/market-logcat.txt",
+    "artifacts/market-final-logcat.txt"
+  ]
+}

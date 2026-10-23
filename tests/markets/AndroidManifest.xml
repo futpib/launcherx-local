@@ -1,0 +1,56 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.launcherx.markets" android:versionCode="1" android:versionName="1">
+    <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34" />
+    <permission android:name="local.launcherx.markets.PRIVATE" android:protectionLevel="signature" />
+    <application android:label="Store picker fixture" android:theme="@android:style/Theme.Material.NoActionBar">
+        <activity android:name=".ReceiptActivity" android:exported="false" />
+        <activity-alias android:name=".Alpha" android:targetActivity=".ReceiptActivity" android:label="Alpha market" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Beta" android:targetActivity=".ReceiptActivity" android:label="Beta market" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Gamma" android:targetActivity=".ReceiptActivity" android:label="Gamma market" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Delta" android:targetActivity=".ReceiptActivity" android:label="Delta market" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Disabled" android:targetActivity=".ReceiptActivity" android:label="Disabled market" android:exported="true" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Private" android:targetActivity=".ReceiptActivity" android:label="Private market" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Protected" android:targetActivity=".ReceiptActivity" android:label="Protected market" android:exported="true" android:permission="local.launcherx.markets.PRIVATE">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MARKET" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias android:name=".Ordinary" android:targetActivity=".ReceiptActivity" android:label="Ordinary app" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+    </application>
+</manifest>

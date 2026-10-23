@@ -1,8 +1,8 @@
 {
   "result": "passed",
-  "module_version": "0.3",
-  "apk_sha256": "82af4d40dc0db0c33f23c1fcecf29a337145ecae7500b66ed84b66c70b6c0df3",
-  "publisher_sha256": "d6ac8bd251f096115b0bc35602b1b6f8a9b0567c502d7d728216ffe793caeaec",
+  "module_version": "0.4",
+  "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
+  "publisher_sha256": "f0e4fe4c541549b9f7b0659bf9bd5aa2b03b2304870215e66f3cafbb194b2903",
   "accounts": 0,
   "checks": [
     "empty providers keep apps-only Home",
@@ -25,10 +25,9 @@
   "cleanup": "Passed: test publisher uninstalled, its three provider tables empty, temporary IPv4/IPv6 rules removed.",
   "limitations": [
     "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
-    "Only the pinned launcher executable and account-free Android 14 emulator were tested for 0.3; physical TV remains on 0.2.",
+    "Only the pinned launcher executable and account-free Android 14 emulator were tested for 0.4; physical TV remains on 0.2.",
     "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
-    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline.",
-    "The final complete run passed reboot and both pre/post-reboot fatal-exception checks without restarting the emulator host. An earlier run required a host cold-start after the emulator exited during reboot."
+    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
   ],
   "evidence": [
     "artifacts/content-result.json",
@@ -56,7 +55,6 @@
     "artifacts/content-cleared.png",
     "artifacts/content-before-reboot-logcat.txt",
     "artifacts/content-logcat.txt",
-    "artifacts/content-final-logcat.txt",
-    "artifacts/content-uiautomator-failure-logcat.txt"
+    "artifacts/content-final-logcat.txt"
   ]
 }

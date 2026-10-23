@@ -118,6 +118,23 @@ the setup chooser and native DPAD playback links, and removes its records and
 package afterward. It temporarily blocks only the launcher's network traffic
 inside the emulator. See [local-content test notes](local-content.md).
 
+For the store picker, download the unmodified store APKs to
+`artifacts/market-fdroid.apk` from `https://f-droid.org/F-Droid.apk` and
+`artifacts/market-aurora.apk` from
+`https://f-droid.org/repo/com.aurora.store_76.apk`. Start with only Google Play
+registered as an app store in the emulator, then run:
+
+```sh
+python3 scripts/market_smoke.py
+```
+
+This uses `tesseract` for screenshot text checks. The test builds a separate
+fixture with multiple `APP_MARKET` entry points, then checks real store APKs.
+It temporarily disables only emulator Google Play for the empty-list case and
+restores its exact enabled state in `finally`. Test packages are uninstalled and
+the initial handler list is checked after cleanup. The physical TV is never
+selected. See [store-picker test notes](store-picker.md).
+
 A disabled-framework-module test was performed separately through LSPosed's UI:
 with LauncherX Local disabled, Enable refused to change Basic TV; re-enabling
 only Google TV scope allowed Enable to restart the launcher and activate Home.

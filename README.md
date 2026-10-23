@@ -1,9 +1,9 @@
 # LauncherX Local
 
 Use the official Google TV Home without a Google account, with installed apps,
-Continue watching, and content rows published by TV apps. The original app tiles,
-cards, remote navigation, app launching and quick settings stay inside Google's
-launcher. The launcher APK is not modified or re-signed.
+Continue watching, content rows published by TV apps, and an app-store picker.
+The original app tiles, cards, remote navigation, app launching and quick settings
+stay inside Google's launcher. The launcher APK is not modified or re-signed.
 
 This is an **LSPosed module APK**, hosted by Magisk and Zygisk. It is not a ZIP to
 flash directly in Magisk. The setup app has TV remote controls for enabling local
@@ -19,8 +19,9 @@ Home and restoring Basic TV. No ADB commands are needed for normal setup.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
 - Owner user only, with no Google account visible to the launcher.
 
-Physical-device validation covers version **0.2**. Version **0.3** adds local
-content rows and the channel chooser; its validation uses the isolated emulator.
+Physical-device validation covers version **0.2**. Version **0.3** added local
+content rows and the channel chooser. Version **0.4** adds the store picker;
+validation of these additions uses the isolated emulator.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -88,6 +89,22 @@ does not establish which third-party apps currently publish compatible data or
 verify video playback inside those apps. See the [implementation and test
 notes](docs/local-content.md).
 
+## Add apps
+
+Select **Add apps** at the end of **Your apps** to choose an installed app store
+with the remote. Stores appear automatically when they advertise Android's
+`MAIN` + `APP_MARKET` entry point; there is no package-name list to maintain.
+F-Droid, Aurora Store and Google Play were checked in the emulator.
+
+With one available store, Android opens it directly. With several, the system
+chooser appears on each click. With none, Home explains that an app store needs
+to be installed or enabled. Installing, disabling or removing stores updates the
+next click without restarting Home. Each store keeps its own setup, account and
+installation requirements. Apps that do not advertise `APP_MARKET`, including
+the inspected Obtainium build, remain accessible through their own app tile.
+
+See the [store-picker implementation and validation](docs/store-picker.md).
+
 ## Restore or uninstall
 
 Open LauncherX Local and choose **Restore Basic TV**. This disables local Home,
@@ -109,8 +126,8 @@ requires local Home to be selected and the launcher's account view to contain ze
 Google accounts. An account lookup error leaves the original behavior.
 
 There is no forged Google account, credential injection, or signature-check
-bypass. Personalized recommendations, purchases, Google account services, and the
-Play Store's **Add apps** action still require Google authentication. This is not
+bypass. Personalized recommendations, purchases, Google account services, and
+Google Play itself still require Google authentication. This is not
 a telemetry blocker; unrelated background Google-service requests may continue.
 Signed-in account behavior has not been tested.
 
@@ -157,6 +174,8 @@ by these scripts.
 [`validation-tv.json`](validation-tv.json) records physical-device evidence.
 [`validation-content.json`](validation-content.json) records the local-content
 tests with the real emulator UI and a separate TV-provider publisher.
+[`validation-market.json`](validation-market.json) records store discovery and
+remote-controlled selection, including real F-Droid and Aurora entry screens.
 The [lab guide](docs/lab.md) describes the guarded emulator, smoke tests, rollback,
 negative compatibility tests, and the separate full-feed experiment.
 
