@@ -19,9 +19,11 @@ Home and restoring Basic TV. No ADB commands are needed for normal setup.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
 - Owner user only, with no Google account visible to the launcher.
 
-Physical-device validation covers version **0.2**. Version **0.3** added local
-content rows and the channel chooser. Version **0.4** adds the store picker;
-validation of these additions uses the isolated emulator.
+Physical-device validation covers the initial **0.2** setup, the **0.4** store
+picker, and the **0.5** update that enables app channels by default. The complete
+content-row suite runs in the isolated emulator. At the latest TV check,
+SmartTube's channels were enabled but its local program tables were empty, so
+third-party content cards and playback links remain unverified on that TV.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -70,11 +72,13 @@ ordered by most recent engagement, and shows native artwork, episode information
 and resume progress. Selecting a card opens the app's playback link with its
 extras intact. The app is responsible for resuming playback and updating entries.
 
-In LauncherX Local, choose **Choose app content**, select the published channels
-you want, and press **Save**. This works with the remote. It changes only the
-selected preview channels' visibility through Android's TV provider. Hidden
-programs stay hidden. An empty chooser means no installed app has published
-preview channels yet.
+App content channels are **enabled by default** when Home first discovers them,
+including existing channels on the first run of version **0.5**. New channels
+published later are enabled automatically too. To hide a row, open LauncherX
+Local, choose **Choose app content**, uncheck the channel, and press **Save**.
+This works with the remote. Your later visibility choices survive refreshes,
+launcher restarts and reboots. Hidden individual programs stay hidden. An empty
+chooser means no installed app has published preview channels yet.
 
 The module shows up to 40 local rows and 40 cards per row. It refreshes after
 provider changes and when returning Home, skips invalid/unavailable playback
@@ -172,6 +176,8 @@ by these scripts.
 
 [`validation.json`](validation.json) records emulator results;
 [`validation-tv.json`](validation-tv.json) records physical-device evidence.
+[`validation-tv-update.json`](validation-tv-update.json) records the later store
+picker check and the **0.5** channel-default update on the TV.
 [`validation-content.json`](validation-content.json) records the local-content
 tests with the real emulator UI and a separate TV-provider publisher.
 [`validation-market.json`](validation-market.json) records store discovery and

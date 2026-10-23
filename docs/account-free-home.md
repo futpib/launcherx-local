@@ -1,8 +1,9 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.4**; physical TV
-validation remains at **0.2**.
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.5**. The TV has
+received the store picker and automatic channel defaults; complete content-row
+and playback-link coverage remains emulator-based.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -15,9 +16,9 @@ account-free yet.**
 |---|---|---|
 | 1 | **Your apps** | **Working on your TV:** display installed TV apps, navigate, and launch them. |
 | 2 | **Reorder and app menus** | Local functionality. Reorder UI was observed; persistent reordering wasn’t tested. |
-| 3 | **Add apps / app catalogue** | **Implemented in 0.4; emulator verified.** Opens Android's chooser for installed `MAIN` + `APP_MARKET` handlers, including F-Droid and Aurora. One store opens directly; an empty list shows an explanation. Each store retains its own account requirements. Not yet installed on the physical TV. |
+| 3 | **Add apps / app catalogue** | **Implemented in 0.4; picker and F-Droid handoff verified on the TV.** Opens Android's chooser for installed `MAIN` + `APP_MARKET` handlers, including F-Droid and Aurora. One store opens directly; an empty list shows an explanation. Each store retains its own account requirements; complete installation flows remain untested. |
 | 4 | **Continue watching / Watch Next** | **Implemented in 0.3; emulator verified.** Native cards, artwork, episode information, resume progress and app playback links from browsable local Watch Next entries. Requires participating apps to publish entries; not yet tested on the physical TV. |
-| 5 | **App-provided content rows** | **Implemented in 0.3; emulator verified.** Native rows from enabled local preview channels, with a remote-controlled channel chooser in setup. Refreshes after app changes and opens app playback links; not yet tested on the physical TV. |
+| 5 | **App-provided content rows** | **Enabled by default in 0.5; automatic visibility verified on the TV.** Existing and newly discovered channels start enabled; later hide choices persist. Native cards, live updates, playback links and hide persistence are emulator verified. SmartTube's channels are enabled on the TV, but its local program tables were empty at the last check. |
 | 6 | **Featured banners, trailers, promotions** | Rendering exists, but stock content is supplied remotely. We could populate these with another source; merely exposing the UI won’t supply content. |
 | 7 | **For You, Movies, Shows, genre rows, top picks/charts** | Google’s feed requests failed authentication in our emulator experiment. No working anonymous feed established. |
 | 8 | **Sports, news and themed collections** | Renderers exist. Their individual services haven’t been tested anonymously; they need content feeds. |
@@ -43,9 +44,9 @@ See [local-content implementation and validation](local-content.md) for the data
 sources, supported behavior and test boundaries.
 
 **Add apps** now discovers installed stores through `APP_MARKET`. See the
-[store-picker notes](store-picker.md) for matching rules and emulator evidence.
+[store-picker notes](store-picker.md) for matching rules and test evidence.
 
-“Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The additional
-signed-out dashboard inspection ran only in the emulator; the physical TV was
-untouched during this inventory. See [physical-device validation](../validation-tv.json)
-and [emulator validation](../validation.json) for the installed module's checks.
+“Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The signed-out
+dashboard inspection ran only in the emulator. See the [initial physical-device
+validation](../validation-tv.json), [TV update checks](../validation-tv-update.json)
+and [emulator validation](../validation.json) for the exact coverage.

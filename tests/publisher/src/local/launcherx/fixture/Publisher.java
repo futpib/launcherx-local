@@ -77,6 +77,15 @@ public final class Publisher extends BroadcastReceiver {
                 clip.put("watch_next_type", 0);
                 clip.put("last_engagement_time_utc_millis", System.currentTimeMillis() - 10000);
                 resolver.insert(WATCH, clip);
+            } else if ("add-channel".equals(operation)) {
+                ContentValues channel = new ContentValues();
+                channel.put("type", "TYPE_PREVIEW");
+                channel.put("display_name", "New fixture channel");
+                channel.put("input_id", "local.launcherx.fixture/.PlaybackActivity");
+                Uri uri = resolver.insert(CHANNELS, channel);
+                ContentValues card = program(context, "New channel card", "new-channel", 0);
+                card.put("channel_id", ContentUris.parseId(uri));
+                resolver.insert(PREVIEW, card);
             } else if ("update".equals(operation)) {
                 ContentValues watch = program(context, "Updated local movie", "watch-0", 420000);
                 resolver.update(Uri.parse(ids.getString("watch0", "")), watch, null, null);

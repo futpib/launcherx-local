@@ -6,22 +6,52 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Base64;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/** The setup UI requests only preview-channel visibility, through its existing root grant. */
+/** Preview channels start visible; later visibility choices remain in Android's TV provider. */
 final class AppChannels {
     static final String ACTION = "local.launcherx.patch.APP_CHANNELS";
     private static final Uri CHANNELS = Uri.parse("content://android.media.tv/channel");
+
+    static void enableNew(Context context) throws Exception {
+        SharedPreferences preferences = context.getSharedPreferences("launcherx-local-channels", Context.MODE_PRIVATE);
+        Set<String> seen = new HashSet<>(preferences.getStringSet("seen", Collections.emptySet()));
+        int previousSize = seen.size();
+        try (Cursor cursor = context.getContentResolver().query(CHANNELS,
+                new String[]{"_id", "package_name", "browsable"},
+                "type=?", new String[]{"TYPE_PREVIEW"}, "_id DESC")) {
+            int scanned = 0;
+            while (cursor != null && cursor.moveToNext() && scanned++ < 1000) {
+                long id = cursor.getLong(0);
+                String owner = cursor.getString(1);
+                String key = owner + ":" + id;
+                if (seen.contains(key)) continue;
+                if (cursor.getInt(2) != 1) {
+                    ContentValues values = new ContentValues();
+                    values.put("browsable", 1);
+                    if (context.getContentResolver().update(ContentUris.withAppendedId(CHANNELS, id),
+                            values, "type=? AND package_name=?", new String[]{"TYPE_PREVIEW", owner}) != 1) continue;
+                }
+                seen.add(key);
+            }
+        }
+        // Persist discovery, not visibility: a later hide in either UI must stay hidden.
+        if (seen.size() != previousSize && !preferences.edit().putStringSet("seen", seen).commit()) {
+            throw new IllegalStateException("Could not save discovered app channels");
+        }
+    }
 
     static void register(Context context, Handler worker, BooleanSupplier enabled) {
         BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -31,6 +61,7 @@ final class AppChannels {
                     JSONObject response = new JSONObject();
                     try {
                         if (!enabled.getAsBoolean()) throw new IllegalStateException("Enable local Home first, without a Google account.");
+                        enableNew(context);
                         JSONArray channels = list(context);
                         String changes = intent.getStringExtra("changes");
                         if (changes != null && !changes.isEmpty()) {

@@ -124,6 +124,11 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         if (!enabled.getAsBoolean()) return;
         List<Object> result = new ArrayList<>();
         try {
+            AppChannels.enableNew(context);
+        } catch (Exception error) {
+            Log.w(TAG, "Could not enable new app channels; keeping existing visibility", error);
+        }
+        try {
             List<Object> cards = watchCards();
             if (!cards.isEmpty()) result.add(row("launcherx-local:watch-next",
                     context.getString(0x7f140654), cards, false));

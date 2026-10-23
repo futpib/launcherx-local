@@ -1,12 +1,13 @@
 {
   "result": "passed",
-  "module_version": "0.4",
-  "apk_sha256": "2ddaf5689ad71acd7d555fd095c89494d487d7001bdf8b71b9b74aaa6d7b5953",
-  "publisher_sha256": "f0e4fe4c541549b9f7b0659bf9bd5aa2b03b2304870215e66f3cafbb194b2903",
+  "module_version": "0.5",
+  "apk_sha256": "306d49e13b74cb94f94d3da4b7ae66a53b5d8d2f9b01bcbba89471cf0fe612cf",
+  "publisher_sha256": "01b6e3b551a2a6c721002027f31629a2c06f0c11ad4a61598b891440d8fd82b6",
   "accounts": 0,
   "checks": [
     "empty providers keep apps-only Home",
-    "remote-controlled setup chooser enables only the selected preview channel",
+    "all existing preview channels enabled automatically on first discovery",
+    "remote-controlled setup chooser hides only the selected preview channel",
     "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
     "DPAD opens both provider deep links with extras intact",
     "non-film Watch Next clip renders and opens through native resume card",
@@ -14,8 +15,10 @@
     "updated resume position and playback extras",
     "deletions made while away are reflected on Home resume",
     "channel visibility changes remove and restore rows live",
+    "newly published channel enabled and rendered live without reviving hidden channels",
+    "external channel hide survives launcher restart",
     "rows and playback links work with launcher IPv4/IPv6 egress blocked",
-    "populated rows survive emulator reboot",
+    "populated rows and explicit channel hides survive emulator reboot",
     "deleting the last entries removes empty rows live"
   ],
   "physical_tv_tested": false,
@@ -23,15 +26,9 @@
   "verified_date": "2026-10-23",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "cleanup": "Passed: test publisher uninstalled, its three provider tables empty, temporary IPv4/IPv6 rules removed.",
-  "limitations": [
-    "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
-    "Only the pinned launcher executable and account-free Android 14 emulator were tested for 0.4; physical TV remains on 0.2.",
-    "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
-    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
-  ],
   "evidence": [
     "artifacts/content-result.json",
-    "artifacts/content-smoke-run.txt",
+    "artifacts/content-smoke-0.5-run.txt",
     "artifacts/content-populated.png",
     "artifacts/content-watch-focus.png",
     "artifacts/content-preview-focus.png",
@@ -55,6 +52,14 @@
     "artifacts/content-cleared.png",
     "artifacts/content-before-reboot-logcat.txt",
     "artifacts/content-logcat.txt",
-    "artifacts/content-final-logcat.txt"
+    "artifacts/content-final-logcat.txt",
+    "artifacts/content-new-channel.png",
+    "artifacts/content-new-channel.txt"
+  ],
+  "limitations": [
+    "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
+    "Complete content suite uses the pinned launcher in the Android 14 emulator; physical TV channel defaults are recorded separately in validation-tv-update.json.",
+    "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
+    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
   ]
 }

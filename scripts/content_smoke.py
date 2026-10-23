@@ -35,6 +35,19 @@ def mark(table, label, value, column='title'):
          + ' --bind browsable:i:' + str(value))
 
 
+def channel_visibility(label, value):
+    deadline = time.monotonic() + 15
+    while True:
+        rows = query('channel', 'display_name')
+        matches = [line for line in rows.splitlines() if 'package_name=' + PACKAGE in line
+                   and 'display_name=' + label in line]
+        if len(matches) == 1 and f'browsable={value},' in matches[0]:
+            return
+        if time.monotonic() >= deadline:
+            raise AssertionError((label, value, rows))
+        time.sleep(.5)
+
+
 def inspect(name, expected=(), absent=(), pixels=False):
     deadline = time.monotonic() + 35
     while True:
@@ -124,9 +137,14 @@ def main():
         # Restart after inspection, then perform each live mutation/navigation uninterrupted.
         fresh_home()
 
-        # Provider records belong to a real installed app. The regular setup chooser approves
-        # the test channel; root marks hidden fixture cards without constructing launcher rows.
+        # Channels already present at startup need no separate approval. Later explicit
+        # hides must remain effective even though new channels default to visible.
+        root('am force-stop ' + TARGET)
         publish('seed')
+        fresh_home()
+        channel_visibility('Fixture recommendations', 1)
+        channel_visibility('Hidden fixture channel', 1)
+        checks.append('all existing preview channels enabled automatically on first discovery')
         shell('am force-stop local.launcherx.patch')
         shell('am start -W -n local.launcherx.patch/.SetupActivity')
         time.sleep(2)
@@ -134,13 +152,16 @@ def main():
         screen('content-chooser-focus')
         shell('input keyevent KEYCODE_DPAD_CENTER')
         inspect('content-chooser', ['App content on Home', 'Fixture recommendations'])
-        shell('input keyevent KEYCODE_DPAD_CENTER')
+        shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER')
         inspect('content-chooser-checked')
-        shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
+        shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
         inspect('content-chooser-saved', ['App content choices saved'])
-        assert re.search(r'browsable=1, display_name=Fixture recommendations', query('channel', 'display_name'))
-        checks.append('remote-controlled setup chooser enables only the selected preview channel')
+        channel_visibility('Fixture recommendations', 1)
+        channel_visibility('Hidden fixture channel', 0)
+        checks.append('remote-controlled setup chooser hides only the selected preview channel')
         shell('input keyevent KEYCODE_HOME')
+        fresh_home()
+        channel_visibility('Hidden fixture channel', 0)
         mark('watch_next_program', 'Hidden watch card', 0)
         mark('preview_program', 'Hidden preview card', 0)
         bad = ['Hidden watch card', 'Invalid watch card', 'Hidden preview card',
@@ -196,6 +217,20 @@ def main():
         inspect('content-restored-channel', ['Fixture recommendations', 'Second recommendation'])
         checks.append('channel visibility changes remove and restore rows live')
 
+        fresh_home()
+        pid = shell('pidof ' + TARGET)
+        publish('add-channel')
+        channel_visibility('New fixture channel', 1)
+        shell('input keyevent ' + ' '.join(['KEYCODE_DPAD_UP'] * 6 + ['KEYCODE_DPAD_DOWN'] * 4))
+        inspect('content-new-channel', ['New channel card'], pixels=True)
+        assert shell('pidof ' + TARGET) == pid
+        channel_visibility('Hidden fixture channel', 0)
+        checks.append('newly published channel enabled and rendered live without reviving hidden channels')
+        mark('channel', 'New fixture channel', 0, 'display_name')
+        fresh_home()
+        channel_visibility('New fixture channel', 0)
+        checks.append('external channel hide survives launcher restart')
+
         # Block the launcher's network only, inside this emulator; local artwork remains real.
         uid = re.search(r'uid:(\d+)', shell('cmd package list packages -U ' + TARGET)).group(1)
         rule = '-m owner --uid-owner ' + uid + ' -m comment --comment launcherx-local-smoke -j REJECT'
@@ -220,7 +255,9 @@ def main():
         time.sleep(3)
         resumed(HOME)
         inspect('content-rebooted', ['Local episode', 'Second recommendation'])
-        checks.append('populated rows survive emulator reboot')
+        channel_visibility('Hidden fixture channel', 0)
+        channel_visibility('New fixture channel', 0)
+        checks.append('populated rows and explicit channel hides survive emulator reboot')
 
         fresh_home()
         publish('clear')

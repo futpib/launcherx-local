@@ -3,7 +3,8 @@
 LauncherX Local 0.4 redirects the official **Add apps** tile to installed Android
 app stores. It runs only in the default apps build, with local Home enabled and
 no Google account visible to the launcher, under the existing version/DEX guard.
-The physical TV remains on 0.2; this feature is validated in the isolated emulator.
+The picker and F-Droid handoff were verified on the physical TV with 0.4. The
+larger discovery and store matrix below uses the isolated emulator.
 
 ## Discovery and selection
 
@@ -53,6 +54,8 @@ discovers them without a package list in the module, and opens both entry screen
 through the picker. This verifies discovery and handoff, not completion of store
 onboarding or downloads. Store versions, hashes, cleanup and check results are
 recorded in [`validation-market.json`](../validation-market.json).
+The separate [TV update record](../validation-tv-update.json) preserves the
+physical-device picker and F-Droid handoff checks.
 
 Screenshot OCR and ActivityManager records are used during navigation because
 attaching UIAutomator can disturb this stock launcher's accessibility focus.

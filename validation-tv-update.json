@@ -1,0 +1,60 @@
+{
+  "result": "passed",
+  "module_version": "0.5",
+  "apk_sha256": "306d49e13b74cb94f94d3da4b7ae66a53b5d8d2f9b01bcbba89471cf0fe612cf",
+  "device": {
+    "model": "MiTV-MOEU0",
+    "device": "ladybird",
+    "android": 14
+  },
+  "accounts": 0,
+  "reboot": false,
+  "checks": [
+    "Same-key APK update from 0.4 to 0.5",
+    "Normal setup Enable local Home action used through DPAD",
+    "Live anonymous hook probe passed",
+    "Existing preview channels automatically enabled by Home without channel-change commands",
+    "Discovery state persisted in launcher preferences",
+    "All remaining SmartTube channels enabled: Subscriptions, Recommended, History",
+    "Original launcher APK unchanged",
+    "Installed APK matches complete emulator content-suite artifact",
+    "No fatal entries during update",
+    "Original SmartTube playback activity and task restored without recreation"
+  ],
+  "limitations": [
+    "SmartTube preview_program and watch_next_program tables were empty at verification; no third-party cards or playback links validated on TV",
+    "Channel hide persistence and reboot persistence tested in emulator; TV was not rebooted"
+  ],
+  "verified_date": "2026-10-23",
+  "evidence": [
+    "artifacts/tv-defaults-0.5/install.txt",
+    "artifacts/tv-defaults-0.5/provider-channels-enabled.txt",
+    "artifacts/tv-defaults-0.5/discovered-channels.xml",
+    "artifacts/tv-defaults-0.5/channel-after.txt",
+    "artifacts/tv-defaults-0.5/preview_program-after.txt",
+    "artifacts/tv-defaults-0.5/watch_next_program-after.txt",
+    "artifacts/tv-defaults-0.5/home-enabled.png",
+    "artifacts/tv-defaults-0.5/probe.txt",
+    "artifacts/tv-defaults-0.5/hook-log-final.txt",
+    "artifacts/tv-defaults-0.5/restore-task.txt",
+    "artifacts/tv-defaults-0.5/activity-restored.txt",
+    "artifacts/tv-defaults-0.5/crashes.txt"
+  ],
+  "previous_store_picker_validation": {
+    "module_version": "0.4",
+    "apk_sha256": "efa64797851a64adb89f805738910a27290bdaf187a59c965044c2ab89d34cba",
+    "checks": [
+      "Native Add apps displayed F-Droid, Aurora and Google Play on the physical TV",
+      "DPAD selected F-Droid and opened its installed activity",
+      "Home key returned to official Home"
+    ],
+    "limitations": [
+      "Store entry screen only; no download or installation through picker"
+    ],
+    "evidence": [
+      "artifacts/tv-update-0.4-20261023-225335/store-picker.png",
+      "artifacts/tv-update-0.4-20261023-225335/fdroid-handoff.txt",
+      "artifacts/tv-update-0.4-20261023-225335/result.json"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # Local content in Google TV Home
 
-LauncherX Local 0.3 connects Android's local TV provider to the pinned launcher's
+LauncherX Local connects Android's local TV provider to the pinned launcher's
 existing row and card renderer. This does not unlock Google's recommendation
 backend. It works only while local Home is selected and the launcher sees no
 Google account.
@@ -13,7 +13,8 @@ Google account.
   resume card with the film subtype removed.
 - App rows: browsable `TYPE_PREVIEW` records in `content://android.media.tv/channel`,
   with browsable programs from `content://android.media.tv/preview_program`, sorted
-  by descending weight. Google's `ljf` converter formats the published cards.
+  by descending weight. Channels default to enabled on first discovery. Google's
+  `ljf` converter formats the published cards.
 - Cards are wrapped in native `aagk` / `lfs` / `lft` objects and appended after the
   bundled apps row at `igc.w`. No replacement launcher UI or remote-navigation
   hooks are installed. These obfuscated names are supported only for the exact
@@ -34,13 +35,22 @@ history, invent viewing history, or publish recommendations itself.
 
 ## Choosing app rows
 
+Starting with **0.5**, Home enables each preview channel when first discovered,
+including channels that already exist during an upgrade. It remembers the
+publishing package and channel ID in a separate launcher preference file. Later
+visibility changes are left alone, including channels hidden through the setup
+dialog or another Android TV interface. Refreshes, process restarts and reboots
+do not re-enable those channels. Newly published channels are discovered through
+the existing content observer and Home resume path. Discovery scans at most
+1,000 channels per read, newest first, under the same account-free Home guard.
+
 The setup app's **Choose app content** dialog lists up to 80 published preview
 channels. Saving changes updates only the selected channels' `browsable` flags
 through `ContentResolver`. The launcher-side receiver requires the sender to hold
 `android.permission.DUMP`; setup reaches it through its existing Magisk root
 grant. It also checks that local Home is enabled and no Google account is visible.
-Channel IDs and values are validated before writes. Merely opening the chooser
-does not enable channels.
+Channel IDs and values are validated before writes. The chooser also initializes
+any newly discovered channels, so its initial checkboxes match Home's defaults.
 
 Watch Next entries appear when apps publish them. Hidden Watch Next entries and
 hidden preview programs are respected. Restoring Basic TV makes these hooks
@@ -65,10 +75,12 @@ Its playback activity displays the received URI and seek extra. This verifies
 native rendering and the actual app handoff, not media playback in a third-party
 player. The fixture is never packaged in the module.
 
-The checks cover empty providers; remote selection of a preview channel; movie,
+The checks cover empty providers; automatic visibility for existing and newly
+published channels; remote hiding of one channel without changing others; movie,
 episode and clip cards; both kinds of playback link; updated progress/extras;
 live edits and removals; hidden channels/programs; broken and duplicate links;
-return from another app; blocked launcher IPv4/IPv6 egress; and boot persistence.
+return from another app; blocked launcher IPv4/IPv6 egress; and persistence of
+both populated rows and explicit channel hides after reboot.
 The publisher and all its records are removed afterward, and temporary firewall
 rules are removed in `finally`. Every device operation uses the emulator guard
 and private ADB server. No physical-TV operations occur.
