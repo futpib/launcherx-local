@@ -33,13 +33,14 @@ in Subscriptions and Recommended rows. The complete content-row suite, playback
 links, sign-in cancellation and reboot persistence remain emulator-tested only;
 authenticated Google switching remains unverified.
 
-Version **0.9** is installed on the TV, with Google TV and TvService selected in
+Version **0.11** is installed on the TV, with Google TV and TvService selected in
 LSPosed. Its remote receiver and Xiaomi bridge reloaded without a TV reboot;
-existing assignments were preserved. New key-action delivery and complete
-six-button assignment, persistence and restoration tests remain emulator-only.
+existing assignments and the foreground SmartTube task were preserved.
+Key-action delivery, latency measurements and complete six-button assignment,
+persistence and restoration tests remain emulator-only.
 The prior **0.8** check observed Live TV and Xiaomi TV+ fallback handling, and
 the user confirmed YouTube, Netflix and Prime long-press customization.
-See the [0.9 deployment record](validation-tv-key-actions.json) and
+See the [0.11 deployment record](validation-tv-key-latency.json) and
 [prior physical remote checks](validation-tv-remote.json) for the boundaries.
 
 Other launcher versions and device/framework combinations are not yet supported
@@ -265,6 +266,9 @@ installation, hook loading, observed OEM fallback paths and user-assisted
 long-press checks.
 [`validation-tv-key-actions.json`](validation-tv-key-actions.json) records the
 **0.9** update, hook reload, unchanged assignments and retained foreground task.
+[`validation-tv-key-latency.json`](validation-tv-key-latency.json) records the
+**0.11** update and hook reload with assignments and foreground task preserved;
+physical remote latency was not measured during deployment.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content

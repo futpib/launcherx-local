@@ -6,7 +6,7 @@ received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
 verified on the physical TV, with app-published cards visible on Home.
-Version 0.9 is installed with the Google remote receiver and Xiaomi service
+Version 0.11 is installed with the Google remote receiver and Xiaomi service
 hooks reloaded, preserving existing assignments. The prior 0.8 check observed
 Live TV and Xiaomi TV+ fallback handling in device logs; complete six-button
 assignment and restoration coverage remains emulator-only.
@@ -16,8 +16,9 @@ keys need root access for LauncherX Local. New key-action delivery is verified
 in the emulator. See [key actions](key-actions.md).
 Version 0.10 adds **No action**, which disables short press while retaining
 long-press customization. Version 0.11 reduces custom-key delivery overhead;
-see the [emulator latency checks](../validation-key-latency.json). Neither
-update is installed on the TV yet.
+see the [emulator latency checks](../validation-key-latency.json). The
+[0.11 TV update](../validation-tv-key-latency.json) includes both changes;
+physical key-action delivery and latency have not been tested there.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -107,6 +108,7 @@ validation](../validation-tv.json), [TV update checks](../validation-tv-update.j
 and [0.6 TV profile checks](../validation-tv-profiles.json), plus
 [TV remote deployment](../validation-tv-remote.json),
 [0.9 TV update](../validation-tv-key-actions.json),
+[0.11 TV update](../validation-tv-key-latency.json),
 [key-action tests](../validation-key-actions.json),
 [No action tests](../validation-no-action.json),
 [remote receiver tests](../validation-remote.json),

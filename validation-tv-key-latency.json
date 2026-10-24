@@ -1,0 +1,61 @@
+{
+  "result": "installed",
+  "module_version": "0.11",
+  "source_commit": "fa8ee25",
+  "apk_sha256": "059210f71258300f060ac5fd86731b2b1299659d8d1df51cddb028e10e340d39",
+  "device": "MiTV-MOEU0",
+  "launcher_version_code": 702401,
+  "scopes": [
+    "com.google.android.apps.tv.launcherx",
+    "mitv.service"
+  ],
+  "checks": [
+    "Same-key APK update from 0.9 to 0.11; installed SHA-256 matches the key-action and latency emulator suites",
+    "Google remote core and Xiaomi service restarted; new processes logged the installed APK path and successful hook installation",
+    "Google main process stopped so its next activity launch loads the new module",
+    "Original Google launcher and Xiaomi TV service APK hashes unchanged",
+    "Native shortcut-store files have identical paths and hashes before and after deployment",
+    "SmartTube retained PID 16834, ActivityRecord d42261f and task 131 as the foreground activity; its media session reported PLAYING before and after",
+    "No TV reboot, foreground activity launch, app-button KeyEvent injection or shortcut-store write by deployment commands",
+    "No module refusal, hook error, fatal exception or ANR found in the deployment log"
+  ],
+  "physical_key_actions_tested": false,
+  "physical_no_action_tested": false,
+  "physical_key_latency_measured": false,
+  "limitations": [
+    "Key actions, No action and latency have emulator coverage; no physical-button test was performed during deployment.",
+    "Google main activity was left unopened to preserve the current foreground experience.",
+    "Media-session state and process identity do not measure audiovisual continuity.",
+    "Reboot persistence, wake/standby, authenticated and managed-profile behavior remain unverified on the TV."
+  ],
+  "deployment_notes": [
+    "The initial empty GLOBAL_BUTTON broadcast was denied for the shell UID. It was retried successfully as root without a KeyEvent payload.",
+    "Two app_process sentinel fault page warnings appeared; both receiver processes subsequently loaded the module successfully."
+  ],
+  "prior_physical_remote_checks": "validation-tv-remote.json",
+  "evidence": [
+    "artifacts/tv-keys-0.11/install.txt",
+    "artifacts/tv-keys-0.11/identity.txt",
+    "artifacts/tv-keys-0.11/module-hash-before.txt",
+    "artifacts/tv-keys-0.11/module-hash-after.txt",
+    "artifacts/tv-keys-0.11/launcher-hash-before.txt",
+    "artifacts/tv-keys-0.11/launcher-hash-after.txt",
+    "artifacts/tv-keys-0.11/xiaomi-hash-before.txt",
+    "artifacts/tv-keys-0.11/xiaomi-hash-after.txt",
+    "artifacts/tv-keys-0.11/package-before.txt",
+    "artifacts/tv-keys-0.11/package-after.txt",
+    "artifacts/tv-keys-0.11/hook-log.txt",
+    "artifacts/tv-keys-0.11/post-reload-logcat.txt",
+    "artifacts/tv-keys-0.11/store-hashes-before.txt",
+    "artifacts/tv-keys-0.11/store-hashes-after.txt",
+    "artifacts/tv-keys-0.11/processes-before.txt",
+    "artifacts/tv-keys-0.11/processes-after.txt",
+    "artifacts/tv-keys-0.11/activities-before.txt",
+    "artifacts/tv-keys-0.11/activities-after.txt",
+    "artifacts/tv-keys-0.11/media-before.txt",
+    "artifacts/tv-keys-0.11/media-after.txt",
+    "artifacts/tv-keys-0.11/core-load.txt",
+    "artifacts/tv-keys-0.11/core-load-root.txt",
+    "artifacts/tv-keys-0.11/restarted-pids.json"
+  ]
+}
