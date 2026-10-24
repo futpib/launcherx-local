@@ -1,0 +1,50 @@
+{
+  "result": "installed",
+  "module_version": "0.9",
+  "source_commit": "5ead8a1",
+  "apk_sha256": "269853ec5624a25ad8366ad28613352a0abaaa5b77f139776a9f23cb188a2abe",
+  "device": "MiTV-MOEU0",
+  "launcher_version_code": 702401,
+  "scopes": [
+    "com.google.android.apps.tv.launcherx",
+    "mitv.service"
+  ],
+  "checks": [
+    "Same-key APK update from 0.8 to 0.9; installed SHA-256 matches both emulator-tested suites",
+    "Google remote core and Xiaomi service restarted; new processes logged the new APK path and successful hook installation",
+    "Google main process stopped so its next activity launch loads the new module",
+    "Original Google launcher and Xiaomi TV service APK hashes unchanged",
+    "Native shortcut-store files have identical paths and hashes before and after deployment",
+    "SmartTube retained PID 16834, ActivityRecord d42261f and task 131 as the foreground activity; its media session reported PLAYING before and after",
+    "No TV reboot, foreground activity launch, app-button KeyEvent injection or shortcut-store write by deployment commands"
+  ],
+  "physical_key_actions_tested": false,
+  "limitations": [
+    "New key actions, chooser controls and actual media-key delivery have emulator coverage; no physical-button test of 0.9 was performed during deployment.",
+    "Google main activity was left unopened to preserve the current foreground experience.",
+    "Media-session state and process identity do not measure audiovisual continuity.",
+    "Reboot persistence, wake/standby, authenticated and managed-profile behavior remain unverified on the TV."
+  ],
+  "prior_physical_remote_checks": "validation-tv-remote.json",
+  "evidence": [
+    "artifacts/tv-keys-0.9/install.txt",
+    "artifacts/tv-keys-0.9/identity.txt",
+    "artifacts/tv-keys-0.9/module-hash-before.txt",
+    "artifacts/tv-keys-0.9/module-hash-after.txt",
+    "artifacts/tv-keys-0.9/launcher-hash-before.txt",
+    "artifacts/tv-keys-0.9/launcher-hash-after.txt",
+    "artifacts/tv-keys-0.9/xiaomi-hash-before.txt",
+    "artifacts/tv-keys-0.9/xiaomi-hash-after.txt",
+    "artifacts/tv-keys-0.9/hook-log.txt",
+    "artifacts/tv-keys-0.9/post-reload-logcat.txt",
+    "artifacts/tv-keys-0.9/store-hashes-before.txt",
+    "artifacts/tv-keys-0.9/store-hashes-after.txt",
+    "artifacts/tv-keys-0.9/processes-before.txt",
+    "artifacts/tv-keys-0.9/processes-after.txt",
+    "artifacts/tv-keys-0.9/activities-before.txt",
+    "artifacts/tv-keys-0.9/activities-after.txt",
+    "artifacts/tv-keys-0.9/media-before.txt",
+    "artifacts/tv-keys-0.9/media-after.txt",
+    "artifacts/tv-keys-0.9/restarted-pids.json"
+  ]
+}

@@ -32,14 +32,14 @@ in Subscriptions and Recommended rows. The complete content-row suite, playback
 links, sign-in cancellation and reboot persistence remain emulator-tested only;
 authenticated Google switching remains unverified.
 
-Version **0.8** is installed on the TV, with Google TV and TvService selected in
-LSPosed and their hooks loaded after process restarts, without a TV reboot.
-Device logs show Live TV and Xiaomi TV+ events reaching their original Xiaomi
-fallback handlers, including a Live TV activity launch. Complete six-button
-assignment, persistence and restoration tests remain emulator-only. The user
-confirmed YouTube, Netflix and Prime long-press customization after hook reload.
-See the
-[TV deployment record](validation-tv-remote.json) for the observed boundaries.
+Version **0.9** is installed on the TV, with Google TV and TvService selected in
+LSPosed. Its remote receiver and Xiaomi bridge reloaded without a TV reboot;
+existing assignments were preserved. New key-action delivery and complete
+six-button assignment, persistence and restoration tests remain emulator-only.
+The prior **0.8** check observed Live TV and Xiaomi TV+ fallback handling, and
+the user confirmed YouTube, Netflix and Prime long-press customization.
+See the [0.9 deployment record](validation-tv-key-actions.json) and
+[prior physical remote checks](validation-tv-remote.json) for the boundaries.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -253,6 +253,8 @@ the **0.8** activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV
 installation, hook loading, observed OEM fallback paths and user-assisted
 long-press checks.
+[`validation-tv-key-actions.json`](validation-tv-key-actions.json) records the
+**0.9** update, hook reload, unchanged assignments and retained foreground task.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content

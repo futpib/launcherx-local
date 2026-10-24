@@ -6,12 +6,14 @@ received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
 verified on the physical TV, with app-published cards visible on Home.
-Version 0.8 is installed with Google TV and Xiaomi service hooks loaded. Live TV
-and Xiaomi TV+ fallback handling was observed in device logs; the complete
-six-button assignment and restoration suite remains emulator-only.
+Version 0.9 is installed with the Google remote receiver and Xiaomi service
+hooks reloaded, preserving existing assignments. The prior 0.8 check observed
+Live TV and Xiaomi TV+ fallback handling in device logs; complete six-button
+assignment and restoration coverage remains emulator-only.
 Version 0.9 adds **Send key…** for Play/Pause, TV Home, Back and arbitrary
 Android key codes. Media controls use Android's current media consumer; other
-keys need root access for LauncherX Local. See [key actions](key-actions.md).
+keys need root access for LauncherX Local. New key-action delivery is verified
+in the emulator. See [key actions](key-actions.md).
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -100,6 +102,7 @@ dashboard inspection ran only in the emulator. See the [initial physical-device
 validation](../validation-tv.json), [TV update checks](../validation-tv-update.json)
 and [0.6 TV profile checks](../validation-tv-profiles.json), plus
 [TV remote deployment](../validation-tv-remote.json),
+[0.9 TV update](../validation-tv-key-actions.json),
 [key-action tests](../validation-key-actions.json),
 [remote receiver tests](../validation-remote.json),
 [0.8 regression tests](../validation-remote-regressions.json) and

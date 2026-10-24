@@ -52,5 +52,7 @@ input helper. This fixture is not a third-party media player.
 The script backs up and restores the native shortcut store and removes its
 fixture APK and receiver helper. See
 [validation-key-actions.json](../validation-key-actions.json) for the tested
-build and checks. Physical-TV deployment and user-assisted checks are recorded
-separately in [validation-tv-remote.json](../validation-tv-remote.json).
+build and checks. Version 0.9 is installed on the physical TV with assignments
+preserved and receiver hooks reloaded; its new key actions were not exercised
+there during deployment. See [0.9 TV update](../validation-tv-key-actions.json)
+and the [prior user-assisted remote checks](../validation-tv-remote.json).
