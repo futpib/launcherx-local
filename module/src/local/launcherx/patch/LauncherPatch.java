@@ -28,6 +28,10 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
+        if (BuildConfig.APPS_ONLY && XiaomiRemote.PACKAGE.equals(param.packageName)) {
+            XiaomiRemote.load(param);
+            return;
+        }
         if (!TARGET.equals(param.packageName)) return;
         boolean coreServices = (TARGET + ":coreservices").equals(param.processName);
         if (!TARGET.equals(param.processName) && !coreServices) return;
@@ -39,7 +43,16 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 try {
                     Compatibility.verify(context);
                     if (coreServices) {
-                        if (BuildConfig.APPS_ONLY) new RemoteButtons(context, param.classLoader).install();
+                        if (BuildConfig.APPS_ONLY) {
+                            List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
+                            try {
+                                new NativeShortcuts(context, param.classLoader).install(hooks, true);
+                                new RemoteButtons(context, param.classLoader).install(hooks);
+                            } catch (Throwable error) {
+                                for (XC_MethodHook.Unhook hookHandle : hooks) hookHandle.unhook();
+                                throw error;
+                            }
+                        }
                     } else {
                         installHooks(param.classLoader, (Application) hook.thisObject);
                     }
@@ -109,6 +122,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         profiles = BuildConfig.APPS_ONLY ? new Profiles(context, loader) : null;
         List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
         try {
+            if (BuildConfig.APPS_ONLY) new NativeShortcuts(context, loader).install(hooks, false);
             if (BuildConfig.EMULATOR_NETWORK) hooks.add(EmulatorNetwork.install(context, loader));
             if (profiles != null) profiles.install(hooks);
             hooks.add(XposedBridge.hookMethod(profile, new XC_MethodHook() {

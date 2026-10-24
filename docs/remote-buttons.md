@@ -1,13 +1,81 @@
 # Remote shortcuts and Incognito audit
 
+## Six-button customization in 0.8
+
+Long-press each button to configure its own shortcut using Google's existing
+chooser and multiprocess protobuf store. The same store supplies native app
+launches. The YouTube button's chooser also accepts installed apps outside the
+YouTube family; its original YouTube selection remains the default until an
+override is saved.
+Opening the YouTube chooser can write native configuration flags before an app
+is selected. These flags are not treated as an assignment: cancelling still
+uses the native YouTube choice and launch checks. The optional YouTube-to-star
+alias is disabled so their saved bindings stay independent.
+
+| # | Button | Android code | Original receiver | Default action |
+|---|---|---|---|---|
+| 1 | Star | `MACRO_1` / 313 | Google TV | Existing star assignment, or its native chooser when unassigned |
+| 2 | YouTube | `BUTTON_3` / 190 | Google TV | Native YouTube selection and launch |
+| 3 | Netflix | `BUTTON_6` / 193 | Xiaomi TV service | Original Netflix handler |
+| 4 | Prime Video | `BUTTON_7` / 194 | Xiaomi TV service | Original Prime Video handler |
+| 5 | Live TV | vendor code 351 | Xiaomi TV service | Original Live TV handler |
+| 6 | Xiaomi TV+ | vendor code 352 | Xiaomi TV service | Original TV+ / PatchWall / Live TV fallback logic |
+
+Google's alternate YouTube keycode 189 is supported too. This does not rewrite
+keylayout files, manufacture MACRO keycodes, enable disabled apps or change
+which keys wake the TV.
+
+**Restore default** and **Restore all button defaults** appear at the top of
+the native chooser, with confirmation and cancellation. They remove custom
+assignments through the native store API. Star returns to its unassigned
+chooser; YouTube returns to its original selection; the four Xiaomi keys
+return to their original handlers. Hold-to-customize stays available. Disabling
+the module in LSPosed and rebooting restores the full stock handlers, including
+their long-press behavior. Removing only the Xiaomi service scope and restarting
+that service restores the four OEM keys while retaining the Google TV patch.
+
+`NativeShortcuts` extends the supported button definitions in `tzk`, retaining
+separate `tzd` identifiers and the native `tzg` update API. It adds generic app
+mode to YouTube's supported modes without discarding its default mode. The
+chooser's restore controls are DPAD reachable and do not replace its Save or
+Cancel controls. Setup readiness, account readiness, native launch validation
+and managed-profile restrictions still execute.
+Restricted native YouTube pickers retain their allowlist-only mode and omit
+the added restore controls. This guard is source-reviewed; no real child or
+authenticated profile was exercised.
+
+`XiaomiRemote` adds one hook to `mitv.service`'s original
+`GlobalKeyReceiver.onReceive`, limited to the four codes above, owner/system UID
+1000, completed setup and enabled Home. It forwards the original `KeyEvent` in
+an ordered protected `GLOBAL_BUTTON` broadcast. Google acknowledges only after
+resolving its real listener and successfully extending the native definitions.
+Without acknowledgement, Xiaomi runs its original method. An unassigned short
+press uses a one-shot immutable PendingIntent back to the original Xiaomi
+receiver; releasing a long press does not launch the default app. PendingIntents
+are cancelled after the forwarded event completes. Other Xiaomi keys and boot
+broadcasts keep their original handlers.
+
+The additional scope is **TvService (`mitv.service`)**, process
+`xiaomi.tvservice`, version **1.1.0 / 110**, with `classes.dex` SHA-256
+`33d06a3edd7d1e229916b85af034513d33d0060d4ee070b03bd84d62502a0c36`.
+The matching firmware and live APK both hashed to
+`e6904e5ff54c25e8750853899d284f41459845cf7136541b052ff5b5d509547c`.
+Unknown launcher/service code is refused. The bridge is not a generic Xiaomi
+service patch for other firmware releases.
+
+Select this additional scope in LSPosed and reboot to load it in the persistent
+Xiaomi service. The APK's scope recommendation alone does not enable new hooks.
+
+## Incognito fix in 0.7
+
 Version **0.7** enables the stock star-button and YouTube-button handlers for
 Incognito. Long-press the star button to open Google's shortcut chooser, choose
 Favorite app, select an app and save. Short-press opens the saved app. With no
 assignment, short-press opens the chooser. YouTube retains its separate native
 chooser and Google's supported YouTube-app list.
 
-The original remote mappings and saved assignments stay with Google TV. This
-does not turn the other Xiaomi app buttons into additional configurable macros.
+The original 0.7 fix covered only Google's remote receivers; 0.8 adds the four
+Xiaomi buttons through the separately pinned service hook described above.
 Google Home, Freeplay and hardware input switching have separate requirements;
 opening the chooser does not make those services available account-free.
 
@@ -48,7 +116,7 @@ exchange updates through the existing native data-store listener.
 
 ## Other account checks found
 
-The audit examined all three DEX files pinned in `compatibility.json`: **82
+The audit examined all four DEX files pinned in `compatibility.json`: **82
 methods in 70 classes** reference `pseudonymous`, `vanilla_mode`, `VANILLA_*`, or
 the Basic TV predicates `nnd.c/d/e`. Relevant callers were inspected in decompiled code;
 the two patched callback/predicate relationships were also checked in DEX
@@ -92,8 +160,9 @@ python3 scripts/remote_smoke.py
 ```
 
 An optional `--baseline-apk` accepts an unpatched module rebuilt with the same
-key and version code. The recorded run compares the old hooks from `d1ffefb`
+key and version code. The original 0.7 run compared the old hooks from `d1ffefb`
 against 0.7, reproducing both Home redirects and the internet app-launch block.
+That historical report is preserved in commit `00049dd`.
 
 The AVD lacks Xiaomi's global-key overlay. The test-only root helper sends real
 `KeyEvent` parcelables through the stock broadcast receivers. DPAD operates the
@@ -102,7 +171,13 @@ module logs establish the result. The helper refuses other AVDs and physical
 devices and is not packaged in the module. The test restores its previous
 shortcut store and removes the helper in `finally`.
 
-See [validation-remote.json](../validation-remote.json). This does not verify
+See [validation-remote.json](../validation-remote.json) and
+[validation-all-shortcuts.json](../validation-all-shortcuts.json). The six-button
+test uses the actual native chooser, DPAD, store, receiver and ordered-broadcast
+acknowledgement on Google's side. It does not run the Xiaomi service, deliver
+the ordered result to Xiaomi, or invoke its PendingIntent fallback. The TV's
+ADB connection went offline during development, so 0.8's Xiaomi handoff remains
+unverified and the recorded TV installation remains 0.7. This does not verify
 Bluetooth, physical keylayout, wake/standby, input hardware, Google Home,
 Freeplay, authenticated switching or playback inside launched apps.
 

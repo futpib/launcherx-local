@@ -9,7 +9,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 /** Keep local remote actions available to the native anonymous account. */
@@ -59,8 +58,7 @@ final class RemoteButtons {
                 == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
     }
 
-    void install() {
-        List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
+    void install(List<XC_MethodHook.Unhook> hooks) {
         try {
             hooks.add(XposedBridge.hookMethod(keyCallback, scope(anonymousCheck)));
             hooks.add(XposedBridge.hookMethod(launchCallback, scope(basicInternetRule)));
@@ -93,8 +91,7 @@ final class RemoteButtons {
                 if (predicate.equals(anonymousCheck)) {
                     KeyEvent event = (KeyEvent) XposedHelpers.getObjectField(hook.thisObject, "c");
                     int code = event.getKeyCode();
-                    if (code != KeyEvent.KEYCODE_MACRO_1 && code != KeyEvent.KEYCODE_BUTTON_2
-                            && code != KeyEvent.KEYCODE_BUTTON_3) return;
+                    if (!NativeShortcuts.supported(code)) return;
                 } else {
                     // eww is a merged callback. Only case 4 belongs to GlobalAppLaunchManager.
                     if (XposedHelpers.getIntField(hook.thisObject, "e") != 4

@@ -1,0 +1,26 @@
+{
+  "result": "passed",
+  "module_version": "0.8",
+  "apk_sha256": "4ab6d8ce7d7df99d054c0fdfd7fbe89010b4b72740f6a1c08a953b06652f2f4d",
+  "checks": [
+    "Star: native long-press chooser saves and short press launches TV Bro",
+    "YouTube: native long-press chooser saves and short press launches TV Bro",
+    "Netflix: native long-press chooser saves and short press launches TV Bro",
+    "Prime Video: native long-press chooser saves and short press launches TV Bro",
+    "Live TV: native long-press chooser saves and short press launches TV Bro",
+    "Xiaomi TV+: native long-press chooser saves and short press launches TV Bro",
+    "All six native assignments survive launcher process restart",
+    "Cancelling restoration keeps the custom assignment",
+    "Restoring YouTube returns its native action and preserves the other five bindings",
+    "A cancelled key-up does not launch a saved app",
+    "Restore all clears custom bindings, restores native star/YouTube and selects OEM fallback paths"
+  ],
+  "physical_tv_tested": false,
+  "accounts": 0,
+  "limitations": [
+    "KeyEvent receiver injection does not exercise the physical remote or Xiaomi bridge.",
+    "OEM default branches were selected; actual Xiaomi app/fallback launches require the TV.",
+    "Authenticated and managed-profile paths were not exercised."
+  ],
+  "cleanup": "Previous native shortcut store restored; test helper removed."
+}

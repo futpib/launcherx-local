@@ -102,6 +102,18 @@ broker, run `python3 scripts/remote_smoke.py`. The AVD lacks Xiaomi's global-key
 overlay, so a root helper injects KeyEvent parcelables into the real receivers;
 the chooser is operated with DPAD. See [remote test boundaries](remote-buttons.md).
 
+With Pillow and Tesseract installed, test independent assignments and default
+restoration for all six keycodes by running
+`python3 scripts/all_shortcuts_smoke.py`. The root helper also sends ordered OEM
+events so the actual Google receiver's acknowledgement path executes. It cannot
+receive ordered result callbacks from `app_process` (there is no registered app
+record), so acknowledgement is observed in the receiver's log. This exercises
+Google's side of the protocol; the emulator does not contain Xiaomi's service.
+The test checks native DPAD saving, per-key independence, process persistence,
+reset confirmation/cancellation, all-button reset and cancelled key-up, then
+restores the original native shortcut store. Xiaomi forwarding and original
+OEM default launches still require the physical TV.
+
 The fixture must have LauncherX Local enabled in LSPosed. The companion app only
 needs a Magisk root grant for its **Choose app content** action. Run:
 

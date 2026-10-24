@@ -122,11 +122,11 @@ def main():
         fresh_home()
         send(190, 'long')
         foreground('remote-youtube-picker', CHOOSER)
-        inspect('remote-youtube-picker', ['Select your favorite YouTube app'])
+        inspect('remote-youtube-picker', ['Create a shortcut', 'Restore YouTube default'])
         shell('input keyevent KEYCODE_BACK')
         send(190, 'short')
         foreground('remote-youtube', 'com.google.android.youtube.tv/')
-        checks.append('YouTube long press opens its native app picker; short press launches YouTube')
+        checks.append('YouTube long press opens the unrestricted native chooser; unassigned short press retains YouTube')
 
         fresh_home()
         send('app', BROWSER)
@@ -161,7 +161,7 @@ def main():
         root('rm -rf ' + backup + ' ' + FIXTURE)
         fresh_home()
     checks.append('Restored the original shortcut store and removed the receiver fixture')
-    report = {'result': 'passed', 'module_version': '0.7',
+    report = {'result': 'passed', 'module_version': '0.8',
               'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
               'physical_tv_tested': False, 'accounts': 0, 'checks': checks,
               'method': 'Root sends KeyEvent parcelables through the real stock broadcast receivers; DPAD, screenshots/OCR, ActivityManager and native saved protobuf storage verify UI and launches.',

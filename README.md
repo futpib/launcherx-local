@@ -2,7 +2,8 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.7** also enables the native star/YouTube shortcut controls in Incognito.
+Version **0.8** adds independent long-press customization and restore controls
+for the six app buttons on the supported Xiaomi remote.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -35,6 +36,8 @@ Version **0.7** is installed on the TV, with its remote hooks loaded in the core
 service process. The update preserved SmartTube's foreground task and process
 without a TV reboot. Shortcut configuration, short/long presses and app launches
 passed in the emulator; physical remote-button behavior remains unverified.
+The **0.8** Xiaomi handoff and original OEM app launches still need physical-TV
+validation. The last recorded TV installation is **0.7**.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -52,13 +55,18 @@ number. Disable the module in LSPosed and restart Google TV to use stock behavio
    from that same ZIP and open the installed LSPosed manager.
 4. Install `launcherx-local.apk` as a regular Android app. Allow installation from
    your chosen file manager in Android Settings when prompted.
-5. In LSPosed's **Modules** page, enable **LauncherX Local**. Leave only its
-   recommended **Google TV** scope checked. Do not select System Framework.
+5. In LSPosed's **Modules** page, enable **LauncherX Local** with **Google TV**
+   selected. On the supported Xiaomi TV, also select **TvService**
+   (`mitv.service`) for the Netflix, Prime Video, Live TV and Xiaomi TV+ buttons.
+   Do not select System Framework or other packages.
 6. Restart Google TV (force stop it in Android Settings, then press Home), or
    reboot. The verified module selects Home automatically inside the launcher.
    There is no separate activation button or Magisk root prompt for this step.
 
 To update, install the new APK signed with the same key and restart Google TV.
+When adding or updating the Xiaomi service hooks, reboot so that persistent
+service also reloads the module. Existing installations must select the newly
+recommended TV service scope; updating the APK does not select it automatically.
 Magisk and LSPosed do not need to be reinstalled. The companion app's compatibility
 status checks the installed launcher; it does not certify that LSPosed is active.
 
@@ -96,12 +104,20 @@ testing. See [profile implementation and test boundaries](docs/profiles.md).
 
 ## Remote shortcuts
 
-In Incognito, long-press the star button to open Google's shortcut chooser.
-Choose **Favorite app**, select an installed TV app, and save. Short-press opens
-that app; an unassigned button opens the chooser. YouTube's button keeps its
-own native app picker. Version 0.7 also removes a Basic TV internet restriction
-on app-button launches. These paths are emulator tested; hardware wake/input
-behavior and Google Home services are not covered. See the
+Hold **Star, YouTube, Netflix, Prime Video, Live TV or Xiaomi TV+** to open
+Google's native shortcut chooser. Select **Favorite app** if a mode screen is
+shown, choose an installed TV app and save. Each button has its own assignment;
+the YouTube button can also choose apps outside Google's YouTube family.
+
+Until customized, branded buttons retain their original actions. An unassigned
+star opens the native chooser. At the top of the chooser, **Restore default**
+resets one button and **Restore all button defaults** resets all six, after
+confirmation. Press Up to reach these controls and Down to return to the chooser.
+Restoring defaults retains hold-to-customize. To restore the complete stock
+handlers, including their long presses, disable the module in LSPosed and reboot.
+
+The earlier Basic TV internet-block fix remains. Hardware wake/input behavior,
+Google Home services and authenticated/managed profiles are not covered. See the
 [remote-button tests and remaining account checks](docs/remote-buttons.md).
 
 ## Local content
@@ -216,8 +232,9 @@ by these scripts.
 picker check and the **0.5** channel-default update on the TV.
 [`validation-tv-profiles.json`](validation-tv-profiles.json) records the **0.6**
 TV update, automatic activation, native Incognito chooser and retained app button.
-[`validation-remote.json`](validation-remote.json) records the **0.7** native
-remote-receiver tests and the comparison with the previous module.
+[`validation-remote.json`](validation-remote.json) records native remote-receiver
+tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
+independent six-button assignments and default restoration in **0.8**.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
 the same build's activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.7** TV

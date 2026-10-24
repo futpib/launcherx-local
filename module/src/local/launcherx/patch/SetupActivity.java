@@ -40,10 +40,12 @@ public final class SetupActivity extends Activity {
         text("LauncherX Local", 28);
         text("Incognito and Google profiles for launcher 1.0.785572138 (702401).\n"
                 + "Enable Zygisk in Magisk and install LSPosed. In LSPosed, enable LauncherX Local "
-                + "with only Google TV selected, then restart Google TV or reboot. Home activates automatically.\n"
+                + "with Google TV selected, then restart Google TV or reboot. Home activates automatically. "
+                + "On the supported Xiaomi TV, also select TV service (mitv.service) and reboot to customize all six app buttons.\n"
                 + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
                 + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
-                + "To return to stock behavior, disable the module in LSPosed and restart Google TV or reboot.", 17);
+                + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
+                + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));
         check();

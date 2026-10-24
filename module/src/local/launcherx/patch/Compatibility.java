@@ -13,8 +13,12 @@ public final class Compatibility {
     public static final String TARGET = "com.google.android.apps.tv.launcherx";
 
     public static void verify(Context context) throws Exception {
-        PackageInfo info = context.getPackageManager().getPackageInfo(TARGET, 0);
-        if (info.getLongVersionCode() != BuildConfig.VERSION_CODE) {
+        verify(context, TARGET, BuildConfig.VERSION_CODE, BuildConfig.DEX_HASHES);
+    }
+
+    static void verify(Context context, String target, long version, String[][] hashes) throws Exception {
+        PackageInfo info = context.getPackageManager().getPackageInfo(target, 0);
+        if (info.getLongVersionCode() != version) {
             throw new IllegalStateException("Unsupported launcher version " + info.getLongVersionCode());
         }
         // Gate on executable code, allowing separately documented emulator ABI adaptation.
@@ -25,10 +29,10 @@ public final class Compatibility {
                 String name = entries.nextElement().getName();
                 if (name.endsWith(".dex") && !name.contains("/")) dexNames.add(name);
             }
-            if (dexNames.size() != BuildConfig.DEX_HASHES.length) {
+            if (dexNames.size() != hashes.length) {
                 throw new IllegalStateException("Unexpected executable code entries");
             }
-            for (String[] expected : BuildConfig.DEX_HASHES) {
+            for (String[] expected : hashes) {
                 ZipEntry entry = apk.getEntry(expected[0]);
                 if (entry == null) throw new IllegalStateException("Missing " + expected[0]);
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
