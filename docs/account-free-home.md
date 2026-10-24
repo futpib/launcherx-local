@@ -6,8 +6,9 @@ received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
 verified on the physical TV, with app-published cards visible on Home.
-Version 0.7 is installed with its remote hooks loaded; physical-button behavior
-remains unverified.
+Version 0.8 is installed with Google TV and Xiaomi service hooks loaded. Live TV
+and Xiaomi TV+ fallback handling was observed in device logs; the complete
+six-button assignment and restoration suite remains emulator-only.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -40,7 +41,7 @@ account-free yet.**
 | 20 | **Notifications** | Local system/app notifications can use notification access. Account-specific cloud notifications still need their account. |
 | 21 | **Screensaver** | The launch control exists and appears signed out. The chosen screensaver’s requirements are separate; personal Google Photos albums need an account. |
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
-| 23 | **Custom remote-button shortcuts** | **0.8 adds independent customization for all six app buttons and per-button/all-button restore controls.** Hold to open the native chooser; short press opens the saved app or the original default action. YouTube accepts other installed apps too. Four buttons require the additional Xiaomi TV service scope. The TV deployment record still covers 0.7; 0.8's physical handoff, wake, input switching and Google Home remain unverified. See [implementation and test scope](remote-buttons.md). |
+| 23 | **Custom remote-button shortcuts** | **0.8 is installed with independent customization for all six app buttons and per-button/all-button restore controls.** Hold to open the native chooser; short press opens the saved app or the original default action. YouTube accepts other installed apps too. The additional Xiaomi TV service scope is enabled. Live TV and Xiaomi TV+ fallback handling was observed on the TV; complete assignment/reset coverage remains emulator-only. Wake, input switching and Google Home remain unverified. See [implementation and test scope](remote-buttons.md). |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
 | 25 | **Top navigation tabs and destinations** | **Home only while Incognito is selected in 0.6.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 

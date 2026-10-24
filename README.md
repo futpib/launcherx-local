@@ -32,12 +32,14 @@ in Subscriptions and Recommended rows. The complete content-row suite, playback
 links, sign-in cancellation and reboot persistence remain emulator-tested only;
 authenticated Google switching remains unverified.
 
-Version **0.7** is installed on the TV, with its remote hooks loaded in the core
-service process. The update preserved SmartTube's foreground task and process
-without a TV reboot. Shortcut configuration, short/long presses and app launches
-passed in the emulator; physical remote-button behavior remains unverified.
-The **0.8** Xiaomi handoff and original OEM app launches still need physical-TV
-validation. The last recorded TV installation is **0.7**.
+Version **0.8** is installed on the TV, with Google TV and TvService selected in
+LSPosed and their hooks loaded after process restarts, without a TV reboot.
+Device logs show Live TV and Xiaomi TV+ events reaching their original Xiaomi
+fallback handlers, including a Live TV activity launch. Complete six-button
+assignment, persistence and restoration tests remain emulator-only. The user
+confirmed YouTube, Netflix and Prime long-press customization after hook reload.
+See the
+[TV deployment record](validation-tv-remote.json) for the observed boundaries.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -237,8 +239,9 @@ tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.8**.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
 the same build's activation, compatibility-refusal and Incognito profile reruns.
-[`validation-tv-remote.json`](validation-tv-remote.json) records the **0.7** TV
-installation and hook loading, without a physical-button test.
+[`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV
+installation, hook loading, observed OEM fallback paths and user-assisted
+long-press checks.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content

@@ -175,9 +175,8 @@ See [validation-remote.json](../validation-remote.json) and
 [validation-all-shortcuts.json](../validation-all-shortcuts.json). The six-button
 test uses the actual native chooser, DPAD, store, receiver and ordered-broadcast
 acknowledgement on Google's side. It does not run the Xiaomi service, deliver
-the ordered result to Xiaomi, or invoke its PendingIntent fallback. The TV's
-ADB connection went offline during development, so 0.8's Xiaomi handoff remains
-unverified and the recorded TV installation remains 0.7. This does not verify
+the ordered result to Xiaomi, or invoke its PendingIntent fallback. These
+emulator tests do not verify
 Bluetooth, physical keylayout, wake/standby, input hardware, Google Home,
 Freeplay, authenticated switching or playback inside launched apps.
 
@@ -186,10 +185,33 @@ Incognito profile suites, including real Google sign-in cancellation and
 emulator reboot persistence. See
 [validation-remote-regressions.json](../validation-remote-regressions.json).
 
-Version 0.7 was installed over 0.6 on the physical MiTV-MOEU0. The installed APK
-hash matches the emulator-tested build, the stock launcher APK is unchanged,
-and the new core-service process loaded the remote hooks. SmartTube retained
-the same foreground activity, task and process. Deployment did not reboot the
-TV, open Home, inject keys or change assignments. No physical-button test was
-performed; retaining the playback activity does not prove uninterrupted video.
-See [validation-tv-remote.json](../validation-tv-remote.json).
+Version 0.8 was installed over 0.7 on the physical MiTV-MOEU0. The installed APK
+hash matches the emulator-tested build; the stock launcher and Xiaomi service
+APKs are unchanged. TvService was selected through LSPosed's normal UI, then
+Google TV's main/core processes and the persistent Xiaomi service were reloaded
+without a TV reboot. Logs confirm all three processes loaded their hooks.
+
+During deployment, incoming Live TV and Xiaomi TV+ events were observed crossing
+the bridge and invoking the original Xiaomi handlers through their PendingIntent
+fallbacks. ActivityManager also recorded a Live TV launch. The native shortcut
+chooser appeared in the foreground activity record. These observations were
+not a controlled six-button test and do not establish complete assignment,
+restoration or wake/standby behavior on the physical remote.
+
+The user subsequently confirmed that YouTube, Netflix and Prime long-press
+customization worked after all hooks finished reloading. Earlier stock-picker
+and Play Store observations overlapped deployment: a Play Store launch at
+16:49:52 TV local time preceded the new Google core hooks at 16:49:56 and Xiaomi
+hooks at 16:49:57. Raw remote events and receiver logs were captured during the
+retest, then both temporary monitors were stopped.
+
+Selecting **Home** in the native shortcut chooser opens Google's smart-home
+panel setup, not the TV launcher's home screen. The TV displayed the native
+Google Home setup instructions inside `MagicAppSelectionActivity`; this does
+not establish account-free smart-home support.
+
+SmartTube retained its process, activity and task identities and was foreground
+at the final check; playback was paused. The LSPosed visit and subsequent TV
+navigation mean uninterrupted playback is not claimed. Deployment did not
+write shortcut assignments or inject app-button KeyEvents. See
+[validation-tv-remote.json](../validation-tv-remote.json).
