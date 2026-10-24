@@ -1,7 +1,7 @@
 {
   "result": "passed",
-  "module_version": "0.9",
-  "apk_sha256": "269853ec5624a25ad8366ad28613352a0abaaa5b77f139776a9f23cb188a2abe",
+  "module_version": "0.11",
+  "apk_sha256": "059210f71258300f060ac5fd86731b2b1299659d8d1df51cddb028e10e340d39",
   "checks": [
     "Root broker rejects an unrelated shell caller",
     "Saved Play/Pause delivers exactly one media press per short press to a real Android MediaSession",

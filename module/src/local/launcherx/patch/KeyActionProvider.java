@@ -2,23 +2,42 @@ package local.launcherx.patch;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
+import android.system.Os;
+import android.system.StructStat;
+import android.util.Log;
 
 /** Only the verified owner-user Google launcher may ask this app to inject a key. */
 public final class KeyActionProvider extends ContentProvider {
+    private final KeyInjectorConnection injector = new KeyInjectorConnection();
+    private String verifiedIdentity;
+
     @Override public boolean onCreate() { return true; }
+
+    private synchronized void authorize(int caller) throws Exception {
+        PackageInfo info = getContext().getPackageManager().getPackageInfo(Compatibility.TARGET, 0);
+        if (caller / 100000 != 0 || caller != info.applicationInfo.uid) {
+            throw new SecurityException("Only Google TV may use this key service");
+        }
+        String path = info.applicationInfo.sourceDir;
+        StructStat file = Os.stat(path);
+        String identity = caller + ":" + path + ":" + info.getLongVersionCode() + ":" + info.lastUpdateTime
+                + ":" + file.st_dev + ":" + file.st_ino + ":" + file.st_size + ":" + file.st_mtime + ":" + file.st_ctime;
+        if (!identity.equals(verifiedIdentity)) {
+            Compatibility.verify(getContext());
+            verifiedIdentity = identity;
+            Log.i("LauncherXLocal", "Verified key-action caller installation");
+        }
+    }
 
     @Override public Bundle call(String method, String argument, Bundle extras) {
         int caller = Binder.getCallingUid();
         try {
-            if (caller / 100000 != 0 || caller != getContext().getPackageManager()
-                    .getApplicationInfo(Compatibility.TARGET, 0).uid) {
-                throw new SecurityException("Only Google TV may use this key service");
-            }
-            Compatibility.verify(getContext());
+            authorize(caller);
         } catch (SecurityException error) {
             throw error;
         } catch (Exception error) {
@@ -32,14 +51,9 @@ public final class KeyActionProvider extends ContentProvider {
         Bundle result = new Bundle();
         try {
             if ("prepare".equals(method)) {
-                if (!"0".equals(SetupActivity.root("id -u").trim())) {
-                    throw new IllegalStateException("Allow LauncherX Local root access in Magisk");
-                }
+                injector.prepare(getContext());
             } else {
-                String apk = getContext().getApplicationInfo().sourceDir;
-                String quoted = "'" + apk.replace("'", "'\\''") + "'";
-                SetupActivity.root("CLASSPATH=" + quoted
-                        + " app_process /system/bin local.launcherx.patch.KeyInjector " + code, 5);
+                injector.send(getContext(), code);
             }
             result.putBoolean("ok", true);
         } catch (Exception error) {

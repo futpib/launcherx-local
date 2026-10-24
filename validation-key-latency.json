@@ -1,0 +1,117 @@
+{
+  "result": "passed",
+  "apk_sha256": "059210f71258300f060ac5fd86731b2b1299659d8d1df51cddb028e10e340d39",
+  "measurement": "Source KeyEvent ACTION_UP eventTime to fixture callback uptime, excluding host ADB and sender startup.",
+  "custom_f8": {
+    "samples_ms": [
+      10,
+      5,
+      4,
+      5,
+      5,
+      5,
+      6,
+      6
+    ],
+    "median_ms": 5.0,
+    "min_ms": 4,
+    "max_ms": 10
+  },
+  "play_pause": {
+    "samples_ms": [
+      6,
+      5,
+      5,
+      4,
+      4,
+      4,
+      4,
+      6
+    ],
+    "median_ms": 4.5,
+    "min_ms": 4,
+    "max_ms": 6
+  },
+  "physical_tv_tested": false,
+  "limitations": [
+    "Google receiver injection in the x86 Android 14 emulator; not physical remote timing.",
+    "Media consumer is a silent AudioTrack and MediaSession fixture."
+  ],
+  "cleanup": "Native store restored; fixture APK and receiver helper removed.",
+  "lifecycle": {
+    "after_killed_worker": {
+      "samples_ms": [
+        244
+      ],
+      "median_ms": 244,
+      "min_ms": 244,
+      "max_ms": 244
+    },
+    "after_cold_provider": {
+      "samples_ms": [
+        505
+      ],
+      "median_ms": 505,
+      "min_ms": 505,
+      "max_ms": 505
+    },
+    "after_idle_expiry": {
+      "samples_ms": [
+        407
+      ],
+      "median_ms": 407,
+      "min_ms": 407,
+      "max_ms": 407
+    },
+    "unprivileged_idle_relay_retired_on_wake": true,
+    "checks": [
+      "Warm calls reuse one full launcher verification and still reject another caller UID",
+      "A worker killed between presses restarts and delivers exactly one key",
+      "Stopping the module closes its root worker and the next press re-verifies the launcher",
+      "The root worker exits after 60 seconds idle; the next press retires any frozen unprivileged relay and starts a new worker",
+      "Private worker exits on EOF and rejects invalid keys without input delivery"
+    ]
+  },
+  "baseline": {
+    "result": "passed",
+    "apk_sha256": "312639a490f64362cd07df9ff9216484c79bb1d7a86e7be880aecd8f04ece14d",
+    "measurement": "Source KeyEvent ACTION_UP eventTime to fixture callback uptime, excluding host ADB and sender startup.",
+    "custom_f8": {
+      "samples_ms": [
+        354,
+        344,
+        374,
+        392,
+        473,
+        489,
+        476,
+        474
+      ],
+      "median_ms": 432.5,
+      "min_ms": 344,
+      "max_ms": 489
+    },
+    "play_pause": {
+      "samples_ms": [
+        5,
+        4,
+        6,
+        3,
+        5,
+        3,
+        4,
+        5
+      ],
+      "median_ms": 4.5,
+      "min_ms": 3,
+      "max_ms": 6
+    },
+    "physical_tv_tested": false,
+    "limitations": [
+      "Google receiver injection in the x86 Android 14 emulator; not physical remote timing.",
+      "Media consumer is a silent AudioTrack and MediaSession fixture."
+    ],
+    "cleanup": "Native store restored; fixture APK and receiver helper removed."
+  },
+  "warm_custom_speedup": 86.5
+}

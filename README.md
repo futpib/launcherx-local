@@ -2,8 +2,9 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.10** adds **No action** alongside Play/Pause and other Android key
-actions for the six app buttons on the supported Xiaomi remote.
+Version **0.11** reduces custom-key delay by reusing launcher verification and
+a temporary root input worker. The six app buttons support Play/Pause, other
+Android keys and **No action**.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -250,11 +251,13 @@ TV update, automatic activation, native Incognito chooser and retained app butto
 [`validation-remote.json`](validation-remote.json) records native remote-receiver
 tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.9**.
-[`validation-key-actions.json`](validation-key-actions.json) records **0.9**
+[`validation-key-actions.json`](validation-key-actions.json) records **0.11**
 media-session delivery, arbitrary input injection, persistence and restoration.
 [`validation-no-action.json`](validation-no-action.json) records **0.10**
 No action on all six receivers, persistence, reconfiguration and restoration,
 plus Play/Pause and custom-key regression checks.
+[`validation-key-latency.json`](validation-key-latency.json) compares actual
+key delivery with 0.10 and checks the 0.11 worker's restart and idle cleanup.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
 the **0.8** activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV

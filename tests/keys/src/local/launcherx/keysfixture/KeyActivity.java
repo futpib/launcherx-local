@@ -9,6 +9,7 @@ import android.media.AudioTrack;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
@@ -21,6 +22,8 @@ public final class KeyActivity extends Activity {
     private int media;
     private int keys;
     private String last = "none";
+    private long received;
+    private long eventTime;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -36,6 +39,8 @@ public final class KeyActivity extends Activity {
             @Override public boolean onMediaButtonEvent(Intent intent) {
                 KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                 if (event != null && event.getAction() == KeyEvent.ACTION_UP) {
+                    received = SystemClock.uptimeMillis();
+                    eventTime = event.getEventTime();
                     media++;
                     playing = !playing;
                     update();
@@ -64,11 +69,14 @@ public final class KeyActivity extends Activity {
         text.setText("Key delivery fixture\nState: " + (playing ? "PLAYING" : "PAUSED")
                 + "\nMedia presses: " + media + "\nWindow presses: " + keys + "\nLast key: " + last);
         getSharedPreferences("events", MODE_PRIVATE).edit().putBoolean("playing", playing)
-                .putInt("media", media).putInt("keys", keys).putString("last", last).commit();
+                .putInt("media", media).putInt("keys", keys).putString("last", last)
+                .putLong("received", received).putLong("event_time", eventTime).commit();
     }
 
     @Override public boolean onKeyUp(int code, KeyEvent event) {
         if (code >= KeyEvent.KEYCODE_F1 && code <= KeyEvent.KEYCODE_F12) {
+            received = SystemClock.uptimeMillis();
+            eventTime = event.getEventTime();
             keys++;
             last = KeyEvent.keyCodeToString(code);
             update();

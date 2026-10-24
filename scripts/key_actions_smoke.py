@@ -167,6 +167,7 @@ def main():
         zero_accounts()
     finally:
         (ARTIFACTS / 'keys-final-logcat.raw').write_bytes(adb('logcat', '-d', binary=True))
+        root('am force-stop local.launcherx.patch')
         root('am force-stop ' + TARGET)
         root('rm -rf ' + STORE)
         if existed:

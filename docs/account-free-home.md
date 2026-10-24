@@ -1,7 +1,7 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.10**. The TV has
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.11**. The TV has
 received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
@@ -15,7 +15,9 @@ Android key codes. Media controls use Android's current media consumer; other
 keys need root access for LauncherX Local. New key-action delivery is verified
 in the emulator. See [key actions](key-actions.md).
 Version 0.10 adds **No action**, which disables short press while retaining
-long-press customization. It is not installed on the TV yet.
+long-press customization. Version 0.11 reduces custom-key delivery overhead;
+see the [emulator latency checks](../validation-key-latency.json). Neither
+update is installed on the TV yet.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need

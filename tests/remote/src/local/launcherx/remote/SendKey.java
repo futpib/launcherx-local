@@ -59,6 +59,7 @@ public final class SendKey {
         KeyEvent event = new KeyEvent(down, SystemClock.uptimeMillis(), action, code, repeat,
                 0, -1, 0, flags | KeyEvent.FLAG_FROM_SYSTEM | (generated ? KeyEvent.FLAG_FALLBACK : 0),
                 InputDevice.SOURCE_KEYBOARD);
+        if (action == KeyEvent.ACTION_UP) System.out.println("source_up_uptime_ms=" + event.getEventTime());
         Intent intent = new Intent("android.intent.action.GLOBAL_BUTTON")
                 .setComponent(new ComponentName(TARGET, TARGET
                         + ".remotecontrol.GlobalKeyListener_Receiver"))

@@ -125,6 +125,14 @@ buttons, restart persistence, retained long-press editing and default
 restoration. It also checks replacement with Play/Pause and custom F8 input,
 then restores the store and removes its fixtures.
 
+`python3 scripts/key_latency_smoke.py --lifecycle` measures key-release to
+delivered-event latency using the same Android uptime clock at both ends. It
+checks the private input worker's reuse, restart and idle cleanup. The idle test
+takes about a minute. Use `--apk` and `--output` to record a baseline before
+installing a newer module, then `--baseline /path/to/baseline.json` to include
+that comparison in the new report. It preserves the native shortcut store,
+removes fixtures, and stops the module's temporary input worker afterward.
+
 The fixture must have LauncherX Local enabled in LSPosed. The companion app
 needs a Magisk root grant for **Choose app content** and non-media key actions.
 Run:
