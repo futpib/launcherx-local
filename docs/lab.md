@@ -120,6 +120,11 @@ recipient; its activity records arbitrary window keys. The test drives the
 native chooser, module root broker and real input-injection helper, then
 restores the shortcut store and uninstalls the fixture.
 
+Run `python3 scripts/no_action_smoke.py` to check No action on all six source
+buttons, restart persistence, retained long-press editing and default
+restoration. It also checks replacement with Play/Pause and custom F8 input,
+then restores the store and removes its fixtures.
+
 The fixture must have LauncherX Local enabled in LSPosed. The companion app
 needs a Magisk root grant for **Choose app content** and non-media key actions.
 Run:

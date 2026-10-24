@@ -10,11 +10,12 @@ import android.view.KeyEvent;
 /** Media keys use Android's session routing; other keys use the module's root broker. */
 final class KeyActions {
     static final String PREFIX = "launcherx-key:";
+    static final int NONE = -1;
     static final Uri BROKER = Uri.parse("content://local.launcherx.patch.keys");
-    static final int[] COMMON = {85, 126, 127, 87, 88, 86, 90, 89, 3, 4, 187, 24, 25, 164, 82, 84};
+    static final int[] COMMON = {85, 126, 127, 87, 88, 86, 90, 89, 3, 4, 187, 24, 25, 164, 82, 84, NONE};
     static final String[] LABELS = {"Play / Pause", "Play", "Pause", "Next track", "Previous track",
             "Stop", "Fast forward", "Rewind", "TV home", "Back", "Recent apps", "Volume up",
-            "Volume down", "Mute", "Menu", "Search", "Other Android key…"};
+            "Volume down", "Mute", "Menu", "Search", "No action", "Other Android key…"};
 
     static int validate(int code) {
         if (code <= 0 || code > KeyEvent.getMaxKeyCode()) {
@@ -51,11 +52,13 @@ final class KeyActions {
     }
 
     static void prepare(Context context, int code) {
+        if (code == NONE) return;
         validate(code);
         if (!media(code)) broker(context, "prepare", code);
     }
 
     static void send(Context context, int code) {
+        if (code == NONE) return;
         validate(code);
         if (media(code)) {
             AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);

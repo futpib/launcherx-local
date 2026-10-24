@@ -2,8 +2,8 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.9** adds Play/Pause and other Android key actions to the independent
-shortcuts for the six app buttons on the supported Xiaomi remote.
+Version **0.10** adds **No action** alongside Play/Pause and other Android key
+actions for the six app buttons on the supported Xiaomi remote.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -116,6 +116,10 @@ Choose **Send key…** in the added controls to bind a button to **Play/Pause**,
 **TV home**, **Back**, or another Android key. Custom numeric key codes and
 `KEYCODE_` names are supported. Non-media keys require granting LauncherX Local
 root access in Magisk. See [key actions and delivery rules](docs/key-actions.md).
+
+Choose **No action** in that list to make short press do nothing. Long press
+still opens customization. No action needs no root grant; **Restore default**
+re-enables the button's original action.
 
 Until customized, branded buttons retain their original actions. An unassigned
 star opens the native chooser. At the top of the chooser, **Restore default**
@@ -248,6 +252,9 @@ tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.9**.
 [`validation-key-actions.json`](validation-key-actions.json) records **0.9**
 media-session delivery, arbitrary input injection, persistence and restoration.
+[`validation-no-action.json`](validation-no-action.json) records **0.10**
+No action on all six receivers, persistence, reconfiguration and restoration,
+plus Play/Pause and custom-key regression checks.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
 the **0.8** activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV

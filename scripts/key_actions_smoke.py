@@ -116,7 +116,7 @@ def main():
         assert 'name="playing" value="false"' in events()
         checks.append('Opening the chooser, cancelling a replacement and restarting the launcher retain the saved key action')
 
-        choose(313, 16, 'KEYCODE_F8 (138)', custom='KEYCODE_F8')
+        choose(313, 17, 'KEYCODE_F8 (138)', custom='KEYCODE_F8')
         receiver()
         send(313, 'short')
         assert 'KEYCODE_F8' in events() and 'name="keys" value="1"' in events()
@@ -175,7 +175,7 @@ def main():
         root('rm -rf ' + backup + ' ' + FIXTURE)
         adb('uninstall', APP)
         fresh_home()
-    report = {'result': 'passed', 'module_version': '0.9',
+    report = {'result': 'passed', 'module_version': json.loads((apk.parent / 'receipt.json').read_text())['version_name'],
               'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(), 'checks': checks,
               'physical_tv_tested': False, 'accounts': 0,
               'limitations': ['Silent AudioTrack and MediaSession fixture is not a third-party player.',

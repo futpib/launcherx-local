@@ -45,7 +45,7 @@ public final class SetupActivity extends Activity {
                 + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
                 + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
                 + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
-                + "Send key adds Play/Pause and other Android keys. Non-media keys need LauncherX Local root access in Magisk. "
+                + "Send key adds Play/Pause, other Android keys and No action. Non-media keys need LauncherX Local root access in Magisk. "
                 + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));

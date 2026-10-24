@@ -239,7 +239,8 @@ final class NativeShortcuts {
                             || KeyActions.generated(eventScope.get())) return;
                     try {
                         KeyActions.send(context, target);
-                        Log.i(TAG, "Sent shortcut key: " + code + " -> " + target);
+                        Log.i(TAG, target == KeyActions.NONE ? "No action for shortcut: " + code
+                                : "Sent shortcut key: " + code + " -> " + target);
                     } catch (RuntimeException error) {
                         Log.e(TAG, "Could not send shortcut key", error);
                         new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
@@ -269,6 +270,7 @@ final class NativeShortcuts {
         if (state == null || XposedHelpers.getIntField(state, "b") != 4) return null;
         String value = (String) XposedHelpers.getObjectField(state, "c");
         if (!value.startsWith(KeyActions.PREFIX)) return null;
+        if (value.equals(KeyActions.PREFIX + "none")) return KeyActions.NONE;
         return KeyActions.parse(value.substring(KeyActions.PREFIX.length()));
     }
 
@@ -400,7 +402,8 @@ final class NativeShortcuts {
 
     private static void updateKeyLabel(RestoreControls row, Object peer) {
         Integer code = keyAction(XposedHelpers.getObjectField(peer, "x"));
-        ((Button) row.getChildAt(2)).setText(code == null ? "Send key…" : "Key: " + KeyActions.label(code));
+        ((Button) row.getChildAt(2)).setText(code == null ? "Send key…"
+                : code == KeyActions.NONE ? "No action" : "Key: " + KeyActions.label(code));
     }
 
     private void chooseKey(Activity activity, int source) {
@@ -441,7 +444,8 @@ final class NativeShortcuts {
     private void confirmKey(Activity activity, int source, int target) {
         new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle("Bind " + label(source) + " to " + KeyActions.label(target) + "?")
-                .setMessage("Short press sends this key. Hold to customize again."
+                .setMessage(target == KeyActions.NONE ? "Short press does nothing. Hold to customize again."
+                        : "Short press sends this key. Hold to customize again."
                         + (KeyActions.media(target) ? "" : " Allow LauncherX Local root access in Magisk if prompted."))
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton("Save", (dialog, which) -> saveKey(activity, source, target)).show();
@@ -454,7 +458,8 @@ final class NativeShortcuts {
                 Object state = blank("lmj", "a");
                 Object value = mutable(state);
                 XposedHelpers.setIntField(value, "b", 4);
-                XposedHelpers.setObjectField(value, "c", KeyActions.PREFIX + target);
+                XposedHelpers.setObjectField(value, "c", KeyActions.PREFIX
+                        + (target == KeyActions.NONE ? "none" : Integer.toString(target)));
                 XposedHelpers.setBooleanField(value, "e", true);
                 Object id = blank("tzd", "a");
                 XposedHelpers.setIntField(mutable(id), "b", source);
@@ -468,7 +473,7 @@ final class NativeShortcuts {
                 Future<?> saved = (Future<?>) XposedHelpers.callMethod(setup, "c", XposedHelpers.callMethod(change, "r"));
                 saved.get(10, TimeUnit.SECONDS);
                 activity.runOnUiThread(() -> {
-                    Toast.makeText(activity, label(source) + " sends " + KeyActions.label(target), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, label(source) + ": " + KeyActions.label(target), Toast.LENGTH_SHORT).show();
                     activity.finish();
                 });
             } catch (Exception error) {

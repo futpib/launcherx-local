@@ -1,7 +1,7 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.9**. The TV has
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.10**. The TV has
 received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
@@ -14,6 +14,8 @@ Version 0.9 adds **Send key…** for Play/Pause, TV Home, Back and arbitrary
 Android key codes. Media controls use Android's current media consumer; other
 keys need root access for LauncherX Local. New key-action delivery is verified
 in the emulator. See [key actions](key-actions.md).
+Version 0.10 adds **No action**, which disables short press while retaining
+long-press customization. It is not installed on the TV yet.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -46,7 +48,7 @@ account-free yet.**
 | 20 | **Notifications** | Local system/app notifications can use notification access. Account-specific cloud notifications still need their account. |
 | 21 | **Screensaver** | The launch control exists and appears signed out. The chosen screensaver’s requirements are separate; personal Google Photos albums need an account. |
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
-| 23 | **Custom remote-button shortcuts** | **Independent customization for all six app buttons and per-button/all-button restore controls.** Hold to open the native chooser; short press opens the saved app, sends a saved Android key (0.9), or runs the original default action. Play/Pause and TV Home are presets; arbitrary Android key codes are accepted. YouTube accepts other installed apps too. The additional Xiaomi TV service scope is enabled. Live TV and Xiaomi TV+ fallback handling was observed on the TV; complete assignment/reset coverage remains emulator-only. Wake, input switching and Google Home remain unverified. See [key actions](key-actions.md) and [remote routing](remote-buttons.md). |
+| 23 | **Custom remote-button shortcuts** | **Independent customization for all six app buttons and per-button/all-button restore controls.** Hold to open the native chooser; short press opens the saved app, sends a saved Android key (0.9), does nothing with **No action** (0.10), or runs the original default action. Play/Pause and TV Home are presets; arbitrary Android key codes are accepted. YouTube accepts other installed apps too. The additional Xiaomi TV service scope is enabled. Live TV and Xiaomi TV+ fallback handling was observed on the TV; complete assignment/reset coverage remains emulator-only. Wake, input switching and Google Home remain unverified. See [key actions](key-actions.md) and [remote routing](remote-buttons.md). |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
 | 25 | **Top navigation tabs and destinations** | **Home only while Incognito is selected in 0.6.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 
@@ -104,6 +106,7 @@ and [0.6 TV profile checks](../validation-tv-profiles.json), plus
 [TV remote deployment](../validation-tv-remote.json),
 [0.9 TV update](../validation-tv-key-actions.json),
 [key-action tests](../validation-key-actions.json),
+[No action tests](../validation-no-action.json),
 [remote receiver tests](../validation-remote.json),
 [0.8 regression tests](../validation-remote-regressions.json) and
 [emulator validation](../validation.json), for the exact coverage.

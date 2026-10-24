@@ -1,0 +1,21 @@
+{
+  "result": "passed",
+  "module_version": "0.10",
+  "apk_sha256": "312639a490f64362cd07df9ff9216484c79bb1d7a86e7be880aecd8f04ece14d",
+  "checks": [
+    "All six source buttons save No action through the native chooser and consume short press without app launch, media events or window keys",
+    "All six No action assignments survive launcher process restart",
+    "Long press still opens customization, displays No action and preserves the assignment when cancelled",
+    "Replacing No action with Play/Pause resumes real media-key delivery",
+    "Custom key entry remains reachable and F8 reaches the focused activity",
+    "Individual restore re-enables YouTube while Netflix remains disabled",
+    "Restore all removes No action assignments and selects native and OEM defaults"
+  ],
+  "accounts": 0,
+  "physical_tv_tested": false,
+  "limitations": [
+    "Source KeyEvents enter the Google receiver; physical buttons and Xiaomi forwarding are not exercised.",
+    "OEM defaults are observed as selected branches; the emulator has no Xiaomi service."
+  ],
+  "cleanup": "Native shortcut store restored; receiver helper and media/key fixture removed."
+}

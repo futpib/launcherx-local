@@ -5,6 +5,13 @@ six supported buttons. Hold the source button, press Up to reach the added
 controls, then move right to Send key. Select a key and confirm Save. Short press
 sends the chosen key; long press still opens customization.
 
+Version **0.10** adds **No action** to this list. It consumes short press without
+launching an app, sending a key or invoking the button's default handler. Long
+press still opens customization, and the chooser displays **No action** as the
+current assignment. It needs no root access. Restore default re-enables the
+original action; No action is a saved assignment, not an unassigned button.
+This applies to the app shortcut handler, not the TV's hardware wake behavior.
+
 Play/Pause is first in the list. Other presets include Play, Pause, Next,
 Previous, Stop, Fast forward, Rewind, TV home, Back, Recent apps, volume, mute,
 Menu and Search. **Other Android key…** accepts a numeric Android key code or a
@@ -19,9 +26,9 @@ keeps the saved action. Choosing a favorite app replaces the key action, and
 Restore default / Restore all button defaults remove it through the same native
 store used for app shortcuts.
 
-Before disabling or uninstalling the module, restore any key actions using
-these controls. Stock Google TV cannot execute the module's saved key actions;
-normal favorite-app assignments remain native Google TV data.
+Before disabling or uninstalling the module, restore any key or No action
+assignments using these controls. Stock Google TV cannot execute the module's
+saved key actions; normal favorite-app assignments remain native Google TV data.
 
 ## Delivery and access
 
@@ -43,6 +50,12 @@ marked so that another Send key binding cannot recursively send more keys.
 Managed profiles cannot execute the added key actions.
 
 ## Validation
+
+`python3 scripts/no_action_smoke.py` covers No action on all six Google receiver
+paths, process-restart persistence, long-press editing, cancellation, restoration
+and replacing it with Play/Pause or a custom key. See
+[validation-no-action.json](../validation-no-action.json). Version 0.10 has not
+been deployed to the physical TV.
 
 `python3 scripts/key_actions_smoke.py` uses the real native chooser and store,
 an Android MediaSession with a silent AudioTrack, and a focused activity that

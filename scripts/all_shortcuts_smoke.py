@@ -161,7 +161,7 @@ def main():
         root('rm -rf ' + backup + ' ' + FIXTURE)
         fresh_home()
     report = {
-        'result': 'passed', 'module_version': '0.9',
+        'result': 'passed', 'module_version': json.loads((apk.parent / 'receipt.json').read_text())['version_name'],
         'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
         'checks': checks, 'physical_tv_tested': False, 'accounts': 0,
         'limitations': ['KeyEvent receiver injection does not exercise the physical remote or Xiaomi bridge.',
