@@ -124,9 +124,10 @@ shown, choose an installed TV app and save. Each button has its own assignment;
 the YouTube button can also choose apps outside Google's YouTube family.
 
 Choose **Send key…** in the added controls to bind a button to **Play/Pause**,
-**TV home**, **Back**, or another Android key. Custom numeric key codes and
-`KEYCODE_` names are supported. Non-media keys require granting LauncherX Local
-root access in Magisk. See [key actions and delivery rules](docs/key-actions.md).
+**TV home**, **Back**, or another Android key. Single letters such as `f`,
+numeric key codes and `KEYCODE_` names are supported. Non-media keys require
+granting LauncherX Local root access in Magisk. See
+[key actions and delivery rules](docs/key-actions.md).
 
 Choose **No action** in that list to make short press do nothing. Long press
 still opens customization. No action needs no root grant; **Restore default**
@@ -267,8 +268,9 @@ TV update, automatic activation, native Incognito chooser and retained app butto
 [`validation-remote.json`](validation-remote.json) records native remote-receiver
 tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.9**.
-[`validation-key-actions.json`](validation-key-actions.json) records **0.11**
-media-session delivery, arbitrary input injection, persistence and restoration.
+[`validation-key-actions.json`](validation-key-actions.json) records **0.12**
+media-session delivery, single-letter and symbolic key input, arbitrary input
+injection, persistence and restoration.
 [`validation-no-action.json`](validation-no-action.json) records **0.10**
 No action on all six receivers, persistence, reconfiguration and restoration,
 plus Play/Pause and custom-key regression checks.

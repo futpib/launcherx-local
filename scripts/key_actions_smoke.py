@@ -41,7 +41,7 @@ def choose(code, index, label, custom=None, cancel=False):
     fresh_home()
     send(code, 'long')
     foreground('keys-chooser', CHOOSER)
-    shell('input keyevent KEYCODE_DPAD_UP KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT '
+    shell('input keyevent KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT '
           'KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
     dialog('keys-list', 'Send key for')
     if index:
@@ -50,9 +50,15 @@ def choose(code, index, label, custom=None, cancel=False):
     if custom is not None:
         dialog('keys-custom', 'Android key code')
         shell('input text ' + custom)
+        time.sleep(1)
         shell('input keyevent KEYCODE_BACK')
+        deadline = time.monotonic() + 10
+        while 'mInputShown=true' in shell('dumpsys input_method'):
+            assert time.monotonic() < deadline, 'TV keyboard did not close'
+            time.sleep(.2)
+        shell('input keyevent KEYCODE_TAB')
         time.sleep(.4)
-        shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_LEFT KEYCODE_DPAD_CENTER')
+        shell('input keyevent KEYCODE_DPAD_CENTER')
     dialog('keys-confirm', ' to ' + label + '?')
     if cancel:
         shell('input keyevent KEYCODE_BACK')
@@ -122,6 +128,17 @@ def main():
         assert 'KEYCODE_F8' in events() and 'name="keys" value="1"' in events()
         checks.append('Custom symbolic Android key is saved and root injection reaches the focused app window')
         print(checks[-1], flush=True)
+
+        for custom in ['f', 'F', '34', 'KEYCODE_F']:
+            choose(313, 17, 'KEYCODE_F (34)', custom=custom)
+            receiver()
+            before = int(re.search(r'name="keys" value="(\d+)"', events()).group(1))
+            send(313, 'short')
+            delivered = events()
+            assert '<string name="last">KEYCODE_F</string>' in delivered, delivered
+            assert 'name="keys" value="' + str(before + 1) + '"' in delivered, delivered
+            print(custom + ': saved F key reaches the focused app window', flush=True)
+        checks.append('Single lowercase and uppercase letters, numeric codes and full names save and deliver the same F key')
 
         fresh_home()
         choose_app(313, 'Star')

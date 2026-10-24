@@ -14,9 +14,13 @@ This applies to the app shortcut handler, not the TV's hardware wake behavior.
 
 Play/Pause is first in the list. Other presets include Play, Pause, Next,
 Previous, Stop, Fast forward, Rewind, TV home, Back, Recent apps, volume, mute,
-Menu and Search. **Other Android key…** accepts a numeric Android key code or a
-symbol such as `KEYCODE_F8`. These are Android key codes, not Linux scan codes.
-The accepted range follows `KeyEvent.getMaxKeyCode()` on the device.
+Menu and Search. **Other Android key…** accepts a single letter, a numeric
+Android key code or a symbol such as `KEYCODE_F8`. For example, `f`, `F`, `34`
+and `KEYCODE_F` all select the F key. Names are case-insensitive and the
+`KEYCODE_` prefix is optional. For Space, enter `SPACE` or `62`.
+Numbers are interpreted as key codes; use
+`KEYCODE_1` to select the digit 1 key. These are Android key codes, not Linux
+scan codes. The accepted range follows `KeyEvent.getMaxKeyCode()` on the device.
 
 **TV home** sends the Home key. The native **Google Home** shortcut is a
 different action: it opens the smart-home panel or its setup instructions.
@@ -91,7 +95,8 @@ and replacing it with Play/Pause or a custom key. See
 `python3 scripts/key_actions_smoke.py` uses the real native chooser and store,
 an Android MediaSession with a silent AudioTrack, and a focused activity that
 records delivered keys. It also exercises the module's actual root broker and
-input helper. This fixture is not a third-party media player.
+input helper, including saving and delivering `f`, `F`, `34` and `KEYCODE_F`
+through the custom-key dialog. This fixture is not a third-party media player.
 
 The script backs up and restores the native shortcut store and removes its
 fixture APK and receiver helper. See

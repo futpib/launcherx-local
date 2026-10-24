@@ -476,7 +476,7 @@ final class NativeShortcuts {
     private void customKey(Activity activity, int source) {
         EditText input = new EditText(activity);
         input.setSingleLine(true);
-        input.setHint("85 or KEYCODE_MEDIA_PLAY_PAUSE");
+        input.setHint("f, 34 or KEYCODE_F");
         AlertDialog dialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle("Android key code")
                 .setView(input).setNegativeButton(android.R.string.cancel, null)

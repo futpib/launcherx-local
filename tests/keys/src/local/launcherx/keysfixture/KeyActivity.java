@@ -74,7 +74,8 @@ public final class KeyActivity extends Activity {
     }
 
     @Override public boolean onKeyUp(int code, KeyEvent event) {
-        if (code >= KeyEvent.KEYCODE_F1 && code <= KeyEvent.KEYCODE_F12) {
+        if ((code >= KeyEvent.KEYCODE_F1 && code <= KeyEvent.KEYCODE_F12)
+                || (code >= KeyEvent.KEYCODE_A && code <= KeyEvent.KEYCODE_Z)) {
             received = SystemClock.uptimeMillis();
             eventTime = event.getEventTime();
             keys++;
