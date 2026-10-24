@@ -1,7 +1,7 @@
 {
   "result": "passed",
-  "module_version": "0.8",
-  "apk_sha256": "4ab6d8ce7d7df99d054c0fdfd7fbe89010b4b72740f6a1c08a953b06652f2f4d",
+  "module_version": "0.9",
+  "apk_sha256": "269853ec5624a25ad8366ad28613352a0abaaa5b77f139776a9f23cb188a2abe",
   "checks": [
     "Star: native long-press chooser saves and short press launches TV Bro",
     "YouTube: native long-press chooser saves and short press launches TV Bro",

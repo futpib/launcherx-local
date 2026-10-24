@@ -1,0 +1,25 @@
+{
+  "result": "passed",
+  "module_version": "0.9",
+  "apk_sha256": "269853ec5624a25ad8366ad28613352a0abaaa5b77f139776a9f23cb188a2abe",
+  "checks": [
+    "Root broker rejects an unrelated shell caller",
+    "Saved Play/Pause delivers exactly one media press per short press to a real Android MediaSession",
+    "An injected fallback key cannot recursively trigger another Send key action",
+    "Opening the chooser, cancelling a replacement and restarting the launcher retain the saved key action",
+    "Custom symbolic Android key is saved and root injection reaches the focused app window",
+    "Choosing a favorite app replaces a saved key action",
+    "All six supported source buttons can send Play/Pause through the Google receiver",
+    "Back action uses Android input dispatch to leave the receiver app",
+    "YouTube can send the actual TV Home key without opening Google Home setup",
+    "Individual and all-button restoration remove key actions and retain native defaults"
+  ],
+  "physical_tv_tested": false,
+  "accounts": 0,
+  "limitations": [
+    "Silent AudioTrack and MediaSession fixture is not a third-party player.",
+    "Source KeyEvents enter the Google receiver; physical buttons and Xiaomi forwarding are not exercised.",
+    "Custom key effects depend on the receiving app and Android policy."
+  ],
+  "cleanup": "Native shortcut store restored; test APK and helper removed."
+}

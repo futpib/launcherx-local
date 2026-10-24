@@ -2,8 +2,8 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.8** adds independent long-press customization and restore controls
-for the six app buttons on the supported Xiaomi remote.
+Version **0.9** adds Play/Pause and other Android key actions to the independent
+shortcuts for the six app buttons on the supported Xiaomi remote.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -82,8 +82,9 @@ interfaces may need a pointer; the LauncherX Local content chooser works with DP
 This follows the [standard LSPosed installation and module activation flow](https://github.com/LSPosed/LSPosed/wiki/How-to-use-it).
 No framework databases, system files, or Google account records are edited directly.
 Running hooks use LSPosed. Home activation uses the launcher's own permission
-to select its activities. The companion app requests root only for **Choose app
-content**, to reach the launcher's protected channel-visibility receiver.
+to select its activities. The companion app requests root for **Choose app
+content** and for sending non-media keys. Play/Pause and other media controls
+use Android's media-button API directly.
 
 ## Profiles
 
@@ -110,6 +111,11 @@ Hold **Star, YouTube, Netflix, Prime Video, Live TV or Xiaomi TV+** to open
 Google's native shortcut chooser. Select **Favorite app** if a mode screen is
 shown, choose an installed TV app and save. Each button has its own assignment;
 the YouTube button can also choose apps outside Google's YouTube family.
+
+Choose **Send key…** in the added controls to bind a button to **Play/Pause**,
+**TV home**, **Back**, or another Android key. Custom numeric key codes and
+`KEYCODE_` names are supported. Non-media keys require granting LauncherX Local
+root access in Magisk. See [key actions and delivery rules](docs/key-actions.md).
 
 Until customized, branded buttons retain their original actions. An unassigned
 star opens the native chooser. At the top of the chooser, **Restore default**
@@ -168,6 +174,9 @@ the inspected Obtainium build, remain accessible through their own app tile.
 See the [store-picker implementation and validation](docs/store-picker.md).
 
 ## Restore or uninstall
+
+Use **Restore default** or **Restore all button defaults** to remove any Send
+key assignments first. Stock Google TV cannot execute those module actions.
 
 Disable **LauncherX Local** in LSPosed and restart Google TV, or reboot. With
 no Google accounts, the stock launcher shows its signed-out setup screen. This
@@ -236,9 +245,11 @@ picker check and the **0.5** channel-default update on the TV.
 TV update, automatic activation, native Incognito chooser and retained app button.
 [`validation-remote.json`](validation-remote.json) records native remote-receiver
 tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
-independent six-button assignments and default restoration in **0.8**.
+independent six-button assignments and default restoration in **0.9**.
+[`validation-key-actions.json`](validation-key-actions.json) records **0.9**
+media-session delivery, arbitrary input injection, persistence and restoration.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
-the same build's activation, compatibility-refusal and Incognito profile reruns.
+the **0.8** activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV
 installation, hook loading, observed OEM fallback paths and user-assisted
 long-press checks.

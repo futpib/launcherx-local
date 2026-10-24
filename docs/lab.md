@@ -114,8 +114,15 @@ reset confirmation/cancellation, all-button reset and cancelled key-up, then
 restores the original native shortcut store. Xiaomi forwarding and original
 OEM default launches still require the physical TV.
 
-The fixture must have LauncherX Local enabled in LSPosed. The companion app only
-needs a Magisk root grant for its **Choose app content** action. Run:
+Run `python3 scripts/key_actions_smoke.py` for key bindings. Its media-session
+fixture plays a silent AudioTrack so Android selects it as a media-button
+recipient; its activity records arbitrary window keys. The test drives the
+native chooser, module root broker and real input-injection helper, then
+restores the shortcut store and uninstalls the fixture.
+
+The fixture must have LauncherX Local enabled in LSPosed. The companion app
+needs a Magisk root grant for **Choose app content** and non-media key actions.
+Run:
 
 ```sh
 python3 scripts/setup_smoke.py

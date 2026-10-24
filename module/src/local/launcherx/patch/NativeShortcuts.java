@@ -18,6 +18,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -227,11 +228,28 @@ final class NativeShortcuts {
             @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                 Object info = hook.args[1];
                 int code = key(info);
-                if ((!oem(code) && code != 189 && code != 190) || !enabled(context)) return;
+                if (!enabled(context)) return;
+                Object state = ((Map<?, ?>) XposedHelpers.getObjectField(hook.thisObject, "k"))
+                        .get(XposedHelpers.getObjectField(info, "f"));
+                Integer target = keyAction(state);
+                if (target != null && supported(code)) {
+                    hook.setResult(null);
+                    Object account = XposedHelpers.getObjectField(hook.args[0], "c");
+                    if ((account != null && "managed_profile".equals(XposedHelpers.getObjectField(account, "e")))
+                            || KeyActions.generated(eventScope.get())) return;
+                    try {
+                        KeyActions.send(context, target);
+                        Log.i(TAG, "Sent shortcut key: " + code + " -> " + target);
+                    } catch (RuntimeException error) {
+                        Log.e(TAG, "Could not send shortcut key", error);
+                        new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                Toast.makeText(context, "Could not send key: " + error.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                    return;
+                }
+                if (!oem(code) && code != 189 && code != 190) return;
                 Object bytes = XposedHelpers.getObjectField(info, "i");
                 if (!(Boolean) XposedHelpers.callMethod(bytes, "C")) {
-                    Object state = ((Map<?, ?>) XposedHelpers.getObjectField(hook.thisObject, "k"))
-                            .get(XposedHelpers.getObjectField(info, "f"));
                     if (state != null && XposedHelpers.getIntField(state, "b") != 0) return;
                 }
                 if (code == 189 || code == 190) {
@@ -245,6 +263,13 @@ final class NativeShortcuts {
                 hook.setResult(null);
             }
         }));
+    }
+
+    private static Integer keyAction(Object state) {
+        if (state == null || XposedHelpers.getIntField(state, "b") != 4) return null;
+        String value = (String) XposedHelpers.getObjectField(state, "c");
+        if (!value.startsWith(KeyActions.PREFIX)) return null;
+        return KeyActions.parse(value.substring(KeyActions.PREFIX.length()));
     }
 
     private void youtubeDefault(Object listener, Object accountState, Object info) throws Exception {
@@ -304,6 +329,7 @@ final class NativeShortcuts {
                 ViewGroup content = activity.findViewById(android.R.id.content);
                 RestoreControls previous = content.findViewWithTag(RESET_VIEW);
                 if (previous != null && previous.code == key(info)) {
+                    updateKeyLabel(previous, hook.thisObject);
                     updateRestoreVisibility(hook.thisObject);
                     return;
                 }
@@ -316,14 +342,15 @@ final class NativeShortcuts {
                 Button one = button(activity, "Restore " + label(code) + " default");
                 one.setOnClickListener(v -> confirmReset(activity, new int[] {code}));
                 Button all = button(activity, "Restore all button defaults");
-                one.setId(View.generateViewId());
-                all.setId(View.generateViewId());
-                one.setNextFocusLeftId(one.getId());
-                one.setNextFocusRightId(all.getId());
-                all.setNextFocusLeftId(one.getId());
-                all.setNextFocusRightId(all.getId());
+                Button send = button(activity, "Send key…");
+                send.setOnClickListener(v -> chooseKey(activity, code));
                 all.setOnClickListener(v -> confirmReset(activity, ALL_KEYS));
-                for (Button button : new Button[] {one, all}) {
+                Button[] controls = {one, all, send};
+                for (Button control : controls) control.setId(View.generateViewId());
+                for (int index = 0; index < controls.length; index++) {
+                    Button button = controls[index];
+                    button.setNextFocusLeftId(controls[Math.max(0, index - 1)].getId());
+                    button.setNextFocusRightId(controls[Math.min(controls.length - 1, index + 1)].getId());
                     LinearLayout.LayoutParams item = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     item.setMargins(8, 0, 8, 0);
@@ -340,6 +367,7 @@ final class NativeShortcuts {
                 params.topMargin = Math.round(12 * activity.getResources().getDisplayMetrics().density);
                 activity.addContentView(row, params);
                 row.peer = hook.thisObject;
+                updateKeyLabel(row, hook.thisObject);
                 updateRestoreVisibility(hook.thisObject);
             }
         }));
@@ -368,6 +396,87 @@ final class NativeShortcuts {
                 }
             }
         }));
+    }
+
+    private static void updateKeyLabel(RestoreControls row, Object peer) {
+        Integer code = keyAction(XposedHelpers.getObjectField(peer, "x"));
+        ((Button) row.getChildAt(2)).setText(code == null ? "Send key…" : "Key: " + KeyActions.label(code));
+    }
+
+    private void chooseKey(Activity activity, int source) {
+        AlertDialog dialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Send key for " + label(source))
+                .setItems(KeyActions.LABELS, (choice, index) -> {
+                    if (index < KeyActions.COMMON.length) confirmKey(activity, source, KeyActions.COMMON[index]);
+                    else customKey(activity, source);
+                }).setNegativeButton(android.R.string.cancel, null).create();
+        dialog.setOnShowListener(unused -> {
+            dialog.getListView().requestFocus();
+            dialog.getListView().setSelection(0);
+        });
+        dialog.show();
+    }
+
+    private void customKey(Activity activity, int source) {
+        EditText input = new EditText(activity);
+        input.setSingleLine(true);
+        input.setHint("85 or KEYCODE_MEDIA_PLAY_PAUSE");
+        AlertDialog dialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Android key code")
+                .setView(input).setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton("Continue", null).create();
+        dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            try {
+                int target = KeyActions.parse(input.getText().toString());
+                if (target == source) throw new IllegalArgumentException("Choose a different key");
+                dialog.dismiss();
+                confirmKey(activity, source, target);
+            } catch (IllegalArgumentException error) {
+                input.setError(error.getMessage());
+            }
+        }));
+        dialog.show();
+    }
+
+    private void confirmKey(Activity activity, int source, int target) {
+        new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Bind " + label(source) + " to " + KeyActions.label(target) + "?")
+                .setMessage("Short press sends this key. Hold to customize again."
+                        + (KeyActions.media(target) ? "" : " Allow LauncherX Local root access in Magisk if prompted."))
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton("Save", (dialog, which) -> saveKey(activity, source, target)).show();
+    }
+
+    private void saveKey(Activity activity, int source, int target) {
+        new Thread(() -> {
+            try {
+                KeyActions.prepare(activity, target);
+                Object state = blank("lmj", "a");
+                Object value = mutable(state);
+                XposedHelpers.setIntField(value, "b", 4);
+                XposedHelpers.setObjectField(value, "c", KeyActions.PREFIX + target);
+                XposedHelpers.setBooleanField(value, "e", true);
+                Object id = blank("tzd", "a");
+                XposedHelpers.setIntField(mutable(id), "b", source);
+                Object change = blank("tzg", "a");
+                Object message = mutable(change);
+                XposedHelpers.setObjectField(message, "c", XposedHelpers.callMethod(id, "r"));
+                XposedHelpers.setIntField(message, "b", 1);
+                XposedHelpers.setIntField(message, "d", 1);
+                XposedHelpers.setObjectField(message, "e", XposedHelpers.callMethod(
+                        XposedHelpers.callMethod(state, "r"), "toByteString"));
+                Future<?> saved = (Future<?>) XposedHelpers.callMethod(setup, "c", XposedHelpers.callMethod(change, "r"));
+                saved.get(10, TimeUnit.SECONDS);
+                activity.runOnUiThread(() -> {
+                    Toast.makeText(activity, label(source) + " sends " + KeyActions.label(target), Toast.LENGTH_SHORT).show();
+                    activity.finish();
+                });
+            } catch (Exception error) {
+                Log.e(TAG, "Could not save shortcut key", error);
+                activity.runOnUiThread(() -> Toast.makeText(activity,
+                        "Key was not saved: " + error.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }, "LauncherX-save-key").start();
     }
 
     private static Button button(Activity activity, String text) {

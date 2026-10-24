@@ -1,5 +1,13 @@
 # Remote shortcuts and Incognito audit
 
+## Key actions in 0.9
+
+Each button's native chooser now includes **Send key…**, with Play/Pause first,
+TV Home and Back presets, and arbitrary Android key codes. Short press sends
+the key; long press still opens customization. Media keys use Android's media
+routing, while other keys use a root helper in the module APK. See
+[key actions](key-actions.md) for access, restoration and validation details.
+
 ## Six-button customization in 0.8
 
 Long-press each button to configure its own shortcut using Google's existing

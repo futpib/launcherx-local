@@ -8,7 +8,7 @@ from lab import SDK
 
 
 def build(kind='publisher'):
-    if kind not in ('publisher', 'markets', 'remote'):
+    if kind not in ('publisher', 'markets', 'remote', 'keys'):
         raise ValueError(kind)
     tools = SDK / 'build-tools/37.0.0'
     android = SDK / 'platforms/android-34/android.jar'

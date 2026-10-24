@@ -45,6 +45,7 @@ public final class SetupActivity extends Activity {
                 + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
                 + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
                 + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
+                + "Send key adds Play/Pause and other Android keys. Non-media keys need LauncherX Local root access in Magisk. "
                 + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));
@@ -149,7 +150,11 @@ public final class SetupActivity extends Activity {
         }, "launcherx-channels").start();
     }
 
-    private static String root(String command) throws Exception {
+    static String root(String command) throws Exception {
+        return root(command, 90);
+    }
+
+    static String root(String command, int timeoutSeconds) throws Exception {
         Process process = new ProcessBuilder("su", "-c", command).redirectErrorStream(true).start();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Thread reader = new Thread(() -> {
@@ -161,7 +166,7 @@ public final class SetupActivity extends Activity {
         }, "launcherx-root-output");
         reader.start();
         try {
-            if (!process.waitFor(90, TimeUnit.SECONDS)) {
+            if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
                 throw new IllegalStateException("Root request timed out. Check Magisk's Superuser page.");
             }
             reader.join(5000);

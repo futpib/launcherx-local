@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.launcherx.keysfixture" android:versionCode="1" android:versionName="1">
+    <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <application android:label="Key delivery fixture" android:theme="@android:style/Theme.Material.NoActionBar">
+        <activity android:name=".KeyActivity" android:exported="true" android:launchMode="singleTop" />
+    </application>
+</manifest>

@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 public final class SendKey {
     private static final String TARGET = "com.google.android.apps.tv.launcherx";
     private static boolean bridge;
+    private static boolean generated;
 
     public static void main(String[] args) throws Exception {
         Class<?> properties = Class.forName("android.os.SystemProperties");
@@ -28,6 +29,7 @@ public final class SendKey {
         Object instance = thread.getMethod("systemMain").invoke(null);
         Context context = (Context) thread.getMethod("getSystemContext").invoke(instance);
         bridge = args.length == 3 && "bridge".equals(args[2]);
+        generated = args.length == 3 && "generated".equals(args[2]);
         if ("app".equals(args[0])) {
             Intent launch = new Intent("com.google.global_button.ACTION_LAUNCH_APP")
                     .setComponent(new ComponentName(TARGET, TARGET
@@ -55,7 +57,8 @@ public final class SendKey {
 
     private static void send(Context context, long down, int code, int action, int repeat, int flags) throws Exception {
         KeyEvent event = new KeyEvent(down, SystemClock.uptimeMillis(), action, code, repeat,
-                0, -1, 0, flags | KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_KEYBOARD);
+                0, -1, 0, flags | KeyEvent.FLAG_FROM_SYSTEM | (generated ? KeyEvent.FLAG_FALLBACK : 0),
+                InputDevice.SOURCE_KEYBOARD);
         Intent intent = new Intent("android.intent.action.GLOBAL_BUTTON")
                 .setComponent(new ComponentName(TARGET, TARGET
                         + ".remotecontrol.GlobalKeyListener_Receiver"))

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="local.launcherx.patch" android:versionCode="8" android:versionName="0.8">
+    package="local.launcherx.patch" android:versionCode="9" android:versionName="0.9">
     <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -13,6 +13,8 @@
         <meta-data android:name="xposeddescription" android:value="Account-free local Home for Google TV launcher 702401" />
         <meta-data android:name="xposedminversion" android:value="82" />
         <meta-data android:name="xposedscope" android:resource="@array/xposed_scope" />
+        <provider android:name=".KeyActionProvider" android:authorities="local.launcherx.patch.keys"
+            android:exported="true" />
         <activity android:name=".SetupActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
