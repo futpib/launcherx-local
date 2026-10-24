@@ -38,7 +38,7 @@ public final class SetupActivity extends Activity {
         scroll.addView(content);
         setContentView(scroll);
         text("LauncherX Local", 28);
-        text("Incognito and Google profiles for launcher 1.0.785572138 (702401).\n"
+        text("Incognito and Google profiles for supported Google TV Home versions.\n"
                 + "Enable Zygisk in Magisk and install LSPosed. In LSPosed, enable LauncherX Local "
                 + "with Google TV selected, then restart Google TV or reboot. Home activates automatically. "
                 + "On the supported Xiaomi TV, also select TV service (mitv.service) and reboot to customize all six app buttons.\n"

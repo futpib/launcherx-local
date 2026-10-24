@@ -27,7 +27,7 @@ final class StorePicker {
     private final Method launch;
     private final BooleanSupplier enabled;
 
-    StorePicker(ClassLoader loader, BooleanSupplier enabled) throws Exception {
+    StorePicker(LauncherSymbols loader, BooleanSupplier enabled) throws Exception {
         this.enabled = enabled;
         launch = loader.loadClass("fyt").getDeclaredMethod("c", Activity.class,
                 loader.loadClass("aaht"), loader.loadClass("vhe"), String.class,

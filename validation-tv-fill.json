@@ -1,0 +1,101 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-10-24",
+  "module_version": "0.12",
+  "apk_sha256": "cebae97be09992a584ae550fe239c49ff696e1b152bdf6afc3feec665ce7c41b",
+  "device": "MiTV-MOEU0",
+  "android": 14,
+  "launcher_version_name": "1.0.1002449598",
+  "launcher_version_code": 835645,
+  "smarttube_version": "32.56",
+  "crop_comparison_apk_sha256": "0d034ec0401565e81f5e39108d536ece63d860a344b9b243e558249249b5f6da",
+  "checks": [
+    "Built the same-key module; APK signature, manifest, executable contents and both compatibility profiles passed release verification",
+    "Both reviewed original launcher APKs and every DEX match compatibility.json; crop hook signatures and native CenterCrop class hierarchy checked in raw DEX",
+    "Native Home and core-service hooks loaded on physical launcher 835645",
+    "SmartTube Subscriptions and History filled the native cards after installing the crop hook",
+    "Three sampled Recommended image interiors were pixel-identical before and after",
+    "All six existing preview channels rendered; provider IDs, channel IDs, poster URLs and aspect metadata compared byte-for-byte unchanged",
+    "App icons retained their existing shape; local preview images use native CenterCrop without changing source URLs or ImageView state",
+    "The final build retained the same crop source and rendered filled Subscriptions on Home",
+    "On the final build, injected long press KEYCODE_BUTTON_3 (190) opened the native YouTube shortcut chooser with Restore and Send key controls",
+    "Final captured logs contain successful hook installation and no module refusal, hook exception, fatal exception or ANR"
+  ],
+  "earlier_port_checks": [
+    "Incognito Home with six local rows",
+    "Native chooser displayed Incognito and Add account; selecting Incognito returned to Home",
+    "Google sign-in entry opened and was cancelled without entering account credentials",
+    "Star long press opened the native chooser and retained the Play/Pause assignment"
+  ],
+  "recommended_pixel_comparison": [
+    {
+      "card": "recommended_first",
+      "mean_absolute_rgb_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds": [
+        130,
+        780,
+        630,
+        1045
+      ]
+    },
+    {
+      "card": "recommended_second",
+      "mean_absolute_rgb_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds": [
+        710,
+        780,
+        1210,
+        1045
+      ]
+    },
+    {
+      "card": "recommended_third",
+      "mean_absolute_rgb_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds": [
+        1285,
+        780,
+        1785,
+        1045
+      ]
+    }
+  ],
+  "limitations": [
+    "Crop runtime coverage is only for 835645; 702401 received static DEX binding checks, not a new runtime test",
+    "No authenticated Google account or managed-profile test, and no reboot persistence test",
+    "The alternate UI-entity crop factory was statically checked but was not independently forced in a live test",
+    "Remote check used ADB-injected key events on the physical TV, not a physical remote press; assigning/restoring every shortcut was not retested on 835645",
+    "No post-chooser shortcut-store comparison: the user stopped further TV access; opening the native chooser may update native seen flags",
+    "The initial bindings-before/after files incorrectly hashed the store directory, so they are not evidence of preserved assignment bytes",
+    "The first development build refused hooks due to a decompiler-renamed enum field; the raw-DEX correction was installed and subsequent Home rendering passed",
+    "The last captured TV screen was the YouTube shortcut chooser. No further TV commands were sent after the user requested stopping device access"
+  ],
+  "evidence": [
+    "artifacts/tv-thumbnails/fill/before-2.png",
+    "artifacts/tv-thumbnails/fill/after-1.png",
+    "artifacts/tv-thumbnails/fill/before-4.png",
+    "artifacts/tv-thumbnails/fill/after-3.png",
+    "artifacts/tv-thumbnails/fill/provider-before.txt",
+    "artifacts/tv-thumbnails/fill/provider-after.txt",
+    "artifacts/tv-thumbnails/fill/recommended-comparison.json",
+    "artifacts/tv-thumbnails/fill/binding-checks.txt",
+    "artifacts/tv-thumbnails/fill/youtube-fixed-189.png",
+    "artifacts/tv-thumbnails/fill/youtube-fixed-190.png",
+    "artifacts/tv-thumbnails/fill/final-logcat.txt",
+    "artifacts/tv-thumbnails/fill/remote-policy.txt",
+    "artifacts/tv-launcher-upgrade/profiles-012-real.png",
+    "artifacts/tv-launcher-upgrade/add-account-012-ready.png",
+    "artifacts/tv-launcher-upgrade/star-012.png"
+  ]
+}

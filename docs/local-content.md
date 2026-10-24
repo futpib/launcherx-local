@@ -3,7 +3,8 @@
 LauncherX Local connects Android's local TV provider to the pinned launcher's
 existing row and card renderer. This does not unlock Google's recommendation
 backend. Since 0.6 it works while Home is active and **Incognito** is selected,
-even when Google accounts are saved on the TV. Google profiles use stock Home.
+even when Google accounts are saved on the TV. Google profiles use stock Home's
+content selection; the local preview artwork correction also applies there.
 These provider rows and visibility settings are shared within the Android user.
 
 ## Data and rendering
@@ -18,7 +19,8 @@ These provider rows and visibility settings are shared within the Android user.
   `ljf` converter formats the published cards.
 - Cards are wrapped in native `aagk` / `lfs` / `lft` objects and appended after the
   bundled apps row at `igc.w`. The content integration uses native remote navigation and card UI. These obfuscated names are supported only for the exact
-  executable hashes in `compatibility.json`.
+  executable hashes in `compatibility.json`. These names describe build 702401;
+  `LauncherSymbols` selects the reviewed equivalents for 835645.
 
 Provider reads and conversion run on a worker thread. Debounced content observers
 watch all three tables. The main thread updates only attached Home fragment
@@ -32,6 +34,46 @@ the publishing package. Cross-package or selector intents are ignored. The
 validated intent and its playback extras are handed to the stock action handler.
 Links are deduplicated within each row. The module does not read application-private
 history, invent viewing history, or publish recommendations itself.
+
+## Filling preview artwork
+
+Version **0.12** adds the launcher's bundled Glide `CenterCrop` transformation to
+local preview-card image requests. This fills each card while preserving image
+proportions. A 640x480 JPEG containing a centered 640x360 picture loses its top
+and bottom bands in a 16:9 card. Already matching 16:9 artwork keeps its framing.
+This is ordinary center cropping, not border detection; other aspect mismatches
+can crop meaningful content.
+
+`LocalArtwork` hooks the native asset factory and UI-entity adapter, and only
+changes IDs beginning with `local:asset:`. The asset factory also requires the
+`ROLE_LOCAL_ASSET` role. It leaves Watch Next, app icons and remote assets alone.
+It applies in both Incognito and Google profiles whenever those paths render a
+local preview card. Signed-in content availability has not been validated.
+
+The stock image loader has a center-crop flag, but its explicit transform path
+can be skipped when target override dimensions are zero. Therefore the patch
+uses the native builder's additional transformation, rather than just flipping
+that flag or changing a recycled ImageView's scale type. Glide includes the
+transformation in its cache key, so no cache clearing is needed. Published URLs,
+metadata and provider rows remain unchanged.
+
+| # | Launcher build | Asset factory | UI-entity factory | Builder transform | Native crop |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 702401 | `nnf.f(aapk, aaoz, int)` | `frd.f(Context)` | `ito.j(dkp)` | `dqh` |
+| 2 | 835645 | `otk.h(zqu, zqj, ImageView, int)` | `gfc.f(Context, ImageView)` | `jgd.j(eig)` | `enw` |
+
+All bindings are resolved after the executable hash check. The newer factories
+return an immutable request, which is copied into a builder; the older factories
+return a builder, which is cloned. The original request is only replaced after
+the transformation has been added successfully. Disabling the module restores
+the stock rendering on launcher restart.
+
+Physical-TV verification on 835645 compared the same SmartTube 32.56 records
+before and after installation: Subscriptions and History filled their cards,
+and three sampled Recommended image interiors were pixel-identical. Six local
+rows rendered and provider IDs, URLs and aspect metadata were unchanged. Both
+versions' hook signatures and crop classes were checked in raw DEX; runtime crop
+coverage is limited to 835645. See [the validation record](../validation-tv-fill.json).
 
 ## Choosing app rows
 

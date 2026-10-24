@@ -2,9 +2,9 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.11** reduces custom-key delay by reusing launcher verification and
-a temporary root input worker. The six app buttons support Play/Pause, other
-Android keys and **No action**.
+Version **0.12** supports both reviewed Google TV Home builds and fills local
+preview cards with centered artwork, including SmartTube's padded thumbnails.
+The six app buttons support Play/Pause, other Android keys and **No action**.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -16,8 +16,8 @@ instructions and automatic compatibility status. No ADB commands are needed.
 
 ## Compatibility
 
-- Google TV package `com.google.android.apps.tv.launcherx`, version
-  **1.0.785572138 / 702401**, with the exact executable hashes in
+- Google TV package `com.google.android.apps.tv.launcherx`, versions
+  **1.0.785572138 / 702401** and **1.0.1002449598 / 835645**, with the exact executable hashes in
   [`compatibility.json`](compatibility.json).
 - Tested on a Xiaomi **MiTV-MOEU0**, Android 14, ARM32, and an isolated Google TV
   Android 14 emulator running the same original launcher APK.
@@ -33,8 +33,17 @@ in Subscriptions and Recommended rows. The complete content-row suite, playback
 links, sign-in cancellation and reboot persistence remain emulator-tested only;
 authenticated Google switching remains unverified.
 
-Version **0.11** is installed on the TV, with Google TV and TvService selected in
-LSPosed. Its remote receiver and Xiaomi bridge reloaded without a TV reboot;
+Version **0.12** was installed on the physical TV running launcher **835645**.
+Incognito Home, local rows, the native profile chooser and sign-in cancellation
+were exercised without a Google account. SmartTube Subscriptions and History
+now fill their cards; sampled Recommended artwork was pixel-identical before and
+after. A synthetic YouTube long press opened the extended native shortcut chooser.
+The crop bindings for **702401** were checked against its original DEX, but the
+new crop behavior has not been runtime-tested on that older build. See the
+[0.12 validation record](validation-tv-fill.json) for the precise coverage.
+
+The prior **0.11** deployment selected Google TV and TvService in LSPosed.
+Its remote receiver and Xiaomi bridge reloaded without a TV reboot;
 existing assignments and the foreground SmartTube task were preserved.
 Key-action delivery, latency measurements and complete six-button assignment,
 persistence and restoration tests remain emulator-only.
@@ -155,6 +164,12 @@ provider changes and when returning Home, skips invalid/unavailable playback
 links and duplicate links within a row, and hides empty rows. Apps remain first.
 Local metadata needs no Google feed; app artwork may still load from URLs
 published by the app.
+
+Local preview artwork uses **center crop**: it keeps the image's proportions and
+crops its edges to fill the card. This removes the padding seen with SmartTube's
+4:3 thumbnail files containing a 16:9 picture. It does not stretch images, rewrite
+thumbnail URLs, or change published aspect-ratio metadata. Cropping can trim real
+content when an image's proportions differ from its card.
 
 These are Android TV's local **Watch Next** and **preview-channel** APIs. Apps
 that publish only to Google's cloud/Engage feed do not gain local rows. The test

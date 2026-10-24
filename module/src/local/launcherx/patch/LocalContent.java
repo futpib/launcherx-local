@@ -43,7 +43,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
             "internal_provider_id", "duration_millis", "last_playback_position_millis", "series_id"};
 
     private final Context context;
-    private final ClassLoader loader;
+    private final LauncherSymbols loader;
     private final BooleanSupplier enabled;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Map<Object, Object> tabs = new WeakHashMap<>();
@@ -56,7 +56,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
     private boolean foreground;
     private List<Object> rows = Collections.emptyList();
 
-    LocalContent(Context context, ClassLoader loader, BooleanSupplier enabled) throws Exception {
+    LocalContent(Context context, LauncherSymbols loader, BooleanSupplier enabled) throws Exception {
         this.context = context;
         this.loader = loader;
         this.enabled = enabled;
@@ -76,7 +76,9 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
             @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                 if (!enabled.getAsBoolean()) return;
                 Object destination = XposedHelpers.getObjectField(hook.thisObject, "g");
-                if (!"error_fallback_destination".equals(XposedHelpers.callMethod(destination, "f"))) return;
+                Object id = loader.modern ? XposedHelpers.getObjectField(destination, "g")
+                        : XposedHelpers.callMethod(destination, "f");
+                if (!"error_fallback_destination".equals(id)) return;
                 List<?> original = (List<?>) XposedHelpers.getObjectField(hook.args[0], "a");
                 List<Object> base = new ArrayList<>();
                 for (Object item : original) {
@@ -93,7 +95,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
 
     private void start(Object tab) {
         Log.i(TAG, "observing local Watch Next and preview providers");
-        provider = XposedHelpers.getObjectField(XposedHelpers.getObjectField(tab, "at"), "c");
+        provider = XposedHelpers.getObjectField(XposedHelpers.getObjectField(tab, loader.pick("at", "ar")), "c");
         HandlerThread thread = new HandlerThread("LauncherXLocalContent");
         thread.start();
         worker = new Handler(thread.getLooper());
@@ -131,7 +133,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         try {
             List<Object> cards = watchCards();
             if (!cards.isEmpty()) result.add(row("launcherx-local:watch-next",
-                    context.getString(0x7f140654), cards, false));
+                    context.getString(loader.pick(0x7f140654, 2132018634)), cards, false));
         } catch (Throwable error) {
             Log.w(TAG, "Watch Next unavailable; keeping app rows", error);
         }
@@ -252,7 +254,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
                 valid.addRow(values);
             }
             Object converter = XposedHelpers.newInstance(loader.loadClass("ljf"), provider, owner,
-                    0, false, XposedHelpers.getStaticObjectField(loader.loadClass("zej"), "b"));
+                    0, false, loader.emptyBytes());
             return (List<?>) XposedHelpers.callMethod(converter, "a", new Object[]{null, valid});
         }
     }
@@ -280,7 +282,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         set(row, "e", title); set(row, "o", id);
         set(row, "c", preview ? 24 : 11);
         set(row, "d", defaultValue(preview ? "abbi" : "aaff"));
-        XposedHelpers.callMethod(row, "bg", cards);
+        XposedHelpers.callMethod(row, loader.pick("bg", "bc"), cards);
         return rowConstructor.newInstance(id, finish(row), null);
     }
 
@@ -288,7 +290,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         Object asset = XposedHelpers.getObjectField(card, "c");
         Object entity = copy(XposedHelpers.getObjectField(asset, "f"));
         set(entity, "c", 0); set(entity, "d", null);
-        set(entity, "t", XposedHelpers.getStaticObjectField(loader.loadClass("zej"), "b"));
+        set(entity, "t", loader.emptyBytes());
         XposedHelpers.callStaticMethod(loader.loadClass("fxr"), "m", entity);
         Object assetCopy = copy(asset);
         set(assetCopy, "f", finish(entity));
@@ -297,9 +299,9 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         return finish(cardCopy);
     }
 
-    private static Object copy(Object proto) {
+    private Object copy(Object proto) {
         Object result = XposedHelpers.callMethod(proto, "toBuilder");
-        XposedHelpers.callMethod(result, "w");
+        loader.copyOnWrite(result);
         return result;
     }
 
@@ -315,7 +317,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         XposedHelpers.setObjectField(XposedHelpers.getObjectField(builder, "b"), field, value);
     }
 
-    private static Object finish(Object builder) { return XposedHelpers.callMethod(builder, "r"); }
+    private Object finish(Object builder) { return loader.finish(builder); }
 
     private static String string(Cursor cursor, String column) {
         String value = cursor.getString(cursor.getColumnIndexOrThrow(column));

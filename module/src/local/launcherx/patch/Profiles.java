@@ -31,7 +31,7 @@ final class Profiles {
     private static final String TAG = "LauncherXLocal";
     private static final String ANONYMOUS = "pseudonymous";
     private final Context context;
-    private final ClassLoader loader;
+    private final LauncherSymbols loader;
     private final SharedPreferences preferences;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
@@ -46,25 +46,33 @@ final class Profiles {
     private volatile String activeType;
     private WeakReference<Object> home = new WeakReference<>(null);
 
-    Profiles(Context context, ClassLoader loader) throws Exception {
+    Profiles(Context context, LauncherSymbols loader) throws Exception {
         this.context = context;
         this.loader = loader;
         preferences = context.getSharedPreferences("launcherx-local-profiles", Context.MODE_PRIVATE);
         accountClass = loader.loadClass("vjm");
         chooserPeerClass = loader.loadClass("kxc");
         initialSelection = loader.loadClass("kve").getDeclaredMethod("a", loader.loadClass("vip"));
-        accountChanged = loader.loadClass("isa").getDeclaredMethod("g", loader.loadClass("yjv"));
+        accountChanged = loader.loadClass("isa").getDeclaredMethod(loader.pick("g", "e"), loader.loadClass("yjv"));
         chooserData = loader.loadClass("kwx").getDeclaredMethod("b", Object.class);
         accountSelected = loader.loadClass("juj").getDeclaredMethod("a", loader.loadClass("wqw"));
         loader.loadClass("kve").getDeclaredField("c");
         loader.loadClass("kve").getDeclaredField("d");
-        loader.loadClass("isa").getDeclaredMethod("k", boolean.class, boolean.class,
-                String.class, boolean.class, boolean.class, loader.loadClass("vhe"));
+        if (loader.modern) {
+            loader.loadClass("isa").getDeclaredMethod("k", boolean.class, boolean.class,
+                    String.class, boolean.class, boolean.class, boolean.class, boolean.class, loader.loadClass("vhe"));
+        } else {
+            loader.loadClass("isa").getDeclaredMethod("k", boolean.class, boolean.class,
+                    String.class, boolean.class, boolean.class, loader.loadClass("vhe"));
+        }
         loader.loadClass("vnq").getDeclaredMethod("a", loader.loadClass("vip"));
         loader.loadClass("vjn").getDeclaredMethod("c", loader.loadClass("vhe"));
-        loader.loadClass("kwf").getDeclaredConstructor(loader.loadClass("wyc"), loader.loadClass("wyc"),
-                loader.loadClass("wyc"), loader.loadClass("j$.util.Optional"), int.class,
-                loader.loadClass("j$.util.Optional"));
+        Class<?> list = loader.loadClass("wyc"), optional = loader.loadClass("j$.util.Optional");
+        if (loader.modern) {
+            loader.loadClass("kwf").getDeclaredConstructor(list, list, list, optional, int.class, optional, boolean.class);
+        } else {
+            loader.loadClass("kwf").getDeclaredConstructor(list, list, list, optional, int.class, optional);
+        }
         loader.loadClass("kwe").getDeclaredConstructor(accountClass, Bitmap.class, Object.class,
                 int.class, boolean.class);
         chooserPeerClass.getDeclaredMethod("f", accountClass, String.class);
@@ -91,7 +99,7 @@ final class Profiles {
         XposedHelpers.setObjectField(value, "e", "Incognito");
         XposedHelpers.setObjectField(value, "g", "");
         XposedHelpers.setIntField(value, "b", XposedHelpers.getIntField(value, "b") | 2 | 4 | 16);
-        return XposedHelpers.callMethod(builder, "r");
+        return loader.finish(builder);
     }
 
     void install(List<XC_MethodHook.Unhook> hooks) throws Exception {
@@ -111,7 +119,7 @@ final class Profiles {
                 if (!activity.getClass().getName().equals(Compatibility.TARGET + ".home.HomeActivity")) return;
                 home = new WeakReference<>(hook.thisObject);
                 if (!enabled()) return;
-                activeType = (String) XposedHelpers.callMethod(hook.args[0], "co");
+                activeType = (String) XposedHelpers.callMethod(hook.args[0], loader.pick("co", "ad"));
                 preferences.edit().putBoolean("incognito", ANONYMOUS.equals(activeType)).apply();
                 Log.i(TAG, "active launcher profile: " + activeType);
             }
@@ -121,12 +129,16 @@ final class Profiles {
                 View view = (View) hook.thisObject;
                 Object peer = home.get();
                 // This pinned resource is the native account button in both tab layouts.
-                if (!enabled() || view.getId() != 0x7f0b05fb || peer == null
+                if (!enabled() || view.getId() != loader.pick(0x7f0b05fb, 2131429037) || peer == null
                         || !(ANONYMOUS.equals(activeType) || "google".equals(activeType))) return;
                 Activity activity = (Activity) XposedHelpers.getObjectField(peer, "b");
                 if (activity.isFinishing() || activity.isDestroyed()
                         || view.getRootView() != activity.getWindow().getDecorView().getRootView()) return;
-                XposedHelpers.callMethod(peer, "k", false, false, null, false, false, null);
+                if (loader.modern) {
+                    XposedHelpers.callMethod(peer, "k", false, false, null, false, false, false, false, null);
+                } else {
+                    XposedHelpers.callMethod(peer, "k", false, false, null, false, false, null);
+                }
                 hook.setResult(true);
             }
         }));
@@ -166,8 +178,8 @@ final class Profiles {
         }));
         hooks.add(XposedBridge.hookMethod(accountSelected, new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
-                // juj is a shared synthetic callback; case 19 belongs to the chooser.
-                if (XposedHelpers.getIntField(hook.thisObject, "b") != 19) return;
+                // Keep the shared synthetic callback scoped to its profile chooser case.
+                if (XposedHelpers.getIntField(hook.thisObject, loader.pick("b", "$cid")) != loader.pick(19, 5)) return;
                 Object peer = XposedHelpers.getObjectField(hook.thisObject, "a");
                 if (!chooserPeerClass.isInstance(peer)) return;
                 Activity activity = chooserActivity(peer);
@@ -186,7 +198,7 @@ final class Profiles {
 
     private Activity chooserActivity(Object peer) {
         Object fragment = XposedHelpers.getObjectField(peer, "b");
-        return (Activity) XposedHelpers.callMethod(fragment, "G");
+        return (Activity) XposedHelpers.callMethod(fragment, loader.pick("G", "F"));
     }
 
     private boolean eligible(Activity activity) {
@@ -232,13 +244,20 @@ final class Profiles {
         }
         Class<?> list = loader.loadClass("wyc");
         Class<?> optional = loader.loadClass("j$.util.Optional");
+        Object newRows = XposedHelpers.callStaticMethod(list, "o", rows);
+        Object newChoices = XposedHelpers.callStaticMethod(list, "o", choices);
+        Object children = XposedHelpers.getObjectField(data, loader.pick("f", "g"));
+        Object selected = incognito() ? XposedHelpers.callStaticMethod(optional, "of", anonymous)
+                : XposedHelpers.getObjectField(data, "c");
+        int addAccount = XposedHelpers.getIntField(data, loader.pick("e", "f"));
+        Object extra = XposedHelpers.getObjectField(data, "d");
+        if (loader.modern) {
+            return loader.loadClass("kwf").getConstructor(list, list, list, optional, int.class, optional, boolean.class)
+                    .newInstance(newRows, newChoices, children, selected, addAccount, extra,
+                            XposedHelpers.getBooleanField(data, "e"));
+        }
         return loader.loadClass("kwf").getConstructor(list, list, list, optional, int.class, optional)
-                .newInstance(XposedHelpers.callStaticMethod(list, "o", rows),
-                        XposedHelpers.callStaticMethod(list, "o", choices),
-                        XposedHelpers.getObjectField(data, "f"),
-                        incognito() ? XposedHelpers.callStaticMethod(optional, "of", anonymous)
-                                : XposedHelpers.getObjectField(data, "c"),
-                        XposedHelpers.getIntField(data, "e"), XposedHelpers.getObjectField(data, "d"));
+                .newInstance(newRows, newChoices, children, selected, addAccount, extra);
     }
 
     private static boolean isAnonymous(Object account) {

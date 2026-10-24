@@ -41,23 +41,23 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 if (installed) return;
                 context = (Context) hook.args[0];
                 try {
-                    Compatibility.verify(context);
+                    LauncherSymbols loader = new LauncherSymbols(param.classLoader, Compatibility.verify(context));
                     if (coreServices) {
                         if (BuildConfig.APPS_ONLY) {
                             List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
                             try {
-                                new NativeShortcuts(context, param.classLoader).install(hooks, true);
-                                new RemoteButtons(context, param.classLoader).install(hooks);
+                                new NativeShortcuts(context, loader).install(hooks, true);
+                                new RemoteButtons(context, loader).install(hooks);
                             } catch (Throwable error) {
                                 for (XC_MethodHook.Unhook hookHandle : hooks) hookHandle.unhook();
                                 throw error;
                             }
                         }
                     } else {
-                        installHooks(param.classLoader, (Application) hook.thisObject);
+                        installHooks(loader, (Application) hook.thisObject);
                     }
                     installed = true;
-                    event("installed mode=" + BuildConfig.MODE + " version=" + BuildConfig.VERSION_CODE
+                    event("installed mode=" + BuildConfig.MODE + " version=" + loader.version
                             + " process=" + param.processName);
                 } catch (Throwable error) {
                     Log.e(TAG, "Patch refused; launcher remains unmodified", error);
@@ -85,7 +85,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         }
     }
 
-    private void installHooks(ClassLoader loader, Application application) throws Exception {
+    private void installHooks(LauncherSymbols loader, Application application) throws Exception {
         Class<?> activityPeer = loader.loadClass("isa");
         Class<?> rootPeer = loader.loadClass("isn");
         Class<?> appsOnlyObserver = loader.loadClass("isf");
@@ -100,25 +100,30 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         Class<?> profileObserver = loader.loadClass("idj");
         Method profile = profileObserver.getDeclaredMethod("b", Object.class);
         Method theme = activityPeer.getDeclaredMethod("x", String.class);
-        Method showHome = rootPeer.getDeclaredMethod("h", boolean.class);
+        Method showHome = rootPeer.getDeclaredMethod(loader.pick("h", "f"), boolean.class);
         Method appsOnly = appsOnlyObserver.getDeclaredMethod("b", Object.class);
         Method recovery = accountCallback.getDeclaredMethod("apply", Object.class);
-        rootPeer.getDeclaredField("r");
-        rootPeer.getDeclaredField("A");
+        rootPeer.getDeclaredField(loader.pick("r", "u"));
+        rootPeer.getDeclaredField(loader.pick("A", "w"));
         accountCallback.getDeclaredField("a");
-        accountCallback.getDeclaredField("b");
-        Method localChannels = localHome.getDeclaredMethod("c");
-        Method errorChannels = localHome.getDeclaredMethod("b", String.class);
+        accountCallback.getDeclaredField(loader.pick("b", "$cid"));
+        Method localChannels = localHome.getDeclaredMethod(loader.pick("c", "b"));
+        Method errorChannels = localHome.getDeclaredMethod(loader.pick("b", "a"), String.class);
         Method loadDestinations = destinations.getDeclaredMethod("d");
         Method refreshDestinations = destinations.getDeclaredMethod("b");
         localHome.getDeclaredConstructor(Object.class);
-        localHome.getDeclaredMethod("d");
-        futures.getDeclaredMethod("W", Object.class);
+        localHome.getDeclaredMethod(loader.pick("d", "c"));
+        futures.getDeclaredMethod(loader.pick("W", "ae"), Object.class);
         cacheResult.getDeclaredMethod("a", Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
+        if (loader.modern) {
+            destinations.getDeclaredMethod("a");
+            loader.loadClass("xhu").getDeclaredConstructor(loader.loadClass("xje"));
+        }
         LocalContent content = BuildConfig.APPS_ONLY ? new LocalContent(context, loader, this::anonymous) : null;
         StorePicker stores = BuildConfig.APPS_ONLY ? new StorePicker(loader, this::anonymous) : null;
+        LocalArtwork artwork = BuildConfig.APPS_ONLY ? new LocalArtwork(loader) : null;
         profiles = BuildConfig.APPS_ONLY ? new Profiles(context, loader) : null;
         List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
         try {
@@ -135,23 +140,32 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 }
             }));
             if (BuildConfig.APPS_ONLY) {
+                artwork.install(hooks);
                 hooks.add(content.install());
                 hooks.add(stores.install());
+                if (loader.modern) NavigationDetails.install(context, loader, this::anonymous, hooks);
                 XC_MethodHook localDestinations = new XC_MethodHook() {
                     @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                         if (!anonymous()) return;
                         Object factory = localHome.getConstructor(Object.class).newInstance(context);
-                        Object home = XposedHelpers.callMethod(factory, "d");
-                        if ("d".equals(hook.method.getName())) {
+                        Object home = XposedHelpers.callMethod(factory, loader.pick("d", "c"));
+                        if (!"b".equals(hook.method.getName())) {
                             Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
                             home = XposedHelpers.callStaticMethod(cacheResult, "a", home, expiry);
                         }
-                        hook.setResult(XposedHelpers.callStaticMethod(futures, "W", home));
+                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae"), home);
+                        // The newer loader may use its prefetched future without calling d().
+                        if (loader.modern && "a".equals(hook.method.getName())) {
+                            result = XposedHelpers.newInstance(loader.loadClass("xhu"), result);
+                        }
+                        hook.setResult(result);
                         event("using bundled local home destination without a feed request");
                     }
                 };
                 hooks.add(XposedBridge.hookMethod(loadDestinations, localDestinations));
                 hooks.add(XposedBridge.hookMethod(refreshDestinations, localDestinations));
+                if (loader.modern) hooks.add(XposedBridge.hookMethod(
+                        destinations.getDeclaredMethod("a"), localDestinations));
                 XC_MethodHook appsChannelOnly = new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam hook) throws Throwable {
                         if (!anonymous() || hook.hasThrowable()) return;
@@ -181,15 +195,15 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
             hooks.addAll(XposedBridge.hookAllConstructors(rootPeer, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam hook) {
                     if (!anonymous()) return;
-                    XposedHelpers.setBooleanField(hook.thisObject, "r", false);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("r", "u"), false);
                     event("anonymous profile allowed into GuideHomeFragment");
                 }
             }));
             hooks.add(XposedBridge.hookMethod(showHome, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) {
                     if (!anonymous()) return;
-                    XposedHelpers.setBooleanField(hook.thisObject, "r", false);
-                    XposedHelpers.setBooleanField(hook.thisObject, "A", BuildConfig.APPS_ONLY);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("r", "u"), false);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("A", "w"), BuildConfig.APPS_ONLY);
                     event("show official guide; appsOnly=" + BuildConfig.APPS_ONLY);
                 }
             }));
@@ -200,8 +214,8 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
             }));
             hooks.add(XposedBridge.hookMethod(recovery, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) {
-                    // This synthetic callback serves many unrelated call sites; only case 1 is recovery.
-                    if (XposedHelpers.getIntField(hook.thisObject, "b") == 1
+                    // Only this reviewed callback case belongs to no-account recovery.
+                    if (XposedHelpers.getIntField(hook.thisObject, loader.pick("b", "$cid")) == loader.pick(1, 3)
                             && accountVerifier.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
                             && anonymous()) {
                         hook.setResult(null);

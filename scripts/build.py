@@ -40,6 +40,14 @@ def run(*args):
     subprocess.run([str(arg) for arg in args], check=True)
 
 
+def compatibility_versions(compatibility):
+    versions = [compatibility] + compatibility.get("additional_versions", [])
+    codes = [version["version_code"] for version in versions]
+    if len(codes) != len(set(codes)):
+        raise ValueError("Compatibility profiles must have distinct version codes")
+    return versions
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--launcher", type=Path, help="Optionally verify a privately obtained launcher APK")
@@ -58,9 +66,15 @@ def main():
         if not all(os.environ.get(name) for name in ["LAUNCHERX_STORE_PASS", "LAUNCHERX_KEY_PASS"]):
             raise SystemExit("Set LAUNCHERX_STORE_PASS and LAUNCHERX_KEY_PASS for release signing")
     compatibility = json.loads((ROOT / "compatibility.json").read_text())
+    versions = compatibility_versions(compatibility)
+    inspected = compatibility
     inputs = [(args.api, API_SHA256)]
     if args.launcher:
-        inputs.append((args.launcher, compatibility["apk_sha256"]))
+        digest = hashlib.sha256(args.launcher.read_bytes()).hexdigest()
+        matches = [version for version in versions if version["apk_sha256"] == digest]
+        if len(matches) != 1:
+            raise SystemExit("Launcher APK is not a reviewed compatibility build")
+        inspected = matches[0]
     for path, expected in inputs:
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise SystemExit(f"Unexpected input SHA-256: {path}")
@@ -78,7 +92,7 @@ def main():
     for name in ["classes", "dex"]:
         shutil.rmtree(build / name, ignore_errors=True)
         (build / name).mkdir()
-    hashes = compatibility["dex_sha256"]
+    hashes = inspected["dex_sha256"]
     if args.launcher:
         with zipfile.ZipFile(args.launcher) as apk:
             actual = [[name, hashlib.sha256(apk.read(name)).hexdigest()]
@@ -86,13 +100,17 @@ def main():
         if actual != hashes:
             raise SystemExit("Launcher DEX hashes differ from compatibility.json")
     generated = build / "BuildConfig.java"
-    entries = ",\n".join("{" + json.dumps(name) + "," + json.dumps(digest) + "}" for name, digest in hashes)
+    profiles = ",\n".join("{" + ",".join("{" + json.dumps(name) + "," + json.dumps(digest) + "}"
+                                        for name, digest in version["dex_sha256"]) + "}"
+                            for version in versions)
     generated.write_text("package local.launcherx.patch;\npublic final class BuildConfig {\n"
-                         f"public static final long VERSION_CODE = {compatibility['version_code']}L;\n"
+                         "public static final long[] VERSIONS = {"
+                         + ",".join(str(version["version_code"]) + "L" for version in versions) + "};\n"
+                         + "public static final String[][][] PROFILE_HASHES = {" + profiles + "};\n"
                          f'public static final String MODE = "{args.mode}";\n'
                          f"public static final boolean APPS_ONLY = {str(args.mode == 'apps').lower()};\n"
                          f"public static final boolean EMULATOR_NETWORK = {str(args.emulator_network).lower()};\n"
-                         "public static final String[][] DEX_HASHES = {" + entries + "};\n}\n")
+                         "}\n")
     run("javac", "-source", "8", "-target", "8", "-Xlint:-options", "-bootclasspath",
         f"{android}:{tools / 'core-lambda-stubs.jar'}",
         "-classpath", f"{android}:{args.api}", "-d", build / "classes", generated,
@@ -120,7 +138,10 @@ def main():
     (build / "receipt.json").write_text(json.dumps({"mode": args.mode,
         "version_name": version_name, "version_code": version_code,
         "emulator_network": args.emulator_network, "apk": str(output),
-        "sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "launcher_dex": hashes}, indent=2) + "\n")
+        "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+        "launcher_profiles": [{"version_code": version["version_code"],
+                               "version_name": version["version_name"],
+                               "dex_sha256": version["dex_sha256"]} for version in versions]}, indent=2) + "\n")
     (build / "SHA256SUMS").write_text(hashlib.sha256(output.read_bytes()).hexdigest() + "  " + output.name + "\n")
     print(output)
 

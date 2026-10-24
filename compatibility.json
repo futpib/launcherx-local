@@ -20,5 +20,30 @@
       "classes4.dex",
       "0beb2f768845139e153c5040e71afb7ea0ab686348aa26a181665e1a06610188"
     ]
+  ],
+  "additional_versions": [
+    {
+      "version_name": "1.0.1002449598",
+      "version_code": 835645,
+      "apk_sha256": "c9496fe05596b03e60acb4889b8296b2bd73eefea9575a65912714206aff9e2d",
+      "dex_sha256": [
+        [
+          "classes.dex",
+          "a814f92ed6d1540372e4af7f1e61d9e078aaf857e773bbf66fb8c763033b6096"
+        ],
+        [
+          "classes2.dex",
+          "e937534e4e06e7a14c35f16d76dbca1585150dad16a44e3ebb4c2569c003a90c"
+        ],
+        [
+          "classes3.dex",
+          "ed2040f55550cb50cb55a740f9042a82f3413cb16a1922f92ca1761e52f4666d"
+        ],
+        [
+          "classes4.dex",
+          "0dc36a2f4f4e37a68d1a03bac6f8ae556bf04f20283c5118e6b0f74826f18e7e"
+        ]
+      ]
+    }
   ]
 }

@@ -10,7 +10,7 @@ import struct
 import subprocess
 import zipfile
 
-from build import ROOT
+from build import ROOT, compatibility_versions
 
 
 def verify(directory):
@@ -19,6 +19,10 @@ def verify(directory):
     digest = hashlib.sha256(apk.read_bytes()).hexdigest()
     assert receipt["mode"] == "apps" and receipt["emulator_network"] is False, receipt
     assert receipt["sha256"] == digest
+    versions = compatibility_versions(json.loads((ROOT / "compatibility.json").read_text()))
+    assert receipt["launcher_profiles"] == [
+        {key: version[key] for key in ("version_code", "version_name", "dex_sha256")}
+        for version in versions]
     assert (directory / "SHA256SUMS").read_text() == f"{digest}  {apk.name}\n"
     sdk = Path(os.environ.get("ANDROID_HOME", str(Path.home() / "Android/Sdk")))
     tools = sdk / "build-tools/37.0.0"

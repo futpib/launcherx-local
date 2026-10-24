@@ -21,6 +21,7 @@ final class RemoteButtons {
     private final Method anonymousCheck;
     private final Method basicInternetRule;
     private final Class<?> launchManager;
+    private final boolean modern;
     private final ThreadLocal<Gate> current = new ThreadLocal<>();
 
     private static final class Gate {
@@ -34,8 +35,24 @@ final class RemoteButtons {
         }
     }
 
-    RemoteButtons(Context context, ClassLoader loader) throws Exception {
+    RemoteButtons(Context context, LauncherSymbols loader) throws Exception {
         this.context = context;
+        modern = loader.modern;
+        launchManager = loader.loadClass("ibq");
+        loader.loadClass("gbp").getDeclaredField("e");
+        if (modern) {
+            // NativeShortcuts temporarily uses generic mode during anonymous
+            // YouTube dispatch, before the inlined YouTube-only account gate.
+            keyCallback = null;
+            anonymousCheck = null;
+            Class<?> launch = loader.loadClass("inw");
+            launchCallback = launch.getDeclaredMethod("a", Object.class);
+            if (launch.getDeclaredField("a").getType() != launchManager) {
+                throw new IllegalStateException("Unexpected app launch callback");
+            }
+            basicInternetRule = loader.loadClass("oro").getDeclaredMethod("b", Context.class);
+            return;
+        }
         Class<?> callback = loader.loadClass("llx");
         keyCallback = callback.getDeclaredMethod("a");
         if (callback.getDeclaredField("c").getType() != KeyEvent.class) {
@@ -45,8 +62,6 @@ final class RemoteButtons {
         launchCallback = launch.getDeclaredMethod("apply", Object.class);
         launch.getDeclaredField("e");
         launch.getDeclaredField("a");
-        launchManager = loader.loadClass("ibq");
-        loader.loadClass("gbp").getDeclaredField("e");
         Class<?> checks = loader.loadClass("nnd");
         anonymousCheck = checks.getDeclaredMethod("d", String.class);
         basicInternetRule = checks.getDeclaredMethod("b");
@@ -60,7 +75,7 @@ final class RemoteButtons {
 
     void install(List<XC_MethodHook.Unhook> hooks) {
         try {
-            hooks.add(XposedBridge.hookMethod(keyCallback, scope(anonymousCheck)));
+            if (!modern) hooks.add(XposedBridge.hookMethod(keyCallback, scope(anonymousCheck)));
             hooks.add(XposedBridge.hookMethod(launchCallback, scope(basicInternetRule)));
             XC_MethodHook predicate = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) {
@@ -76,7 +91,7 @@ final class RemoteButtons {
                             + (hook.method.equals(anonymousCheck) ? "button" : "app launch"));
                 }
             };
-            hooks.add(XposedBridge.hookMethod(anonymousCheck, predicate));
+            if (!modern) hooks.add(XposedBridge.hookMethod(anonymousCheck, predicate));
             hooks.add(XposedBridge.hookMethod(basicInternetRule, predicate));
         } catch (Throwable error) {
             for (XC_MethodHook.Unhook hook : hooks) hook.unhook();
@@ -93,8 +108,8 @@ final class RemoteButtons {
                     int code = event.getKeyCode();
                     if (!NativeShortcuts.supported(code)) return;
                 } else {
-                    // eww is a merged callback. Only case 4 belongs to GlobalAppLaunchManager.
-                    if (XposedHelpers.getIntField(hook.thisObject, "e") != 4
+                    // The legacy merged callback needs an additional case guard.
+                    if ((!modern && XposedHelpers.getIntField(hook.thisObject, "e") != 4)
                             || !launchManager.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
                             || !"pseudonymous".equals(XposedHelpers.getObjectField(hook.args[0], "e"))) return;
                 }

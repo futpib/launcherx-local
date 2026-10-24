@@ -12,8 +12,15 @@ import java.util.zip.ZipFile;
 public final class Compatibility {
     public static final String TARGET = "com.google.android.apps.tv.launcherx";
 
-    public static void verify(Context context) throws Exception {
-        verify(context, TARGET, BuildConfig.VERSION_CODE, BuildConfig.DEX_HASHES);
+    public static long verify(Context context) throws Exception {
+        long version = context.getPackageManager().getPackageInfo(TARGET, 0).getLongVersionCode();
+        for (int index = 0; index < BuildConfig.VERSIONS.length; index++) {
+            if (version == BuildConfig.VERSIONS[index]) {
+                verify(context, TARGET, version, BuildConfig.PROFILE_HASHES[index]);
+                return version;
+            }
+        }
+        throw new IllegalStateException("Unsupported launcher version " + version);
     }
 
     static void verify(Context context, String target, long version, String[][] hashes) throws Exception {
