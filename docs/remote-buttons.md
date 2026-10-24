@@ -105,3 +105,16 @@ shortcut store and removes the helper in `finally`.
 See [validation-remote.json](../validation-remote.json). This does not verify
 Bluetooth, physical keylayout, wake/standby, input hardware, Google Home,
 Freeplay, authenticated switching or playback inside launched apps.
+
+The same APK also passed the activation/LSPosed toggle, version/DEX refusal and
+Incognito profile suites, including real Google sign-in cancellation and
+emulator reboot persistence. See
+[validation-remote-regressions.json](../validation-remote-regressions.json).
+
+Version 0.7 was installed over 0.6 on the physical MiTV-MOEU0. The installed APK
+hash matches the emulator-tested build, the stock launcher APK is unchanged,
+and the new core-service process loaded the remote hooks. SmartTube retained
+the same foreground activity, task and process. Deployment did not reboot the
+TV, open Home, inject keys or change assignments. No physical-button test was
+performed; retaining the playback activity does not prove uninterrupted video.
+See [validation-tv-remote.json](../validation-tv-remote.json).

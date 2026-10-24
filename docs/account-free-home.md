@@ -6,6 +6,8 @@ received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
 verified on the physical TV, with app-published cards visible on Home.
+Version 0.7 is installed with its remote hooks loaded; physical-button behavior
+remains unverified.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -38,7 +40,7 @@ account-free yet.**
 | 20 | **Notifications** | Local system/app notifications can use notification access. Account-specific cloud notifications still need their account. |
 | 21 | **Screensaver** | The launch control exists and appears signed out. The chosen screensaver’s requirements are separate; personal Google Photos albums need an account. |
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
-| 23 | **Custom remote-button shortcuts** | **Implemented in 0.7; emulator verified.** Star short press opens its assigned app; long press opens the native chooser. YouTube's native picker and OEM-delegated app launching also work in the receiver tests. Physical remote, wake, input switching and Google Home remain unverified. See [remote fixes and remaining account gates](remote-buttons.md). |
+| 23 | **Custom remote-button shortcuts** | **Implemented in 0.7; emulator verified; installed on TV.** Star short press opens its assigned app; long press opens the native chooser. YouTube's native picker and OEM-delegated app launching also work in the receiver tests. Physical remote, wake, input switching and Google Home remain unverified. See [remote fixes and remaining account gates](remote-buttons.md). |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
 | 25 | **Top navigation tabs and destinations** | **Home only while Incognito is selected in 0.6.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 
@@ -93,4 +95,7 @@ and app row do not cover those separate paths.
 dashboard inspection ran only in the emulator. See the [initial physical-device
 validation](../validation-tv.json), [TV update checks](../validation-tv-update.json)
 and [0.6 TV profile checks](../validation-tv-profiles.json), plus
+[0.7 TV installation](../validation-tv-remote.json),
+[remote receiver tests](../validation-remote.json),
+[0.7 regression tests](../validation-remote-regressions.json) and
 [emulator validation](../validation.json), for the exact coverage.

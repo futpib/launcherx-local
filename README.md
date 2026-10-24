@@ -31,6 +31,11 @@ in Subscriptions and Recommended rows. The complete content-row suite, playback
 links, sign-in cancellation and reboot persistence remain emulator-tested only;
 authenticated Google switching remains unverified.
 
+Version **0.7** is installed on the TV, with its remote hooks loaded in the core
+service process. The update preserved SmartTube's foreground task and process
+without a TV reboot. Shortcut configuration, short/long presses and app launches
+passed in the emulator; physical remote-button behavior remains unverified.
+
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
 before hooks are installed or Home is activated. Keep launcher updates in mind:
@@ -211,6 +216,12 @@ by these scripts.
 picker check and the **0.5** channel-default update on the TV.
 [`validation-tv-profiles.json`](validation-tv-profiles.json) records the **0.6**
 TV update, automatic activation, native Incognito chooser and retained app button.
+[`validation-remote.json`](validation-remote.json) records the **0.7** native
+remote-receiver tests and the comparison with the previous module.
+[`validation-remote-regressions.json`](validation-remote-regressions.json) records
+the same build's activation, compatibility-refusal and Incognito profile reruns.
+[`validation-tv-remote.json`](validation-tv-remote.json) records the **0.7** TV
+installation and hook loading, without a physical-button test.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content
