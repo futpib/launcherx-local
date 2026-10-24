@@ -23,12 +23,12 @@ instructions and automatic compatibility status. No ADB commands are needed.
   Google accounts; the authenticated switching round trip remains untested.
 
 Physical-device validation covers the initial **0.2** setup, the **0.4** store
-picker, and the **0.5** update that enables app channels by default. The complete
-content-row suite runs in the isolated emulator. At the latest TV check,
-SmartTube's channels were enabled but its local program tables were empty, so
-third-party content cards and playback links remain unverified on that TV.
-Version **0.6** profile switching and automatic activation are tested in the
-emulator only; they have not been installed on the physical TV.
+picker, the **0.5** channel defaults, and the **0.6** update. On the TV, 0.6
+activates Incognito Home on launcher restart, opens the native profile chooser,
+and returns to Home when Incognito is selected. App-published cards are visible
+in Subscriptions and Recommended rows. The complete content-row suite, playback
+links, sign-in cancellation and reboot persistence remain emulator-tested only;
+authenticated Google switching remains unverified.
 
 Other launcher versions and device/framework combinations are not yet supported
 by evidence from this project. An unfamiliar version or DEX hash is refused
@@ -198,6 +198,8 @@ by these scripts.
 [`validation-tv.json`](validation-tv.json) records physical-device evidence.
 [`validation-tv-update.json`](validation-tv-update.json) records the later store
 picker check and the **0.5** channel-default update on the TV.
+[`validation-tv-profiles.json`](validation-tv-profiles.json) records the **0.6**
+TV update, automatic activation, native Incognito chooser and retained app button.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content

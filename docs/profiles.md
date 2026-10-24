@@ -101,5 +101,9 @@ simulated Google responses.
 **No real Google account was used.** Successful sign-in, Google-to-Incognito-to-
 Google switching, multiple Google profiles, account removal, child profiles,
 profile locks and authenticated cloud feeds remain unverified. The physical TV
-has not received 0.6. See `validation-profiles.json` and `validation.json` for
-exact APK hashes and completed checks.
+received the same 0.6 APK: automatic activation on launcher restart, the native
+chooser with Incognito and Add account, DPAD selection back to Home, and the sole
+Choose app content button were checked. The TV was not rebooted; sign-in handoff,
+cancellation and reboot persistence remain emulator-tested only. See
+[`validation-tv-profiles.json`](../validation-tv-profiles.json) for the device
+checks, and `validation-profiles.json` and `validation.json` for emulator coverage.

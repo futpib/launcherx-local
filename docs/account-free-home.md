@@ -3,8 +3,9 @@
 Feature inventory recorded on 2026-10-23 for Google TV Home
 **1.0.785572138 / 702401**. Updated for LauncherX Local **0.6**. The TV has
 received the store picker and automatic channel defaults; complete content-row
-and playback-link coverage remains emulator-based. The 0.6 Incognito chooser
-and automatic activation have only been tested in the emulator.
+and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
+Incognito selection and automatic activation on launcher restart are now also
+verified on the physical TV, with app-published cards visible on Home.
 
 The original apps-only screen now also supports local content rows. More local
 features look feasible; Google's account-backed feeds need
@@ -19,7 +20,7 @@ account-free yet.**
 | 2 | **Reorder and app menus** | Local functionality. Reorder UI was observed; persistent reordering wasn’t tested. |
 | 3 | **Add apps / app catalogue** | **Implemented in 0.4; picker and F-Droid handoff verified on the TV.** Opens Android's chooser for installed `MAIN` + `APP_MARKET` handlers, including F-Droid and Aurora. One store opens directly; an empty list shows an explanation. Each store retains its own account requirements; complete installation flows remain untested. |
 | 4 | **Continue watching / Watch Next** | **Implemented in 0.3; emulator verified.** Native cards, artwork, episode information, resume progress and app playback links from browsable local Watch Next entries. Requires participating apps to publish entries; not yet tested on the physical TV. |
-| 5 | **App-provided content rows** | **Enabled by default in 0.5; automatic visibility verified on the TV.** Existing and newly discovered channels start enabled; later hide choices persist. Native cards, live updates, playback links and hide persistence are emulator verified. SmartTube's channels are enabled on the TV, but its local program tables were empty at the last check. |
+| 5 | **App-provided content rows** | **Enabled by default in 0.5; automatic visibility verified on the TV.** Existing and newly discovered channels start enabled; later hide choices persist. The 0.6 TV check shows cards in Subscriptions and Recommended rows. Live updates, playback links and hide persistence remain emulator verified. |
 | 6 | **Featured banners, trailers, promotions** | Rendering exists, but stock content is supplied remotely. We could populate these with another source; merely exposing the UI won’t supply content. |
 | 7 | **For You, Movies, Shows, genre rows, top picks/charts** | Google’s feed requests failed authentication in our emulator experiment. No working anonymous feed established. |
 | 8 | **Sports, news and themed collections** | Renderers exist. Their individual services haven’t been tested anonymously; they need content feeds. |
@@ -29,7 +30,7 @@ account-free yet.**
 | 12 | **Watchlist, likes, watched markers** | Google’s versions are account-backed. A local watchlist could be implemented with separate storage. |
 | 13 | **Library, purchases, rentals, Family Library, DVR rows** | Google purchases and family access need account entitlements. Provider DVR access depends on that provider. Local media remains accessible through apps. |
 | 14 | **Search and voice assistant** | Disabled by stock apps-only mode. Local app search or another search/voice provider could be added; Google search isn’t proven account-free. [Google’s restrictions](https://support.google.com/googletv/answer/10070784?hl=en) |
-| 15 | **Profile chooser and kids profiles** | **Incognito chooser implemented in 0.6; emulator verified.** Incognito is the initial default and uses the native pseudonymous account. Home opens the stock chooser with Incognito, Google profiles and Add account. Sign-in handoff, cancellation and Incognito persistence are tested with zero accounts; a real Google switching round trip and kids/lock behavior remain unverified. See [profile notes](profiles.md). |
+| 15 | **Profile chooser and kids profiles** | **Incognito chooser implemented in 0.6; default and Incognito selection verified on the TV.** Incognito uses the native pseudonymous account. With zero accounts, Home opens the stock chooser with Incognito and Add account. Sign-in handoff, cancellation and Incognito persistence are emulator tested; a real Google switching round trip and kids/lock behavior remain unverified. See [profile notes](profiles.md). |
 | 16 | **Clock and date** | **Confirmed in the signed-out emulator dashboard.** Uses local system time. |
 | 17 | **Quick settings** | Network, Bluetooth, accessibility, audio output, display and input shortcuts are local functions. Signed-out dashboard confirmed in the emulator; available tiles depend on the TV. |
 | 18 | **Sleep timer** | Local alarm/power implementation exists. Feature availability and operation haven’t been tested. |
@@ -86,4 +87,5 @@ unlock. Supplying a tab label alone does not supply its content or service acces
 “Working on your TV” refers to the tested Xiaomi MiTV-MOEU0. The signed-out
 dashboard inspection ran only in the emulator. See the [initial physical-device
 validation](../validation-tv.json), [TV update checks](../validation-tv-update.json)
-and [emulator validation](../validation.json) for the exact coverage.
+and [0.6 TV profile checks](../validation-tv-profiles.json), plus
+[emulator validation](../validation.json), for the exact coverage.

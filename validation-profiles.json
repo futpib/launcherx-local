@@ -22,7 +22,7 @@
     "Child profiles, forced profile locks and authenticated cloud feeds remain unverified; their stock paths are retained by design.",
     "Incognito is launcher-local; apps retain accounts/history and TvProvider rows are shared within the Android user.",
     "Screenshots, OCR and ActivityManager verify uninterrupted DPAD sequences; TalkBack is not tested.",
-    "Physical TV remains on the previously tested 0.5 build."
+    "This profile suite ran in the emulator. Physical TV checks of the same 0.6 APK cover automatic activation and Incognito chooser/selection only; see validation-tv-profiles.json."
   ],
   "evidence": [
     "artifacts/profile-smoke-run.txt",
@@ -36,5 +36,6 @@
     "artifacts/profile-after-reboot.png",
     "artifacts/profile-before-reboot-logcat.txt",
     "artifacts/profile-final-logcat.txt"
-  ]
+  ],
+  "physical_tv_record": "validation-tv-profiles.json"
 }

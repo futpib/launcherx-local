@@ -1,0 +1,53 @@
+{
+  "result": "passed",
+  "module_version": "0.6",
+  "module_version_code": 6,
+  "source_commit": "7ecf161",
+  "apk_sha256": "f7411318cc93e15addd6c9cce6bf9270214de98e97e165690feaff68a0d84900",
+  "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
+  "device": {
+    "model": "MiTV-MOEU0",
+    "device": "ladybird",
+    "android": 14
+  },
+  "physical_tv_tested": true,
+  "accounts": 0,
+  "reboot": false,
+  "verified_date": "2026-10-24",
+  "checks": [
+    "Same-key APK update from 0.5 to 0.6; installed version and device APK hash verified",
+    "Installed APK matches the emulator-tested 0.6 artifact",
+    "Automatic Home activation and native Incognito default on launcher restart",
+    "DPAD opens native ProfileChooserActivity with Incognito and Add account",
+    "DPAD selects Incognito and returns to Home",
+    "App-published cards visible in Subscriptions and Recommended rows",
+    "Companion app retains only Choose app content, setup instructions and compatibility status",
+    "Original launcher APK unchanged",
+    "No fatal exception in the update crash log; account count remains zero",
+    "Original SmartTube playback activity and task restored without recreation"
+  ],
+  "authenticated_google_roundtrip_tested": false,
+  "verification_method": "Screenshots, OCR, ActivityManager records, installed APK hashes and module logs. Choose app content was confirmed visually because OCR omitted its label.",
+  "limitations": [
+    "No real Google account used; successful sign-in, Google account switching, child profiles and profile locks remain unverified.",
+    "Google sign-in handoff, cancellation, module disable/re-enable and reboot persistence were tested only in the emulator.",
+    "This TV update checks content-card rendering; playback links, live provider changes and channel hide persistence were not retested on the TV.",
+    "Restoring the existing SmartTube playback screen does not establish uninterrupted or resumed video playback."
+  ],
+  "evidence": [
+    "artifacts/tv-profiles-0.6-20261024-000241/preflight.json",
+    "artifacts/tv-profiles-0.6-20261024-000241/install.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/module-before.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/module-after.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/home.png",
+    "artifacts/tv-profiles-0.6-20261024-000241/profiles.png",
+    "artifacts/tv-profiles-0.6-20261024-000241/profiles-activity.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/incognito-return.png",
+    "artifacts/tv-profiles-0.6-20261024-000241/settings-button.png",
+    "artifacts/tv-profiles-0.6-20261024-000241/hook-log.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/crashes.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/activity-before.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/restore-task.txt",
+    "artifacts/tv-profiles-0.6-20261024-000241/activity-restored.txt"
+  ]
+}

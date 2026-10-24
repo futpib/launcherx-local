@@ -26,9 +26,9 @@
   },
   "physical_tv_tested": false,
   "physical_tv_record": {
-    "path": "validation-tv-update.json",
-    "module_version": "0.5",
-    "note": "Historical device validation; 0.6 is emulator-tested only and was not installed on the TV."
+    "path": "validation-tv-profiles.json",
+    "module_version": "0.6",
+    "note": "Same APK installed on the TV; automatic activation, native Incognito chooser and selection checked separately. This record describes the emulator suite."
   },
   "setup": {
     "result": "passed",
