@@ -28,7 +28,9 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
-        if (!TARGET.equals(param.packageName) || !TARGET.equals(param.processName)) return;
+        if (!TARGET.equals(param.packageName)) return;
+        boolean coreServices = (TARGET + ":coreservices").equals(param.processName);
+        if (!TARGET.equals(param.processName) && !coreServices) return;
         if (android.os.Process.myUid() / 100000 != 0) return;
         XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam hook) {
@@ -36,9 +38,14 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 context = (Context) hook.args[0];
                 try {
                     Compatibility.verify(context);
-                    installHooks(param.classLoader, (Application) hook.thisObject);
+                    if (coreServices) {
+                        if (BuildConfig.APPS_ONLY) new RemoteButtons(context, param.classLoader).install();
+                    } else {
+                        installHooks(param.classLoader, (Application) hook.thisObject);
+                    }
                     installed = true;
-                    event("installed mode=" + BuildConfig.MODE + " version=" + BuildConfig.VERSION_CODE);
+                    event("installed mode=" + BuildConfig.MODE + " version=" + BuildConfig.VERSION_CODE
+                            + " process=" + param.processName);
                 } catch (Throwable error) {
                     Log.e(TAG, "Patch refused; launcher remains unmodified", error);
                     XposedBridge.log(error);

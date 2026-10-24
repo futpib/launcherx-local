@@ -97,6 +97,11 @@ build and its UI smoke test do **not** enable this workaround.
 
 ## Activation, profiles and compatibility tests
 
+For the native star/YouTube remote receivers, shortcut storage and app-launch
+broker, run `python3 scripts/remote_smoke.py`. The AVD lacks Xiaomi's global-key
+overlay, so a root helper injects KeyEvent parcelables into the real receivers;
+the chooser is operated with DPAD. See [remote test boundaries](remote-buttons.md).
+
 The fixture must have LauncherX Local enabled in LSPosed. The companion app only
 needs a Magisk root grant for its **Choose app content** action. Run:
 

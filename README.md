@@ -2,6 +2,7 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
+Version **0.7** also enables the native star/YouTube shortcut controls in Incognito.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
 stay inside Google's launcher. The launcher APK is not modified or re-signed.
@@ -87,6 +88,16 @@ stock account authentication and profile-lock handling. Child and forced-lock
 chooser flows do not receive an Incognito shortcut. Real Google sign-in completion,
 Google-to-Incognito switching, and kids/profile locks still need authenticated
 testing. See [profile implementation and test boundaries](docs/profiles.md).
+
+## Remote shortcuts
+
+In Incognito, long-press the star button to open Google's shortcut chooser.
+Choose **Favorite app**, select an installed TV app, and save. Short-press opens
+that app; an unassigned button opens the chooser. YouTube's button keeps its
+own native app picker. Version 0.7 also removes a Basic TV internet restriction
+on app-button launches. These paths are emulator tested; hardware wake/input
+behavior and Google Home services are not covered. See the
+[remote-button tests and remaining account checks](docs/remote-buttons.md).
 
 ## Local content
 

@@ -1,0 +1,24 @@
+{
+  "result": "passed",
+  "module_version": "0.7",
+  "apk_sha256": "ff09cbbd2fa351db86f314e6d6dfe953e6adeb17e290d212539f67376959d57b",
+  "physical_tv_tested": false,
+  "accounts": 0,
+  "checks": [
+    "Unpatched module reproduces both Home redirects and the internet app-launch block",
+    "Unassigned star short press opens the native chooser; cancel returns Home",
+    "Native DPAD chooser saves TV Bro; short press launches it with internet available",
+    "Long press edits while another app is foreground; saved action survives process restart",
+    "YouTube long press opens its native app picker; short press launches YouTube",
+    "OEM-style GlobalButtonLaunch receiver launches a local app account-free",
+    "Native launchIntent/package mismatch rejection remains intact",
+    "No crashes or new accounts; unregistered MACRO_2 remains unhandled",
+    "Restored the original shortcut store and removed the receiver fixture"
+  ],
+  "method": "Root sends KeyEvent parcelables through the real stock broadcast receivers; DPAD, screenshots/OCR, ActivityManager and native saved protobuf storage verify UI and launches.",
+  "limitations": [
+    "Receiver injection does not test physical keylayout, Bluetooth, standby or wake.",
+    "No real Google account, child profile or profile lock was exercised.",
+    "Google Home, device-input hardware and Freeplay were not unlocked or verified."
+  ]
+}

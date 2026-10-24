@@ -34,8 +34,21 @@ def module_enabled(enabled):
     # Exercise LSPosed's actual switch; never edit its database or module scope.
     root('am force-stop ' + TARGET)
     shell('am force-stop org.lsposed.manager')
-    shell('am start -W -n ' + MANAGER)
-    nodes = hierarchy('setup-framework-start')
+    # Installing over a foreground SetupActivity can start Basic TV's one-time
+    # Home handoff. Wait for the manager rather than inspecting that transient Home.
+    for attempt in range(3):
+        shell('am start -W -n ' + MANAGER)
+        time.sleep(.5)
+        try:
+            resumed(MANAGER)
+        except AssertionError:
+            continue
+        nodes = hierarchy('setup-framework-start-' + str(attempt))
+        if any(node.get('text') == 'Enable module'
+               or node.get('content-desc', '').startswith('Modules') for node in nodes):
+            break
+    else:
+        raise AssertionError('LSPosed manager did not become ready')
     if not any(node.get('text') == 'Enable module' for node in nodes):
         tab = next(node for node in nodes if node.get('content-desc', '').startswith('Modules'))
         tap(tab)
@@ -152,6 +165,7 @@ def main():
                 start_home('setup-refuse-' + kind + '-home', basic=True)
                 logs = adb('logcat', '-d')
                 assert 'Patch refused' in logs and expected in logs
+                assert 'installed mode=apps' not in logs
                 assert 'Home selected by the loaded module' not in logs
                 (ARTIFACTS / ('setup-refuse-' + kind + '-logcat.txt')).write_text(logs)
                 open_setup('setup-refuse-' + kind, expected)

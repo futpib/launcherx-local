@@ -13,7 +13,7 @@ CHOOSER = TARGET + '/.profile.chooser.ProfileChooserActivity'
 PREFS = '/data/user/0/' + TARGET + '/shared_prefs/launcherx-local-profiles.xml'
 
 
-def inspect(name, expected):
+def inspect(name, expected, any_of=()):
     deadline = time.monotonic() + 25
     while True:
         # Use screen pixels throughout: UIAutomator can crash the paused stock Home.
@@ -23,10 +23,12 @@ def inspect(name, expected):
                                        stderr=subprocess.DEVNULL)
         (ARTIFACTS / (name + '.txt')).write_text(text)
         normalized = re.sub(r'\s+', '', text).casefold()
-        if all(re.sub(r'\s+', '', value).casefold() in normalized for value in expected):
+        if (all(re.sub(r'\s+', '', value).casefold() in normalized for value in expected)
+                and (not any_of or any(re.sub(r'\s+', '', value).casefold() in normalized
+                                       for value in any_of))):
             return text
         if time.monotonic() >= deadline:
-            raise AssertionError((name, expected, text))
+            raise AssertionError((name, expected, any_of, text))
         time.sleep(.5)
 
 
@@ -47,7 +49,11 @@ def chooser(name):
 
 
 def check_logs(name):
-    logs = adb('logcat', '-d')
+    # Native log messages can contain malformed UTF-8. Keep the original bytes
+    # as evidence while decoding the text for Java/module failure checks.
+    raw = adb('logcat', '-d', binary=True)
+    (ARTIFACTS / (name + '.raw')).write_bytes(raw)
+    logs = raw.decode('utf-8', errors='replace')
     (ARTIFACTS / (name + '.txt')).write_text(logs)
     assert 'active launcher profile: pseudonymous' in logs
     for error in ['Cannot add Incognito', 'Cannot update the native profile chooser', 'Patch refused']:
@@ -81,7 +87,10 @@ def main():
 
         chooser('profile-before-signin')
         shell('input keyevent KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
-        inspect('profile-signin', ['Sign in', 'Google Account', 'Email or phone'])
+        # Google's form layout and keyboard vary; the outlined field label can
+        # defeat OCR. Require an email-form cue and the real Play Services activity.
+        inspect('profile-signin', ['Sign in', 'Google Account'],
+                any_of=['Email or phone', 'Forgot email?'])
         state = resumed('com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity')
         (ARTIFACTS / 'profile-signin-activity.txt').write_text(state)
         zero_accounts()

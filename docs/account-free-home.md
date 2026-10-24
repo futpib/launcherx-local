@@ -1,7 +1,7 @@
 # Google TV Home without a Google account
 
 Feature inventory recorded on 2026-10-23 for Google TV Home
-**1.0.785572138 / 702401**. Updated for LauncherX Local **0.6**. The TV has
+**1.0.785572138 / 702401**. Updated for LauncherX Local **0.7**. The TV has
 received the store picker and automatic channel defaults; complete content-row
 and playback-link coverage remains emulator-based. The 0.6 Incognito chooser,
 Incognito selection and automatic activation on launcher restart are now also
@@ -38,7 +38,7 @@ account-free yet.**
 | 20 | **Notifications** | Local system/app notifications can use notification access. Account-specific cloud notifications still need their account. |
 | 21 | **Screensaver** | The launch control exists and appears signed out. The chosen screensaver’s requirements are separate; personal Google Photos albums need an account. |
 | 22 | **Google Home panel: cameras, lights, locks, thermostats** | Stock integration requires a matching Google Home account and home membership. A separate local smart-home integration would be different work. [Requirements](https://support.google.com/googletv/answer/15158065?hl=en-NZ) |
-| 23 | **Custom remote-button shortcuts** | App/input shortcut code exists. Potentially local; depends on compatible remote hardware and feature flags. |
+| 23 | **Custom remote-button shortcuts** | **Implemented in 0.7; emulator verified.** Star short press opens its assigned app; long press opens the native chooser. YouTube's native picker and OEM-delegated app launching also work in the receiver tests. Physical remote, wake, input switching and Google Home remain unverified. See [remote fixes and remaining account gates](remote-buttons.md). |
 | 24 | **Manufacturer tab, tips, help and feedback** | Manufacturer content depends on its provider. Bundled tips can display signed out; feedback submission wasn’t tested. |
 | 25 | **Top navigation tabs and destinations** | **Home only while Incognito is selected in 0.6.** The module supplies the bundled local Home destination. Additional tabs need local destination definitions, content routing and remote-navigation tests. Reusing each stock tab account-free remains unverified. |
 
@@ -81,6 +81,11 @@ first, then a local Library** is a proposed implementation order: Apps would
 mostly reorganize existing functionality, while Library would implement the
 local-watchlist candidate in **12**. Neither is a newly verified stock-tab
 unlock. Supplying a tab label alone does not supply its content or service access.
+
+The [0.7 account-check audit](remote-buttons.md#other-account-checks-found) found
+remaining Basic TV behavior in the dashboard profile area, fullscreen app-grid
+ordering/filtering, and network notifications. The working Home profile icon
+and app row do not cover those separate paths.
 
 ## Validation scope
 
