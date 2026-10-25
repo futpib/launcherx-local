@@ -61,8 +61,13 @@ number. Disable the module in LSPosed and restart Google TV to use stock behavio
 
 Version **0.13** is tested in the isolated emulator with the companion app's
 Magisk root policy explicitly denied. The System Framework input hook uses the
-real Android dispatcher; the new Xiaomi input-host path has no physical-TV test.
-See [no-superuser validation](validation-no-superuser.json).
+real Android dispatcher. The same APK is installed on the physical TV running
+launcher **835645**: Home and local rows loaded, and the Xiaomi service registered
+the new input hook. Existing button assignments were preserved without a reboot.
+Physical key delivery and content-chooser operations were not exercised during
+this deployment; the existing companion Magisk grant was left unchanged.
+See [no-superuser validation](validation-no-superuser.json) and the
+[0.13 TV deployment record](validation-tv-no-superuser.json).
 
 ## Install
 
