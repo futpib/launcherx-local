@@ -1,13 +1,11 @@
 package local.launcherx.patch;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.KeyEvent;
 
-/** Media keys use Android's session routing; other keys use an authenticated hook request. */
+/** All key bindings use Android input dispatch through an authenticated hook request. */
 final class KeyActions {
     static final String PREFIX = "launcherx-key:";
     static final int NONE = -1;
@@ -39,14 +37,6 @@ final class KeyActions {
         return KeyEvent.keyCodeToString(code) + " (" + code + ")";
     }
 
-    static boolean media(int code) {
-        switch (code) {
-            case 79: case 85: case 86: case 87: case 88: case 89: case 90:
-            case 126: case 127: case 130: case 222: return true;
-            default: return false;
-        }
-    }
-
     static boolean generated(KeyEvent event) {
         return event != null && (event.getFlags() & KeyEvent.FLAG_FALLBACK) != 0;
     }
@@ -54,20 +44,13 @@ final class KeyActions {
     static void prepare(Context context, int code) {
         if (code == NONE) return;
         validate(code);
-        if (!media(code)) broker(context, "prepare", code);
+        broker(context, "prepare", code);
     }
 
     static void send(Context context, int code) {
         if (code == NONE) return;
         validate(code);
-        if (media(code)) {
-            AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            long time = SystemClock.uptimeMillis();
-            audio.dispatchMediaKeyEvent(new KeyEvent(time, time, KeyEvent.ACTION_DOWN, code, 0));
-            audio.dispatchMediaKeyEvent(new KeyEvent(time, SystemClock.uptimeMillis(), KeyEvent.ACTION_UP, code, 0));
-        } else {
-            broker(context, "send", code);
-        }
+        broker(context, "send", code);
     }
 
     private static void broker(Context context, String method, int code) {

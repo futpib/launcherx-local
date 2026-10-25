@@ -1,36 +1,36 @@
 {
   "result": "passed",
-  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
+  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
   "measurement": "Source KeyEvent ACTION_UP eventTime to fixture callback uptime, excluding host ADB and sender startup.",
   "custom_f8": {
     "samples_ms": [
-      8,
-      6,
       7,
       5,
+      4,
       5,
       5,
+      6,
       5,
-      5
+      11
     ],
     "median_ms": 5.0,
-    "min_ms": 5,
-    "max_ms": 8
+    "min_ms": 4,
+    "max_ms": 11
   },
   "play_pause": {
     "samples_ms": [
+      6,
+      9,
+      6,
+      8,
       7,
-      4,
-      5,
-      4,
-      5,
-      4,
-      4,
-      4
+      7,
+      7,
+      5
     ],
-    "median_ms": 4.0,
-    "min_ms": 4,
-    "max_ms": 7
+    "median_ms": 7.0,
+    "min_ms": 5,
+    "max_ms": 9
   },
   "physical_tv_tested": false,
   "limitations": [
@@ -41,11 +41,11 @@
   "lifecycle": {
     "after_cold_provider": {
       "samples_ms": [
-        240
+        195
       ],
-      "median_ms": 240,
-      "min_ms": 240,
-      "max_ms": 240
+      "median_ms": 195,
+      "min_ms": 195,
+      "max_ms": 195
     },
     "checks": [
       "Warm calls cache launcher verification and reject another caller UID",

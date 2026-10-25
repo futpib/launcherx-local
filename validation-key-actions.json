@@ -1,10 +1,10 @@
 {
   "result": "passed",
-  "module_version": "0.13",
-  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
+  "module_version": "0.14",
+  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
   "checks": [
     "Key broker rejects an unrelated shell caller",
-    "Saved Play/Pause delivers exactly one media press per short press to a real Android MediaSession",
+    "Saved Play/Pause reaches the focused window, then Android falls back to a real MediaSession exactly once per press",
     "An injected fallback key cannot recursively trigger another Send key action",
     "Opening the chooser, cancelling a replacement and restarting the launcher retain the saved key action",
     "Custom symbolic Android key is saved and the scoped input hook reaches the focused app window",

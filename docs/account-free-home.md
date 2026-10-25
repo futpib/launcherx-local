@@ -11,9 +11,10 @@ hooks reloaded, preserving existing assignments. The prior 0.8 check observed
 Live TV and Xiaomi TV+ fallback handling in device logs; complete six-button
 assignment and restoration coverage remains emulator-only.
 Version 0.9 adds **Send key…** for Play/Pause, TV Home, Back and arbitrary
-Android key codes. Media controls use Android's current media consumer; other
-keys originally needed root access for LauncherX Local. Version 0.13 replaces
-that grant with a TV service or System Framework hook selected in LSPosed. New key-action delivery is verified
+Android key codes. Keys originally needed root access for LauncherX Local.
+Version 0.13 replaces that grant with a TV service or System Framework hook
+selected in LSPosed. Version 0.14 routes media keys through the same input hook
+so focused apps such as TV Bro can handle them. New key-action delivery is verified
 in the emulator. See [key actions](key-actions.md).
 Version 0.10 adds **No action**, which disables short press while retaining
 long-press customization. Version 0.11 reduces custom-key delivery overhead;

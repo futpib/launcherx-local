@@ -40,7 +40,7 @@ public final class SetupActivity extends Activity {
                 + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
                 + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
                 + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
-                + "Send key adds Play/Pause, other Android keys and No action. For non-media keys, select TV service (Xiaomi) or System Framework in LSPosed, then reboot. No companion-app superuser grant is needed. "
+                + "Send key adds Play/Pause, other Android keys and No action. To send keys, select TV service (Xiaomi) or System Framework in LSPosed, then reboot. No companion-app superuser grant is needed. "
                 + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));

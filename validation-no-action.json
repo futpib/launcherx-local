@@ -1,7 +1,7 @@
 {
   "result": "passed",
-  "module_version": "0.10",
-  "apk_sha256": "312639a490f64362cd07df9ff9216484c79bb1d7a86e7be880aecd8f04ece14d",
+  "module_version": "0.14",
+  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
   "checks": [
     "All six source buttons save No action through the native chooser and consume short press without app launch, media events or window keys",
     "All six No action assignments survive launcher process restart",

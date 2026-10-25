@@ -157,7 +157,7 @@ def main():
         root('rm -rf ' + STORE)
         if existed:
             root('cp -a ' + backup + '/store ' + STORE)
-            root('restorecon -RF ' + STORE)
+            root('restorecon -DRF ' + STORE)
         root('rm -rf ' + backup + ' ' + FIXTURE)
         fresh_home()
     checks.append('Restored the original shortcut store and removed the receiver fixture')

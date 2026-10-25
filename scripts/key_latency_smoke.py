@@ -127,7 +127,7 @@ def main():
         root('rm -rf ' + STORE)
         if existed:
             root('cp -a ' + backup + '/store ' + STORE)
-            root('restorecon -RF ' + STORE)
+            root('restorecon -DRF ' + STORE)
         root('rm -rf ' + backup + ' ' + FIXTURE)
         adb('uninstall', app)
         fresh_home()

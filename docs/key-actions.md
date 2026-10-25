@@ -36,12 +36,14 @@ saved key actions; normal favorite-app assignments remain native Google TV data.
 
 ## Delivery and access
 
-Media controls use Android's media-button routing to the current media consumer.
-They do not need another root grant or Xiaomi's service. Which player receives
-the key depends on Android's media-session and audio-playback state.
+Starting with **0.14**, all key bindings use Android's input dispatcher, including
+Play/Pause and the other media keys. The focused app can handle them as remote
+input; unhandled media keys follow Android's media-session fallback. This supports
+TV Bro's playback shortcuts even when it has no media session. Earlier versions
+sent media keys directly to the media-session system, bypassing the focused app.
 
-Starting with **0.13**, non-media keys run in an explicitly scoped privileged
-process. On the supported Xiaomi TV, select **TvService** (`mitv.service`) in
+Keys run in an explicitly scoped privileged process, introduced in **0.13**.
+On the supported Xiaomi TV, select **TvService** (`mitv.service`) in
 LSPosed; its existing system UID already has `INJECT_EVENTS`. Without that service,
 select **System Framework**. Reboot after adding either scope or updating its code.
 The companion app and Google TV need no Magisk superuser grant.
@@ -54,7 +56,7 @@ cannot obtain it just by requesting it. Persistent hooks also verify that the
 installed module signer and permission owner have not changed. Only validated integer key codes and
 `prepare`/`send` operations are accepted. Expired requests are rejected.
 
-Saving a non-media binding probes TV service first, then System Framework. It
+Saving any key binding probes TV service first, then System Framework. It
 refuses to change the binding if neither hook is available. Delivery uses only
 the selected host and is never retried after an uncertain result. The input host
 uses a separate handler thread, so delivery does not block the system main thread.
@@ -92,6 +94,13 @@ an Android MediaSession with a silent AudioTrack, and a focused activity that
 records delivered keys. It also exercises the module's authenticated broker and
 scoped input hook, including saving and delivering `f`, `F`, `34` and `KEYCODE_F`
 through the custom-key dialog. This fixture is not a third-party media player.
+
+`python3 scripts/media_routing_smoke.py` opens a generated local HTML5 video in
+the real TV Bro 2.1.6, verifies it has no media-button session, and checks that a
+saved Play/Pause binding pauses and resumes playback exactly once per press.
+It repeats the check after stopping the companion, with its superuser policy
+denied throughout. The script restores TV Bro's private data, shortcut assignments
+and the original policy. See [validation-media-routing.json](../validation-media-routing.json).
 
 The script backs up and restores the native shortcut store and removes its
 fixture APK and receiver helper. See

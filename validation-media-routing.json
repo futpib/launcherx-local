@@ -1,0 +1,39 @@
+{
+  "result": "passed",
+  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
+  "module_version": "0.14",
+  "tvbro_version": "2.1.6",
+  "tvbro_sha256": "d8634edfe8d94b4fb9a52005d68a090a7f1e85b7f39c2cf01a25dc9dd60942b2",
+  "companion_policy_during_tests": "uid=10128|policy=1|until=0|logging=1|notification=1",
+  "checks": [
+    "Real TV Bro plays an HTML5 video without a registered media-button session",
+    "Saved Play/Pause pauses and resumes the real TV Bro video exactly once per press",
+    "Cold companion recovery retains focused-app delivery without duplicate toggles",
+    "Companion superuser policy remains denied throughout playback checks"
+  ],
+  "physical_tv_tested": false,
+  "limitations": [
+    "Real TV Bro in the Google TV emulator plays a generated local HTML5 video; the user website and physical Ditoo are not exercised.",
+    "Source events enter the actual Google receiver through the emulator-only sender."
+  ],
+  "cleanup": "Original TV Bro data, shortcut store and companion root policy restored; sender, reverse port and local server removed.",
+  "baseline": {
+    "result": "baseline-reproduced",
+    "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
+    "tvbro_version": "2.1.6",
+    "tvbro_sha256": "d8634edfe8d94b4fb9a52005d68a090a7f1e85b7f39c2cf01a25dc9dd60942b2",
+    "companion_policy_during_tests": "uid=10128|policy=1|until=0|logging=1|notification=1",
+    "checks": [
+      "Real TV Bro plays an HTML5 video without a registered media-button session",
+      "Baseline mapped Play/Pause fails to pause TV Bro",
+      "Normal Android input pauses and resumes the same TV Bro video",
+      "Companion superuser policy remains denied throughout playback checks"
+    ],
+    "physical_tv_tested": false,
+    "limitations": [
+      "Real TV Bro in the Google TV emulator plays a generated local HTML5 video; the user website and physical Ditoo are not exercised.",
+      "Source events enter the actual Google receiver through the emulator-only sender."
+    ],
+    "cleanup": "Original TV Bro data, shortcut store and companion root policy restored; sender, reverse port and local server removed."
+  }
+}

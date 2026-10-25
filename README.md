@@ -2,7 +2,9 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.13** removes the companion app's superuser requirement. Both reviewed
+Version **0.14** sends all key bindings through Android's input dispatcher,
+including Play/Pause for apps such as TV Bro. The companion app needs no
+superuser grant. Both reviewed
 Google TV Home builds and centered local artwork remain supported, including
 SmartTube's padded thumbnails.
 The six app buttons support Play/Pause, other Android keys and **No action**.
@@ -82,8 +84,8 @@ See [no-superuser validation](validation-no-superuser.json) and the
 5. In LSPosed's **Modules** page, enable **LauncherX Local** with **Google TV**
    selected. On the supported Xiaomi TV, also select **TvService**
    (`mitv.service`) for the Netflix, Prime Video, Live TV and Xiaomi TV+ buttons.
-   For non-media keys without Xiaomi's service (including the emulator), select
-   **System Framework** instead. Home, content choices and media keys need only Google TV.
+   To send keys without Xiaomi's service (including the emulator), select
+   **System Framework** instead. Home and content choices need only Google TV.
 6. Restart Google TV (force stop it in Android Settings, then press Home), or
    reboot. The verified module selects Home automatically inside the launcher.
    There is no separate activation button or Magisk root prompt for this step.
@@ -107,8 +109,8 @@ No framework databases, system files, or Google account records are edited direc
 Running hooks use LSPosed. Home activation uses the launcher's own permission
 to select its activities. The companion app never invokes `su` and needs no
 Magisk superuser grant. **Choose app content** uses an authenticated message to
-the launcher. Non-media keys use the scoped TV service or System Framework input
-hook; Play/Pause and other media controls use Android's media-button API directly.
+the launcher. All key bindings use the scoped TV service or System Framework input
+hook, allowing focused apps to handle media keys before Android's media-session fallback.
 An old companion-app superuser grant can be revoked after upgrading and rebooting.
 
 ## Profiles
@@ -139,7 +141,7 @@ the YouTube button can also choose apps outside Google's YouTube family.
 
 Choose **Send key…** in the added controls to bind a button to **Play/Pause**,
 **TV home**, **Back**, or another Android key. Single letters such as `f`,
-numeric key codes and `KEYCODE_` names are supported. Non-media keys require
+numeric key codes and `KEYCODE_` names are supported. All key bindings require
 TV service (Xiaomi) or System Framework in the module's LSPosed scope and a reboot. See
 [key actions and delivery rules](docs/key-actions.md).
 
@@ -282,14 +284,16 @@ TV update, automatic activation, native Incognito chooser and retained app butto
 [`validation-remote.json`](validation-remote.json) records native remote-receiver
 tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.9**.
-[`validation-key-actions.json`](validation-key-actions.json) records **0.13**
-media-session delivery, single-letter and symbolic key input, arbitrary input
+[`validation-key-actions.json`](validation-key-actions.json) records **0.14**
+focused-window delivery and media-session fallback, single-letter and symbolic key input, arbitrary input
 injection, persistence and restoration.
-[`validation-no-action.json`](validation-no-action.json) records **0.10**
+[`validation-media-routing.json`](validation-media-routing.json) records the
+real TV Bro Play/Pause regression with companion root access denied.
+[`validation-no-action.json`](validation-no-action.json) records **0.14**
 No action on all six receivers, persistence, reconfiguration and restoration,
 plus Play/Pause and custom-key regression checks.
 [`validation-key-latency.json`](validation-key-latency.json) records actual key
-delivery, companion restart and input-request validation in **0.13**.
+delivery, companion restart and input-request validation in **0.14**.
 [`validation-no-superuser.json`](validation-no-superuser.json) records the
 explicitly denied companion root policy and unauthorized-caller checks.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records

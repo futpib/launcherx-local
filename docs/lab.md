@@ -46,7 +46,7 @@ The actual fixture setup was:
 7. Set `device_provisioned`, `user_setup_complete`, and `tv_user_setup_complete`
    to 1, without adding an account. Install the built module APK. In LSPosed,
    enable **LauncherX Local** with **Google TV** and **System Framework** selected
-   (user 0), then reboot. System Framework provides real non-media input delivery
+   (user 0), then reboot. System Framework provides real input delivery for all key bindings
    in this emulator, which has no Xiaomi service.
 8. Restart Google TV and press Home. Starting with 0.6, the verified module
    selects Home automatically, including when the previous selection was Basic TV.
@@ -144,11 +144,19 @@ removes fixtures and stops the companion app afterward.
 The fixture must have LauncherX Local enabled in LSPosed. Version **0.13** needs
 no companion-app superuser grant. Run `python3 scripts/no_superuser_smoke.py` to
 temporarily set its Magisk policy to **deny**, reject a different-signed caller,
-and run the content, key-action and input-latency suites. The original policy is
+and run the content, key-action, input-latency and real TV Bro playback suites.
+The original policy is
 restored in `finally`; test administration still uses the separate ADB Shell grant.
 The script requires Google TV and System Framework already selected. It installs
 the tested APK and reboots the emulator before exercising its input host.
 The Xiaomi input-host registration is not exercised by this emulator.
+
+`python3 scripts/media_routing_smoke.py` requires the pinned TV Bro APK above and
+`ffmpeg` on the host. It generates a local video, serves it over a temporary
+`adb reverse` port, and observes actual HTML5 playback while sending a saved
+Play/Pause binding. It restores browser data and shortcut assignments, including
+their Android app-data SELinux labels. `--expect-session-bypass` verifies the
+pre-0.14 failure and uses ordinary Android input as a positive control.
 Run:
 
 ```sh

@@ -16,8 +16,8 @@ from smoke import fresh_home
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tests', nargs='*', choices=['content_smoke', 'key_actions_smoke',
-                        'key_latency_smoke', 'no_action_smoke', 'setup_smoke'],
-                        default=['content_smoke', 'key_actions_smoke', 'key_latency_smoke'])
+                        'key_latency_smoke', 'no_action_smoke', 'setup_smoke', 'media_routing_smoke'],
+                        default=['content_smoke', 'key_actions_smoke', 'key_latency_smoke', 'media_routing_smoke'])
     args = parser.parse_args()
     guard()
     apk = ROOT / 'build/apps/launcherx-local.apk'
@@ -38,6 +38,7 @@ def main():
         sql('REPLACE INTO policies (' + columns + ') VALUES (' + str(uid) + ',1,0,1,1);')
         denied = sql(query)
         assert '|policy=1|' in denied, denied
+        root('sync')
         adb('reboot')
         wait_boot()
         boot_log = adb('logcat', '-d', '-s', 'LauncherXLocal:I', '*:S')

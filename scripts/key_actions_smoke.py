@@ -44,7 +44,8 @@ def clean_youtube():
         for kind, source in directories:
             root('rm -rf ' + source)
             root('cp -a ' + backup + '/' + kind + ' ' + source)
-            root('restorecon -RF ' + source)
+            # -D is required to relabel children inside Android app-data directories.
+            root('restorecon -DRF ' + source)
             def manifest(directory):
                 return root('cd ' + directory + ' && find . -type f -exec sha256sum {} \\; | sort')
             assert manifest(source) == manifest(backup + '/' + kind), 'YouTube data restoration failed'
@@ -140,7 +141,8 @@ def main():
         send(313, 'short')
         assert 'name="playing" value="true"' in events()
         assert 'name="media" value="2"' in events()
-        checks.append('Saved Play/Pause delivers exactly one media press per short press to a real Android MediaSession')
+        assert 'name="window_media" value="2"' in events()
+        checks.append('Saved Play/Pause reaches the focused window, then Android falls back to a real MediaSession exactly once per press')
         print(checks[-1], flush=True)
         send_native(313, 'short', 'generated')
         assert 'name="media" value="2"' in events()
@@ -220,7 +222,7 @@ def main():
         root('rm -rf ' + STORE)
         if existed:
             root('cp -a ' + backup + '/store ' + STORE)
-            root('restorecon -RF ' + STORE)
+            root('restorecon -DRF ' + STORE)
         root('rm -rf ' + backup + ' ' + FIXTURE)
         adb('uninstall', APP)
         fresh_home()

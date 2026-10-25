@@ -20,6 +20,7 @@ public final class KeyActivity extends Activity {
     private TextView text;
     private boolean playing = true;
     private int media;
+    private int windowMedia;
     private int keys;
     private String last = "none";
     private long received;
@@ -69,8 +70,15 @@ public final class KeyActivity extends Activity {
         text.setText("Key delivery fixture\nState: " + (playing ? "PLAYING" : "PAUSED")
                 + "\nMedia presses: " + media + "\nWindow presses: " + keys + "\nLast key: " + last);
         getSharedPreferences("events", MODE_PRIVATE).edit().putBoolean("playing", playing)
-                .putInt("media", media).putInt("keys", keys).putString("last", last)
+                .putInt("media", media).putInt("window_media", windowMedia).putInt("keys", keys).putString("last", last)
                 .putLong("received", received).putLong("event_time", eventTime).commit();
+    }
+
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+                && event.getAction() == KeyEvent.ACTION_UP) windowMedia++;
+        // Leave media keys unhandled so Android routes them to the real session.
+        return super.dispatchKeyEvent(event);
     }
 
     @Override public boolean onKeyUp(int code, KeyEvent event) {

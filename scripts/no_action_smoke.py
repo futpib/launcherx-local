@@ -6,7 +6,7 @@ import time
 
 from all_shortcuts_smoke import KEYS, restore, send
 from build_publisher import build
-from key_actions_smoke import ACTIVITY, APP, choose, events, receiver
+from key_actions_smoke import ACTIVITY, APP, choose, clean_youtube, events, receiver
 from lab import ARTIFACTS, ROOT, adb, guard, root, shell
 from profile_smoke import inspect, zero_accounts
 from remote_smoke import CHOOSER, FIXTURE, STORE, foreground
@@ -102,7 +102,7 @@ def main():
         root('rm -rf ' + STORE)
         if existed:
             root('cp -a ' + backup + '/store ' + STORE)
-            root('restorecon -RF ' + STORE)
+            root('restorecon -DRF ' + STORE)
         root('rm -rf ' + backup + ' ' + FIXTURE)
         adb('uninstall', APP)
         fresh_home()
@@ -119,4 +119,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    with clean_youtube():
+        main()
