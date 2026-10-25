@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise saved key actions through native UI, real media sessions and input injection."""
 import hashlib
+from contextlib import contextmanager
 import json
 import re
 import shlex
@@ -18,6 +19,36 @@ from smoke import BROWSER, HOME, TARGET, fresh_home, screen
 APP = 'local.launcherx.keysfixture'
 ACTIVITY = APP + '/.KeyActivity'
 EVENTS = '/data/user/0/' + APP + '/shared_prefs/events.xml'
+
+
+@contextmanager
+def clean_youtube():
+    # Existing YouTube data in the lab crashes even with the module disabled.
+    # Exercise the actual stock app with clean data, then restore the lab's data.
+    guard()
+    package = 'com.google.android.youtube.tv'
+    backup = '/data/local/tmp/launcherx-youtube-' + str(time.time_ns())
+    root('am force-stop ' + package)
+    root('mkdir ' + backup)
+    directories = []
+    try:
+        for kind, parent in [('ce', '/data/user/0/'), ('de', '/data/user_de/0/')]:
+            source = parent + package
+            if root('test -d ' + source + ' && echo yes || echo no') == 'yes':
+                root('cp -a ' + source + ' ' + backup + '/' + kind)
+                directories.append((kind, source))
+        assert root('pm clear ' + package) == 'Success'
+        yield
+    finally:
+        root('am force-stop ' + package)
+        for kind, source in directories:
+            root('rm -rf ' + source)
+            root('cp -a ' + backup + '/' + kind + ' ' + source)
+            root('restorecon -RF ' + source)
+            def manifest(directory):
+                return root('cd ' + directory + ' && find . -type f -exec sha256sum {} \\; | sort')
+            assert manifest(source) == manifest(backup + '/' + kind), 'YouTube data restoration failed'
+        root('rm -rf ' + backup)
 
 
 def dialog(name, expected):
@@ -98,7 +129,7 @@ def main():
         adb('logcat', '-c')
         denied = shell('content call --uri content://local.launcherx.patch.keys --method prepare --arg 4 2>&1')
         assert 'SecurityException' in denied and 'Only Google TV' in denied, denied
-        checks.append('Root broker rejects an unrelated shell caller')
+        checks.append('Key broker rejects an unrelated shell caller')
 
         choose(313, 0, 'Play / Pause')
         receiver()
@@ -126,7 +157,7 @@ def main():
         receiver()
         send(313, 'short')
         assert 'KEYCODE_F8' in events() and 'name="keys" value="1"' in events()
-        checks.append('Custom symbolic Android key is saved and root injection reaches the focused app window')
+        checks.append('Custom symbolic Android key is saved and the scoped input hook reaches the focused app window')
         print(checks[-1], flush=True)
 
         for custom in ['f', 'F', '34', 'KEYCODE_F']:
@@ -198,11 +229,13 @@ def main():
               'physical_tv_tested': False, 'accounts': 0,
               'limitations': ['Silent AudioTrack and MediaSession fixture is not a third-party player.',
                               'Source KeyEvents enter the Google receiver; physical buttons and Xiaomi forwarding are not exercised.',
-                              'Custom key effects depend on the receiving app and Android policy.'],
-              'cleanup': 'Native shortcut store restored; test APK and helper removed.'}
+                              'Custom key effects depend on the receiving app and Android policy.',
+                              'Stock YouTube uses isolated clean private data; original data is restored after the CLI run.'],
+              'cleanup': 'Native shortcut store restored; test APK and helper removed. CLI also restores the isolated YouTube data.'}
     (ROOT / 'validation-key-actions.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2), flush=True)
 
 
 if __name__ == '__main__':
-    main()
+    with clean_youtube():
+        main()

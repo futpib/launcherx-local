@@ -64,7 +64,7 @@ def module_enabled(enabled):
     assert (switch.get('checked') == 'true') == enabled
     checked = [node for node in nodes if node.get('class') == 'android.widget.CheckBox'
                and node.get('checked') == 'true']
-    assert len(checked) == 1, 'Fixture must scope only Google TV'
+    assert len(checked) in (1, 2), 'Fixture scopes Google TV and optionally System Framework'
 
 
 def start_home(name, basic=False, stock=False):

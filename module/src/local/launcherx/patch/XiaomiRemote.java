@@ -36,6 +36,11 @@ final class XiaomiRemote {
                     Compatibility.verify(context, PACKAGE, 110, new String[][] {{"classes.dex",
                             "33d06a3edd7d1e229916b85af034513d33d0060d4ee070b03bd84d62502a0c36"}});
                     install(param.classLoader);
+                    try {
+                        KeyInjection.register(context);
+                    } catch (Exception error) {
+                        Log.w(TAG, "Xiaomi key input unavailable; System Framework scope can provide it", error);
+                    }
                     Log.i(TAG, "installed Xiaomi shortcut bridge");
                 } catch (Throwable error) {
                     Log.e(TAG, "Xiaomi shortcut bridge refused; retaining original handler", error);

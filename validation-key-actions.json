@@ -1,13 +1,13 @@
 {
   "result": "passed",
-  "module_version": "0.12",
-  "apk_sha256": "41ec2be62b4aadd4235f0f6aeb71a64ec794fab763d16f696139a71bcc92c9ce",
+  "module_version": "0.13",
+  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
   "checks": [
-    "Root broker rejects an unrelated shell caller",
+    "Key broker rejects an unrelated shell caller",
     "Saved Play/Pause delivers exactly one media press per short press to a real Android MediaSession",
     "An injected fallback key cannot recursively trigger another Send key action",
     "Opening the chooser, cancelling a replacement and restarting the launcher retain the saved key action",
-    "Custom symbolic Android key is saved and root injection reaches the focused app window",
+    "Custom symbolic Android key is saved and the scoped input hook reaches the focused app window",
     "Single lowercase and uppercase letters, numeric codes and full names save and deliver the same F key",
     "Choosing a favorite app replaces a saved key action",
     "All six supported source buttons can send Play/Pause through the Google receiver",
@@ -20,7 +20,8 @@
   "limitations": [
     "Silent AudioTrack and MediaSession fixture is not a third-party player.",
     "Source KeyEvents enter the Google receiver; physical buttons and Xiaomi forwarding are not exercised.",
-    "Custom key effects depend on the receiving app and Android policy."
+    "Custom key effects depend on the receiving app and Android policy.",
+    "Stock YouTube uses isolated clean private data; original data is restored after the CLI run."
   ],
-  "cleanup": "Native shortcut store restored; test APK and helper removed."
+  "cleanup": "Native shortcut store restored; test APK and helper removed. CLI also restores the isolated YouTube data."
 }

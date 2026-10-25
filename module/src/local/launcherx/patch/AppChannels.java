@@ -5,11 +5,9 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Base64;
 import java.nio.charset.StandardCharsets;
@@ -56,51 +54,43 @@ final class AppChannels {
     static void register(Context context, Handler worker, BooleanSupplier enabled) {
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override public void onReceive(Context unused, Intent intent) {
-                PendingResult result = goAsync();
-                worker.post(() -> {
-                    JSONObject response = new JSONObject();
-                    try {
-                        if (!enabled.getAsBoolean()) throw new IllegalStateException("Select Incognito in Home first.");
-                        enableNew(context);
-                        JSONArray channels = list(context);
-                        String changes = intent.getStringExtra("changes");
-                        if (changes != null && !changes.isEmpty()) {
-                            Set<Long> known = new HashSet<>();
-                            for (int i = 0; i < channels.length(); i++) known.add(channels.getJSONObject(i).getLong("id"));
-                            String[] updates = changes.split(",");
-                            if (updates.length > 80) throw new IllegalArgumentException("Too many channel changes");
-                            for (String update : updates) {
-                                if (!update.matches("[0-9]+:[01]") || !known.contains(Long.parseLong(update.split(":")[0]))) {
-                                    throw new IllegalArgumentException("Channel list changed; reopen the chooser");
-                                }
+                JSONObject response = new JSONObject();
+                try {
+                    HookRequest.validate(this, intent);
+                    if (!enabled.getAsBoolean()) throw new IllegalStateException("Select Incognito in Home first.");
+                    enableNew(context);
+                    JSONArray channels = list(context);
+                    String changes = intent.getStringExtra("changes");
+                    if (changes != null && !changes.isEmpty()) {
+                        Set<Long> known = new HashSet<>();
+                        for (int i = 0; i < channels.length(); i++) known.add(channels.getJSONObject(i).getLong("id"));
+                        String[] updates = changes.split(",");
+                        if (updates.length > 80) throw new IllegalArgumentException("Too many channel changes");
+                        for (String update : updates) {
+                            if (!update.matches("[0-9]+:[01]") || !known.contains(Long.parseLong(update.split(":")[0]))) {
+                                throw new IllegalArgumentException("Channel list changed; reopen the chooser");
                             }
-                            for (String update : updates) {
-                                String[] fields = update.split(":");
-                                ContentValues values = new ContentValues();
-                                values.put("browsable", Integer.parseInt(fields[1]));
-                                if (context.getContentResolver().update(ContentUris.withAppendedId(CHANNELS,
-                                        Long.parseLong(fields[0])), values, "type=?", new String[]{"TYPE_PREVIEW"}) != 1) {
-                                    throw new IllegalStateException("Channel disappeared; reopen the chooser");
-                                }
-                            }
-                            channels = list(context);
                         }
-                        response.put("channels", channels);
-                    } catch (Exception error) {
-                        try { response.put("error", error.getMessage()); } catch (Exception ignored) {}
-                    } finally {
-                        result.setResultData(Base64.encodeToString(response.toString().getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP));
-                        result.finish();
+                        for (String update : updates) {
+                            String[] fields = update.split(":");
+                            ContentValues values = new ContentValues();
+                            values.put("browsable", Integer.parseInt(fields[1]));
+                            if (context.getContentResolver().update(ContentUris.withAppendedId(CHANNELS,
+                                    Long.parseLong(fields[0])), values, "type=?", new String[]{"TYPE_PREVIEW"}) != 1) {
+                                throw new IllegalStateException("Channel disappeared; reopen the chooser");
+                            }
+                        }
+                        channels = list(context);
                     }
-                });
+                    response.put("channels", channels);
+                } catch (Exception error) {
+                    try { response.put("error", error.getMessage()); } catch (Exception ignored) {}
+                } finally {
+                    setResultData(Base64.encodeToString(response.toString().getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP));
+                }
             }
         };
-        IntentFilter filter = new IntentFilter(ACTION);
-        if (Build.VERSION.SDK_INT >= 33) {
-            context.registerReceiver(receiver, filter, "android.permission.DUMP", null, Context.RECEIVER_EXPORTED);
-        } else {
-            context.registerReceiver(receiver, filter, "android.permission.DUMP", null);
-        }
+        HookRequest.register(context, receiver, ACTION, worker);
     }
 
     private static JSONArray list(Context context) throws Exception {

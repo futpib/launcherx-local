@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
-/** Media keys use Android's session routing; other keys use the module's root broker. */
+/** Media keys use Android's session routing; other keys use an authenticated hook request. */
 final class KeyActions {
     static final String PREFIX = "launcherx-key:";
     static final int NONE = -1;
@@ -74,7 +74,7 @@ final class KeyActions {
         Bundle result = context.getContentResolver().call(BROKER, method, Integer.toString(code), null);
         if (result == null || !result.getBoolean("ok")) {
             throw new IllegalStateException(result == null ? "LauncherX Local key service is unavailable"
-                    : result.getString("error", "Allow LauncherX Local root access in Magisk"));
+                    : result.getString("error", "Check the key input scope in LSPosed"));
         }
     }
 }

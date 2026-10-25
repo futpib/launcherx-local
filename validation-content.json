@@ -1,8 +1,8 @@
 {
   "result": "passed",
-  "module_version": "0.6",
-  "apk_sha256": "f7411318cc93e15addd6c9cce6bf9270214de98e97e165690feaff68a0d84900",
-  "publisher_sha256": "9a13a468476c5b3bde5980412be16e74ac77266283849603205024234a2d1151",
+  "module_version": "0.13",
+  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
+  "publisher_sha256": "6b4b8acdf1c754a212c44a3ffa6035efb25fd03aa1478a459bb0906811848c75",
   "accounts": 0,
   "checks": [
     "empty providers keep apps-only Home",
@@ -23,18 +23,19 @@
   ],
   "physical_tv_tested": false,
   "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback",
-  "verified_date": "2026-10-23",
+  "verified_date": "2026-10-25",
   "launcher_sha256": "3187adb10afe8c242d1b67d3d4f16fb77f600a0d72686339a4a3ff75db882ab5",
   "cleanup": "Passed: test publisher uninstalled, its three provider tables empty, temporary IPv4/IPv6 rules removed.",
   "limitations": [
     "Real TvProvider publisher and native launcher UI; app receiver verifies URI and extras, not third-party video playback.",
     "Complete content suite uses the pinned launcher in the Android 14 emulator; physical TV channel defaults are recorded separately in validation-tv-update.json.",
     "TalkBack is not verified. UIAutomator can trigger a stock ViewRootImpl accessibility-focus exception; sensitive navigation checks use screenshot OCR and DPAD.",
-    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline."
+    "Boot completion can precede an inspectable window; the test retries inspection within a bounded deadline.",
+    "Test administration uses the separate ADB Shell root grant; the companion app was explicitly denied root throughout this suite."
   ],
   "evidence": [
     "artifacts/content-result.json",
-    "artifacts/content-smoke-0.6-run.txt",
+    "artifacts/no-superuser-content_smoke.log",
     "artifacts/content-populated.png",
     "artifacts/content-watch-focus.png",
     "artifacts/content-preview-focus.png",
@@ -60,6 +61,9 @@
     "artifacts/content-logcat.txt",
     "artifacts/content-final-logcat.txt",
     "artifacts/content-new-channel.png",
-    "artifacts/content-new-channel.txt"
-  ]
+    "artifacts/content-new-channel.txt",
+    "artifacts/content-logcat.raw",
+    "artifacts/content-final-logcat.raw"
+  ],
+  "companion_policy_during_tests": "uid=10128|policy=1|until=0|logging=1|notification=1"
 }

@@ -1,36 +1,36 @@
 {
   "result": "passed",
-  "apk_sha256": "059210f71258300f060ac5fd86731b2b1299659d8d1df51cddb028e10e340d39",
+  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
   "measurement": "Source KeyEvent ACTION_UP eventTime to fixture callback uptime, excluding host ADB and sender startup.",
   "custom_f8": {
     "samples_ms": [
-      10,
-      5,
-      4,
-      5,
-      5,
-      5,
+      8,
       6,
-      6
+      7,
+      5,
+      5,
+      5,
+      5,
+      5
     ],
     "median_ms": 5.0,
-    "min_ms": 4,
-    "max_ms": 10
+    "min_ms": 5,
+    "max_ms": 8
   },
   "play_pause": {
     "samples_ms": [
-      6,
+      7,
+      4,
       5,
+      4,
       5,
       4,
       4,
-      4,
-      4,
-      6
+      4
     ],
-    "median_ms": 4.5,
+    "median_ms": 4.0,
     "min_ms": 4,
-    "max_ms": 6
+    "max_ms": 7
   },
   "physical_tv_tested": false,
   "limitations": [
@@ -39,79 +39,19 @@
   ],
   "cleanup": "Native store restored; fixture APK and receiver helper removed.",
   "lifecycle": {
-    "after_killed_worker": {
-      "samples_ms": [
-        244
-      ],
-      "median_ms": 244,
-      "min_ms": 244,
-      "max_ms": 244
-    },
     "after_cold_provider": {
       "samples_ms": [
-        505
+        240
       ],
-      "median_ms": 505,
-      "min_ms": 505,
-      "max_ms": 505
+      "median_ms": 240,
+      "min_ms": 240,
+      "max_ms": 240
     },
-    "after_idle_expiry": {
-      "samples_ms": [
-        407
-      ],
-      "median_ms": 407,
-      "min_ms": 407,
-      "max_ms": 407
-    },
-    "unprivileged_idle_relay_retired_on_wake": true,
     "checks": [
-      "Warm calls reuse one full launcher verification and still reject another caller UID",
-      "A worker killed between presses restarts and delivers exactly one key",
-      "Stopping the module closes its root worker and the next press re-verifies the launcher",
-      "The root worker exits after 60 seconds idle; the next press retires any frozen unprivileged relay and starts a new worker",
-      "Private worker exits on EOF and rejects invalid keys without input delivery"
+      "Warm calls cache launcher verification and reject another caller UID",
+      "Stopping the companion app rediscovers the scoped input hook and delivers exactly one key",
+      "No root input worker is created",
+      "Input hook rejects invalid keys, unknown operations and expired requests without input delivery"
     ]
-  },
-  "baseline": {
-    "result": "passed",
-    "apk_sha256": "312639a490f64362cd07df9ff9216484c79bb1d7a86e7be880aecd8f04ece14d",
-    "measurement": "Source KeyEvent ACTION_UP eventTime to fixture callback uptime, excluding host ADB and sender startup.",
-    "custom_f8": {
-      "samples_ms": [
-        354,
-        344,
-        374,
-        392,
-        473,
-        489,
-        476,
-        474
-      ],
-      "median_ms": 432.5,
-      "min_ms": 344,
-      "max_ms": 489
-    },
-    "play_pause": {
-      "samples_ms": [
-        5,
-        4,
-        6,
-        3,
-        5,
-        3,
-        4,
-        5
-      ],
-      "median_ms": 4.5,
-      "min_ms": 3,
-      "max_ms": 6
-    },
-    "physical_tv_tested": false,
-    "limitations": [
-      "Google receiver injection in the x86 Android 14 emulator; not physical remote timing.",
-      "Media consumer is a silent AudioTrack and MediaSession fixture."
-    ],
-    "cleanup": "Native store restored; fixture APK and receiver helper removed."
-  },
-  "warm_custom_speedup": 86.5
+  }
 }

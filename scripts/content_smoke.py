@@ -57,8 +57,8 @@ def inspect(name, expected=(), absent=(), pixels=False):
             screen(name)
             source = ARTIFACTS / (name + '.png')
             crop_bounds = {
-                'content-chooser': (.24, .30, .76, .70),
-                'content-chooser-checked': (.24, .30, .76, .70),
+                'content-chooser': (.24, .05, .76, .95),
+                'content-chooser-checked': (.24, .05, .76, .95),
                 'content-deleted-watch': (.045, .44, .73, .52),
                 'content-deleted-preview': (.045, .83, .73, .92),
             }
@@ -108,9 +108,16 @@ def select(row, name, item=0):
     (ARTIFACTS / (name + '-activity.txt')).write_text(state)
 
 
-def check_logs(name):
-    logs = adb('logcat', '-d')
+def record_logs(name):
+    raw = adb('logcat', '-d', binary=True)
+    (ARTIFACTS / (name + '-logcat.raw')).write_bytes(raw)
+    logs = raw.decode('utf-8', errors='replace')
     (ARTIFACTS / (name + '-logcat.txt')).write_text(logs)
+    return logs
+
+
+def check_logs(name):
+    logs = record_logs(name)
     hook_logs = '\n'.join(line for line in logs.splitlines() if 'LauncherXLocal' in line)
     for error in ['unavailable', 'Skipping', 'failed', 'Patch refused']:
         assert error not in hook_logs, hook_logs
@@ -152,7 +159,12 @@ def main():
         screen('content-chooser-focus')
         shell('input keyevent KEYCODE_DPAD_CENTER')
         inspect('content-chooser', ['App content on Home', 'Fixture recommendations'])
-        shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER')
+        choices = root("content query --uri content://android.media.tv/channel "
+                       "--projection _id:package_name:display_name --where \"type='TYPE_PREVIEW'\" --sort _id")
+        rows = [row for row in choices.splitlines() if row.startswith('Row:')]
+        hidden = next(index for index, row in enumerate(rows)
+                      if 'package_name=' + PACKAGE + ',' in row and 'display_name=Hidden fixture channel' in row)
+        shell('input keyevent ' + ' '.join(['KEYCODE_DPAD_DOWN'] * hidden + ['KEYCODE_DPAD_CENTER']))
         inspect('content-chooser-checked')
         shell('input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
         inspect('content-chooser-saved', ['App content choices saved'])
@@ -274,7 +286,7 @@ def main():
         (ARTIFACTS / 'content-result.json').write_text(json.dumps(result, indent=2) + '\n')
         print(json.dumps(result, indent=2), flush=True)
     finally:
-        (ARTIFACTS / 'content-final-logcat.txt').write_text(adb('logcat', '-d'))
+        record_logs('content-final')
         for command, rule in firewall:
             root(command + ' -D OUTPUT ' + rule)
         publish('clear')

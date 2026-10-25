@@ -2,8 +2,9 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.12** supports both reviewed Google TV Home builds and fills local
-preview cards with centered artwork, including SmartTube's padded thumbnails.
+Version **0.13** removes the companion app's superuser requirement. Both reviewed
+Google TV Home builds and centered local artwork remain supported, including
+SmartTube's padded thumbnails.
 The six app buttons support Play/Pause, other Android keys and **No action**.
 Home's native profile chooser also offers Google sign-in and saved Google profiles.
 The original app tiles, cards, remote navigation, app launching and quick settings
@@ -58,6 +59,11 @@ before hooks are installed or Home is activated. Keep launcher updates in mind:
 a new launcher build needs a new compatibility review, not just an edited version
 number. Disable the module in LSPosed and restart Google TV to use stock behavior.
 
+Version **0.13** is tested in the isolated emulator with the companion app's
+Magisk root policy explicitly denied. The System Framework input hook uses the
+real Android dispatcher; the new Xiaomi input-host path has no physical-TV test.
+See [no-superuser validation](validation-no-superuser.json).
+
 ## Install
 
 1. Start with an already rooted TV. In Magisk Settings, enable **Zygisk**.
@@ -71,14 +77,15 @@ number. Disable the module in LSPosed and restart Google TV to use stock behavio
 5. In LSPosed's **Modules** page, enable **LauncherX Local** with **Google TV**
    selected. On the supported Xiaomi TV, also select **TvService**
    (`mitv.service`) for the Netflix, Prime Video, Live TV and Xiaomi TV+ buttons.
-   Do not select System Framework or other packages.
+   For non-media keys without Xiaomi's service (including the emulator), select
+   **System Framework** instead. Home, content choices and media keys need only Google TV.
 6. Restart Google TV (force stop it in Android Settings, then press Home), or
    reboot. The verified module selects Home automatically inside the launcher.
    There is no separate activation button or Magisk root prompt for this step.
 
 To update, install the new APK signed with the same key and restart Google TV.
-When adding or updating the Xiaomi service hooks, reboot so that persistent
-service also reloads the module. Existing installations must select the newly
+When adding or updating TV service or System Framework hooks, reboot so those
+persistent processes also reload the module. Existing installations must select the newly
 recommended TV service scope; updating the APK does not select it automatically.
 Magisk and LSPosed do not need to be reinstalled. The companion app's compatibility
 status checks the installed launcher; it does not certify that LSPosed is active.
@@ -93,9 +100,11 @@ interfaces may need a pointer; the LauncherX Local content chooser works with DP
 This follows the [standard LSPosed installation and module activation flow](https://github.com/LSPosed/LSPosed/wiki/How-to-use-it).
 No framework databases, system files, or Google account records are edited directly.
 Running hooks use LSPosed. Home activation uses the launcher's own permission
-to select its activities. The companion app requests root for **Choose app
-content** and for sending non-media keys. Play/Pause and other media controls
-use Android's media-button API directly.
+to select its activities. The companion app never invokes `su` and needs no
+Magisk superuser grant. **Choose app content** uses an authenticated message to
+the launcher. Non-media keys use the scoped TV service or System Framework input
+hook; Play/Pause and other media controls use Android's media-button API directly.
+An old companion-app superuser grant can be revoked after upgrading and rebooting.
 
 ## Profiles
 
@@ -126,7 +135,7 @@ the YouTube button can also choose apps outside Google's YouTube family.
 Choose **Send key…** in the added controls to bind a button to **Play/Pause**,
 **TV home**, **Back**, or another Android key. Single letters such as `f`,
 numeric key codes and `KEYCODE_` names are supported. Non-media keys require
-granting LauncherX Local root access in Magisk. See
+TV service (Xiaomi) or System Framework in the module's LSPosed scope and a reboot. See
 [key actions and delivery rules](docs/key-actions.md).
 
 Choose **No action** in that list to make short press do nothing. Long press
@@ -268,14 +277,16 @@ TV update, automatic activation, native Incognito chooser and retained app butto
 [`validation-remote.json`](validation-remote.json) records native remote-receiver
 tests. [`validation-all-shortcuts.json`](validation-all-shortcuts.json) covers
 independent six-button assignments and default restoration in **0.9**.
-[`validation-key-actions.json`](validation-key-actions.json) records **0.12**
+[`validation-key-actions.json`](validation-key-actions.json) records **0.13**
 media-session delivery, single-letter and symbolic key input, arbitrary input
 injection, persistence and restoration.
 [`validation-no-action.json`](validation-no-action.json) records **0.10**
 No action on all six receivers, persistence, reconfiguration and restoration,
 plus Play/Pause and custom-key regression checks.
-[`validation-key-latency.json`](validation-key-latency.json) compares actual
-key delivery with 0.10 and checks the 0.11 worker's restart and idle cleanup.
+[`validation-key-latency.json`](validation-key-latency.json) records actual key
+delivery, companion restart and input-request validation in **0.13**.
+[`validation-no-superuser.json`](validation-no-superuser.json) records the
+explicitly denied companion root policy and unauthorized-caller checks.
 [`validation-remote-regressions.json`](validation-remote-regressions.json) records
 the **0.8** activation, compatibility-refusal and Incognito profile reruns.
 [`validation-tv-remote.json`](validation-tv-remote.json) records the **0.8** TV

@@ -11,14 +11,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,7 +40,7 @@ public final class SetupActivity extends Activity {
                 + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
                 + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
                 + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
-                + "Send key adds Play/Pause, other Android keys and No action. Non-media keys need LauncherX Local root access in Magisk. "
+                + "Send key adds Play/Pause, other Android keys and No action. For non-media keys, select TV service (Xiaomi) or System Framework in LSPosed, then reboot. No companion-app superuser grant is needed. "
                 + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));
@@ -101,17 +96,15 @@ public final class SetupActivity extends Activity {
     }
 
     private void channels(String changes) {
-        busy(true, "Reading app content choices. Allow Magisk root access if prompted…");
+        busy(true, "Reading app content choices…");
         new Thread(() -> {
             try {
                 verifyUser();
                 Compatibility.verify(this);
-                String command = "am broadcast --user 0 --receiver-include-background -a " + AppChannels.ACTION
-                        + " -p " + TARGET;
-                if (changes != null) command += " --es changes " + changes;
-                Matcher match = Pattern.compile("data=\"([A-Za-z0-9+/=]+)\"").matcher(root(command));
-                if (!match.find()) throw new IllegalStateException("Select Incognito in Home, then reopen this chooser. If Home is still Basic TV, enable the module in LSPosed and restart Google TV.");
-                JSONObject result = new JSONObject(new String(Base64.decode(match.group(1), Base64.DEFAULT), StandardCharsets.UTF_8));
+                Intent request = new Intent(AppChannels.ACTION).setPackage(TARGET);
+                if (changes != null) request.putExtra("changes", changes);
+                String response = HookRequest.call(this, request);
+                JSONObject result = new JSONObject(new String(Base64.decode(response, Base64.DEFAULT), StandardCharsets.UTF_8));
                 if (result.has("error")) throw new IllegalStateException(result.getString("error"));
                 JSONArray entries = result.getJSONArray("channels");
                 String[] labels = new String[entries.length()];
@@ -150,31 +143,4 @@ public final class SetupActivity extends Activity {
         }, "launcherx-channels").start();
     }
 
-    static String root(String command) throws Exception {
-        return root(command, 90);
-    }
-
-    static String root(String command, int timeoutSeconds) throws Exception {
-        Process process = new ProcessBuilder("su", "-c", command).redirectErrorStream(true).start();
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Thread reader = new Thread(() -> {
-            try (InputStream input = process.getInputStream()) {
-                byte[] buffer = new byte[4096];
-                int count;
-                while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
-            } catch (java.io.IOException ignored) {}
-        }, "launcherx-root-output");
-        reader.start();
-        try {
-            if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Root request timed out. Check Magisk's Superuser page.");
-            }
-            reader.join(5000);
-            if (reader.isAlive()) throw new IllegalStateException("Root output did not finish");
-            if (process.exitValue() != 0) throw new IllegalStateException(output.toString("UTF-8").trim());
-            return output.toString("UTF-8").trim();
-        } finally {
-            process.destroy();
-        }
-    }
 }

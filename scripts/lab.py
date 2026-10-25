@@ -18,7 +18,8 @@ SERVER_PORT = "5038"
 def adb(*args, timeout=30, binary=False):
     result = subprocess.run([str(SDK / "platform-tools/adb"), "-P", SERVER_PORT,
                              "-s", SERIAL, *map(str, args)],
-                            capture_output=True, text=not binary, timeout=timeout)
+                            capture_output=True, text=not binary,
+                            errors=None if binary else 'replace', timeout=timeout)
     if result.returncode:
         raise RuntimeError((args, result.returncode, result.stdout, result.stderr))
     return result.stdout if binary else result.stdout.strip()

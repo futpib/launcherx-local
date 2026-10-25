@@ -40,36 +40,32 @@ Media controls use Android's media-button routing to the current media consumer.
 They do not need another root grant or Xiaomi's service. Which player receives
 the key depends on Android's media-session and audio-playback state.
 
-Other keys require **LauncherX Local** to have Magisk root access. Saving one
-checks that access before changing the binding. The module's own provider runs
-its small input helper from the installed APK. It accepts only the verified
-Google TV launcher's owner-user UID, checks the pinned launcher code, and accepts
-only a validated key code. It does not accept shell commands from callers.
-Google TV does not need its own root grant, and System Framework is not scoped.
-The same APK works without Xiaomi's service installed.
+Starting with **0.13**, non-media keys run in an explicitly scoped privileged
+process. On the supported Xiaomi TV, select **TvService** (`mitv.service`) in
+LSPosed; its existing system UID already has `INJECT_EVENTS`. Without that service,
+select **System Framework**. Reboot after adding either scope or updating its code.
+The companion app and Google TV need no Magisk superuser grant.
 
-In **0.11**, the provider checks the caller UID and installed APK identity on
-every request. It reuses a successful full DEX verification while the package
-version, update time, path and file identity remain unchanged. A module-process
-restart clears this cache.
+The companion's provider accepts only the verified owner-user Google TV UID. It
+checks the installed APK identity on every call and caches full DEX verification
+until the package version, update time or file identity changes. Requests to the
+input host require the module-defined signature permission; an unrelated app
+cannot obtain it just by requesting it. Persistent hooks also verify that the
+installed module signer and permission owner have not changed. Only validated integer key codes and
+`prepare`/`send` operations are accepted. Expired requests are rejected.
 
-The input worker is prepared when a non-media key is saved, then reused over
-private stdin/stdout pipes. It accepts validated integer key codes, not shell
-commands, and exposes no listening socket. It exits on pipe closure, after one
-minute idle, or after five minutes total. The parent refreshes it before those
-deadlines when needed, and closes Magisk's relay as well. Android's cached-app
-freezer can defer cleanup of the unprivileged relay until the module wakes;
-the root worker still exits independently. New workers go through Magisk again.
-An uncertain delivery is not replayed, to avoid duplicate presses.
+Saving a non-media binding probes TV service first, then System Framework. It
+refuses to change the binding if neither hook is available. Delivery uses only
+the selected host and is never retried after an uncertain result. The input host
+uses a separate handler thread, so delivery does not block the system main thread.
+There are no `su` commands, subprocesses, listening sockets or root-worker relays.
+Stopping the companion app discards its cached host and launcher verification;
+the next press reconnects through the same authenticated path.
 
-Warm custom-key delivery avoids repeated APK hashing and Java-process startup.
-In the recorded emulator run, F8 delivery fell from a **432.5 ms** median in
-0.10 to **5 ms** in 0.11 across eight presses per build. Play/Pause remained
-**4.5 ms**. Killed-worker, cold-provider and idle-expiry recovery took 244,
-505 and 407 ms respectively; these are individual observations, not bounds.
-The first press after a cold start or idle expiry can still take a few hundred
-milliseconds. Media keys already use the direct Android API. Short actions
-continue to execute on release so holding the source button can customize it.
+The historical 0.11 emulator measurements (5 ms median F8 delivery) described the
+previous root worker. Current delivery measurements and cold-companion recovery
+are recorded separately in [the latency report](../validation-key-latency.json).
+Short actions still execute on release so holding the source button can customize it.
 
 Each action sends a down/up pair. Application handling and Android policy
 determine its effect; this is not a chord or held-key action. Generated keys are
@@ -80,10 +76,9 @@ Managed profiles cannot execute the added key actions.
 
 `python3 scripts/key_latency_smoke.py --lifecycle` measures Android uptime from
 source-key release to the fixture's actual delivered event. It excludes host
-ADB and sender startup time. It checks warm worker reuse, unrelated-caller
-rejection after caching, killed-worker recovery, provider restart, idle expiry,
-EOF and invalid input. See [validation-key-latency.json](../validation-key-latency.json)
-for timings and the recorded 0.10 baseline. These are emulator delivery timings,
+ADB and sender startup time. It checks caller rejection after caching, companion
+restart, invalid keys, unknown operations and expired requests. See [validation-key-latency.json](../validation-key-latency.json)
+for current timings. These are emulator delivery timings,
 not physical-remote or screen-rendering measurements. Version 0.11 is installed
 on the physical TV; physical remote latency has not been measured.
 
@@ -94,8 +89,8 @@ and replacing it with Play/Pause or a custom key. See
 
 `python3 scripts/key_actions_smoke.py` uses the real native chooser and store,
 an Android MediaSession with a silent AudioTrack, and a focused activity that
-records delivered keys. It also exercises the module's actual root broker and
-input helper, including saving and delivering `f`, `F`, `34` and `KEYCODE_F`
+records delivered keys. It also exercises the module's authenticated broker and
+scoped input hook, including saving and delivering `f`, `F`, `34` and `KEYCODE_F`
 through the custom-key dialog. This fixture is not a third-party media player.
 
 The script backs up and restores the native shortcut store and removes its

@@ -45,7 +45,9 @@ The actual fixture setup was:
    Verify version, original APK hash, and `primaryCpuAbi=armeabi-v7a`.
 7. Set `device_provisioned`, `user_setup_complete`, and `tv_user_setup_complete`
    to 1, without adding an account. Install the built module APK. In LSPosed,
-   enable **LauncherX Local** with only **Google TV** selected (user 0).
+   enable **LauncherX Local** with **Google TV** and **System Framework** selected
+   (user 0), then reboot. System Framework provides real non-media input delivery
+   in this emulator, which has no Xiaomi service.
 8. Restart Google TV and press Home. Starting with 0.6, the verified module
    selects Home automatically, including when the previous selection was Basic TV.
    No separate companion-app activation or root grant is needed for that switch.
@@ -117,8 +119,14 @@ OEM default launches still require the physical TV.
 Run `python3 scripts/key_actions_smoke.py` for key bindings. Its media-session
 fixture plays a silent AudioTrack so Android selects it as a media-button
 recipient; its activity records arbitrary window keys. The test drives the
-native chooser, module root broker and real input-injection helper, then
-restores the shortcut store and uninstalls the fixture.
+native chooser, authenticated module broker and actual system-server input hook, then
+restores the shortcut store and uninstalls the fixture. The CLI also snapshots,
+clears and restores YouTube's private data, checking restored file hashes. This
+keeps default-launch checks independent of existing app state: the lab's original
+YouTube data reproduced a `dcs.g` null-map crash even with the module disabled
+and the emulator rebooted; a clean state launched successfully. Baseline evidence
+is in `artifacts/no-su-youtube-module-disabled.raw` and
+`artifacts/no-su-youtube-clean-state.raw`.
 
 Run `python3 scripts/no_action_smoke.py` to check No action on all six source
 buttons, restart persistence, retained long-press editing and default
@@ -127,14 +135,20 @@ then restores the store and removes its fixtures.
 
 `python3 scripts/key_latency_smoke.py --lifecycle` measures key-release to
 delivered-event latency using the same Android uptime clock at both ends. It
-checks the private input worker's reuse, restart and idle cleanup. The idle test
-takes about a minute. Use `--apk` and `--output` to record a baseline before
+checks cold companion-process recovery, invalid/expired requests and the absence
+of a root input-worker process. Use `--apk` and `--output` to record a baseline before
 installing a newer module, then `--baseline /path/to/baseline.json` to include
 that comparison in the new report. It preserves the native shortcut store,
-removes fixtures, and stops the module's temporary input worker afterward.
+removes fixtures and stops the companion app afterward.
 
-The fixture must have LauncherX Local enabled in LSPosed. The companion app
-needs a Magisk root grant for **Choose app content** and non-media key actions.
+The fixture must have LauncherX Local enabled in LSPosed. Version **0.13** needs
+no companion-app superuser grant. Run `python3 scripts/no_superuser_smoke.py` to
+temporarily set its Magisk policy to **deny**, reject a different-signed caller,
+and run the content, key-action and input-latency suites. The original policy is
+restored in `finally`; test administration still uses the separate ADB Shell grant.
+The script requires Google TV and System Framework already selected. It installs
+the tested APK and reboots the emulator before exercising its input host.
+The Xiaomi input-host registration is not exercised by this emulator.
 Run:
 
 ```sh

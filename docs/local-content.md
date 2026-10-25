@@ -88,9 +88,10 @@ the existing content observer and Home resume path. Discovery scans at most
 
 The setup app's **Choose app content** dialog lists up to 80 published preview
 channels. Saving changes updates only the selected channels' `browsable` flags
-through `ContentResolver`. The launcher-side receiver requires the sender to hold
-`android.permission.DUMP`; setup reaches it through its existing Magisk root
-grant. It also checks that Home is enabled and Incognito is selected.
+through `ContentResolver`. Starting with **0.13**, the launcher-side receiver
+requires the module-defined signature permission. The companion app sends an
+ordered broadcast directly, without `su`, `am` or a superuser grant. Requests
+expire after ten seconds and are limited to the owner user. It also checks that Home is enabled and Incognito is selected.
 Channel IDs and values are validated before writes. The chooser also initializes
 any newly discovered channels, so its initial checkboxes match Home's defaults.
 

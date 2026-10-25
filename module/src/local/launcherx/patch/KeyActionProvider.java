@@ -2,6 +2,7 @@ package local.launcherx.patch;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,10 +14,33 @@ import android.util.Log;
 
 /** Only the verified owner-user Google launcher may ask this app to inject a key. */
 public final class KeyActionProvider extends ContentProvider {
-    private final KeyInjectorConnection injector = new KeyInjectorConnection();
+    private String keyHost;
     private String verifiedIdentity;
 
     @Override public boolean onCreate() { return true; }
+
+    private synchronized void request(String operation, int code) throws Exception {
+        if (keyHost == null || "prepare".equals(operation)) {
+            keyHost = null;
+            for (String host : new String[] {XiaomiRemote.PACKAGE, "android"}) {
+                try {
+                    String reply = HookRequest.call(getContext(), new Intent(KeyInjection.ACTION)
+                            .setPackage(host).putExtra("operation", "prepare").putExtra("code", code));
+                    if ("OK".equals(reply)) {
+                        keyHost = host;
+                        break;
+                    }
+                } catch (Exception ignored) {}
+            }
+            if (keyHost == null) throw new IllegalStateException(
+                    "Select TV service (Xiaomi) or System Framework in LSPosed, then reboot");
+        }
+        if ("send".equals(operation)) {
+            String reply = HookRequest.call(getContext(), new Intent(KeyInjection.ACTION)
+                    .setPackage(keyHost).putExtra("operation", "send").putExtra("code", code));
+            if (!"OK".equals(reply)) throw new IllegalStateException(reply);
+        }
+    }
 
     private synchronized void authorize(int caller) throws Exception {
         PackageInfo info = getContext().getPackageManager().getPackageInfo(Compatibility.TARGET, 0);
@@ -50,11 +74,7 @@ public final class KeyActionProvider extends ContentProvider {
         long identity = Binder.clearCallingIdentity();
         Bundle result = new Bundle();
         try {
-            if ("prepare".equals(method)) {
-                injector.prepare(getContext());
-            } else {
-                injector.send(getContext(), code);
-            }
+            request(method, code);
             result.putBoolean("ok", true);
         } catch (Exception error) {
             result.putString("error", error.getMessage());

@@ -1,10 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="local.launcherx.patch" android:versionCode="12" android:versionName="0.12">
+    package="local.launcherx.patch" android:versionCode="13" android:versionName="0.13">
     <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
+    <permission android:name="local.launcherx.patch.permission.CONTROL" android:protectionLevel="signature" />
+    <uses-permission android:name="local.launcherx.patch.permission.CONTROL" />
     <queries>
         <package android:name="com.google.android.apps.tv.launcherx" />
+        <package android:name="mitv.service" />
     </queries>
     <application android:label="LauncherX Local" android:allowBackup="false"
         android:icon="@drawable/icon" android:banner="@drawable/banner"

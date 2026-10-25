@@ -5,7 +5,7 @@
 Each button's native chooser now includes **Send key…**, with Play/Pause first,
 TV Home and Back presets, and arbitrary Android key codes. Short press sends
 the key; long press still opens customization. Media keys use Android's media
-routing, while other keys use a root helper in the module APK. See
+routing, while other keys use the scoped TV service or System Framework input hook. See
 [key actions](key-actions.md) for access, restoration and validation details.
 Version **0.10** also offers **No action**: short press is consumed, long press
 still opens customization, and restore controls re-enable the original action.

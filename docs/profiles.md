@@ -63,8 +63,8 @@ test. Re-enabling and restarting selects Incognito Home again. With real Google 
 the launcher uses its stock account flow; that removal case is not yet tested.
 
 The companion app has only **Choose app content**, alongside setup instructions
-and compatibility status. Its root request is limited to the protected channel
-visibility receiver. Compatibility failures prevent activation before any
+and compatibility status. It calls the signature-protected channel visibility
+receiver directly and never requests superuser access. Compatibility failures prevent activation before any
 component state is changed. Installation of hooks participates in the existing
 rollback list.
 

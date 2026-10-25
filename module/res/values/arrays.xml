@@ -2,5 +2,6 @@
     <string-array name="xposed_scope">
         <item>com.google.android.apps.tv.launcherx</item>
         <item>mitv.service</item>
+        <item>android</item>
     </string-array>
 </resources>

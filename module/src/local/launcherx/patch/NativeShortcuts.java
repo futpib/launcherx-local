@@ -499,7 +499,7 @@ final class NativeShortcuts {
                 .setTitle("Bind " + label(source) + " to " + KeyActions.label(target) + "?")
                 .setMessage(target == KeyActions.NONE ? "Short press does nothing. Hold to customize again."
                         : "Short press sends this key. Hold to customize again."
-                        + (KeyActions.media(target) ? "" : " Allow LauncherX Local root access in Magisk if prompted."))
+                        + (KeyActions.media(target) ? "" : " Enable TV service (Xiaomi) or System Framework in LSPosed, then reboot."))
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton("Save", (dialog, which) -> saveKey(activity, source, target)).show();
     }

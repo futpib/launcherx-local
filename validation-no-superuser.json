@@ -1,0 +1,22 @@
+{
+  "result": "passed",
+  "module_version": "0.13",
+  "apk_sha256": "448fce9e2693c390799705a1046bb82385ec328bde0ca1f174a73043795bdc8b",
+  "companion_policy_during_tests": "uid=10128|policy=1|until=0|logging=1|notification=1",
+  "checks": [
+    "Reboot loads the tested APK into the actual system_server input host",
+    "A different-signed installed app requests CONTROL but is denied both channel and key receivers",
+    "The public key provider rejects the unrelated shell UID",
+    "key_actions_smoke passed with companion root explicitly denied",
+    "key_latency_smoke passed with companion root explicitly denied",
+    "setup_smoke passed with companion root explicitly denied",
+    "No root key-injector process exists"
+  ],
+  "physical_tv_tested": false,
+  "input_host": "Actual Android system_server through LSPosed System Framework scope",
+  "limitations": [
+    "Xiaomi service registration is source-reviewed, not exercised by this emulator.",
+    "Test setup and event observation use the separately authorized ADB shell root grant."
+  ],
+  "cleanup": "Previous companion Magisk policy restored; unrelated app removed; regression suites restore their fixtures."
+}
