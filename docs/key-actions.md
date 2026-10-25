@@ -81,7 +81,7 @@ source-key release to the fixture's actual delivered event. It excludes host
 ADB and sender startup time. It checks caller rejection after caching, companion
 restart, invalid keys, unknown operations and expired requests. See [validation-key-latency.json](../validation-key-latency.json)
 for current timings. These are emulator delivery timings,
-not physical-remote or screen-rendering measurements. Version 0.11 is installed
+not physical-remote or screen-rendering measurements. Version 0.14 is installed
 on the physical TV; physical remote latency has not been measured.
 
 `python3 scripts/no_action_smoke.py` covers No action on all six Google receiver
@@ -105,7 +105,7 @@ and the original policy. See [validation-media-routing.json](../validation-media
 The script backs up and restores the native shortcut store and removes its
 fixture APK and receiver helper. See
 [validation-key-actions.json](../validation-key-actions.json) for the tested
-build and checks. Version 0.11 is installed on the physical TV with assignments
-preserved and receiver hooks reloaded; key actions and No action were not
-exercised there during deployment. See [0.11 TV update](../validation-tv-key-latency.json)
+build and checks. Version 0.14 is installed on the physical TV with assignments
+preserved and receiver/input hooks reloaded; deployment did not exercise key
+actions or No action. See [0.14 TV update](../validation-tv-media-routing.json)
 and the [prior user-assisted remote checks](../validation-tv-remote.json).

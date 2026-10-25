@@ -1,0 +1,24 @@
+{
+  "result": "installed",
+  "module_version": "0.14",
+  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
+  "source_commit": "cde4574ad4bc4b070adc6ae9ac5830d58c6009ab",
+  "device": "MiTV-MOEU0",
+  "launcher_version_code": 835645,
+  "reboot": false,
+  "checks": [
+    "Installed APK matches the emulator-tested 0.14 build; package version code is 14",
+    "Google Home, remote core and Xiaomi input host loaded the updated module in new processes",
+    "Original SmartTube playback activity, task and process observed in the foreground after reload",
+    "Native shortcut store, Google/Xiaomi APKs and Magisk policies unchanged",
+    "No hook refusal, fatal exception or ANR in captured deployment logs",
+    "Deployment sent no key events and did not reboot the TV"
+  ],
+  "foreground_transition": "Launcher activation temporarily brought Home to the foreground. A later read-only check found the original SmartTube playback activity and task resumed with its original process; no restoration command was sent.",
+  "physical_playback_tested": false,
+  "limitations": [
+    "Real TV Bro playback and media-session fallback were verified in the emulator with companion root denied; deployment did not test physical playback controls.",
+    "Existing companion Magisk policy was preserved; root denial was tested in the emulator only."
+  ],
+  "evidence_directory": "artifacts/tv-media-routing-0.14"
+}

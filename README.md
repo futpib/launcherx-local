@@ -61,15 +61,17 @@ before hooks are installed or Home is activated. Keep launcher updates in mind:
 a new launcher build needs a new compatibility review, not just an edited version
 number. Disable the module in LSPosed and restart Google TV to use stock behavior.
 
-Version **0.13** is tested in the isolated emulator with the companion app's
-Magisk root policy explicitly denied. The System Framework input hook uses the
-real Android dispatcher. The same APK is installed on the physical TV running
-launcher **835645**: Home and local rows loaded, and the Xiaomi service registered
-the new input hook. Existing button assignments were preserved without a reboot.
-Physical key delivery and content-chooser operations were not exercised during
-this deployment; the existing companion Magisk grant was left unchanged.
-See [no-superuser validation](validation-no-superuser.json) and the
-[0.13 TV deployment record](validation-tv-no-superuser.json).
+Version **0.14** is tested in the isolated emulator with the companion app's
+Magisk root policy explicitly denied, including real TV Bro Play/Pause and
+Android media-session fallback. The same APK is installed on the physical TV
+running launcher **835645**: Google Home, its remote receiver and the Xiaomi
+input hook reloaded without a reboot. Existing button assignments and Magisk
+policies were preserved. Launcher activation briefly brought Home forward;
+the original SmartTube playback task and process were later observed resumed.
+Deployment did not test physical playback controls.
+See [no-superuser validation](validation-no-superuser.json),
+[TV Bro validation](validation-media-routing.json) and the
+[0.14 TV deployment record](validation-tv-media-routing.json).
 
 ## Install
 
@@ -306,6 +308,9 @@ long-press checks.
 [`validation-tv-key-latency.json`](validation-tv-key-latency.json) records the
 **0.11** update and hook reload with assignments and foreground task preserved;
 physical remote latency was not measured during deployment.
+[`validation-tv-media-routing.json`](validation-tv-media-routing.json) records the
+**0.14** update, matching APK hash, hook reload, unchanged assignments and the
+temporary Home foreground transition. Physical playback was not tested.
 [`validation-profiles.json`](validation-profiles.json) records Incognito selection,
 Google sign-in cancellation, persistence, and the remaining authenticated test gap.
 [`validation-content.json`](validation-content.json) records the local-content
