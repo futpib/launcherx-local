@@ -1,7 +1,7 @@
 {
   "result": "passed",
-  "module_version": "0.14",
-  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
+  "module_version": "0.15",
+  "apk_sha256": "6b815a4ea3dd72fc136540a1c3597209bb39d36a62378ac4d1249e041dfb7a39",
   "checks": [
     "Key broker rejects an unrelated shell caller",
     "Saved Play/Pause reaches the focused window, then Android falls back to a real MediaSession exactly once per press",

@@ -1,16 +1,14 @@
 {
   "result": "passed",
-  "module_version": "0.14",
-  "apk_sha256": "10898ca279f725bf27a1cbd937b930e94c36011b0f64974af88a91279e68fe48",
+  "module_version": "0.15",
+  "apk_sha256": "6b815a4ea3dd72fc136540a1c3597209bb39d36a62378ac4d1249e041dfb7a39",
   "companion_policy_during_tests": "uid=10128|policy=1|until=0|logging=1|notification=1",
   "checks": [
     "Reboot loads the tested APK into the actual system_server input host",
     "A different-signed installed app requests CONTROL but is denied both channel and key receivers",
     "The public key provider rejects the unrelated shell UID",
-    "media_routing_smoke passed with companion root explicitly denied",
+    "setup_smoke passed with companion root explicitly denied",
     "key_actions_smoke passed with companion root explicitly denied",
-    "key_latency_smoke passed with companion root explicitly denied",
-    "no_action_smoke passed with companion root explicitly denied",
     "No root key-injector process exists"
   ],
   "physical_tv_tested": false,

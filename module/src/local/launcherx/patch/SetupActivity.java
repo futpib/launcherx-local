@@ -10,6 +10,7 @@ import android.util.Base64;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,9 @@ public final class SetupActivity extends Activity {
     private final List<Button> buttons = new ArrayList<>();
     private TextView status;
     private LinearLayout content;
+    private Switch volumeMute;
+    private TextView volumeStatus;
+    private boolean volumeMuteDisabled;
 
     @Override public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
@@ -44,7 +48,46 @@ public final class SetupActivity extends Activity {
                 + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
         status = text("Checking compatibility…", 18);
         button("Choose app content", () -> channels(null));
+        volumeMute = new Switch(this);
+        volumeMute.setText("Disable double volume-down mute");
+        volumeMute.setTextSize(18);
+        content.addView(volumeMute, new LinearLayout.LayoutParams(-1, -2));
+        volumeStatus = text("Optional Xiaomi TV fix. Select System Framework in LSPosed and reboot once. "
+                + "This option works independently of the launcher and app-button patches.", 17);
+        volumeMute.setOnClickListener(view -> volumeMute(volumeMute.isChecked()));
+        volumeMute(null);
         check();
+    }
+
+    private void volumeMute(Boolean value) {
+        volumeMute.setEnabled(false);
+        new Thread(() -> {
+            try {
+                verifyUser();
+                Intent request = new Intent(SystemAudio.ACTION).setPackage("android")
+                        .putExtra("operation", value == null ? "get" : "set");
+                if (value != null) request.putExtra("disabled", value.booleanValue());
+                String reply = HookRequest.call(this, request);
+                if (!"disabled".equals(reply) && !"enabled".equals(reply)) throw new IllegalStateException(reply);
+                boolean disabled = "disabled".equals(reply);
+                runOnUiThread(() -> {
+                    volumeMuteDisabled = disabled;
+                    volumeMute.setChecked(disabled);
+                    volumeMute.setEnabled(true);
+                    volumeStatus.setText(disabled
+                            ? "Double volume-down only lowers the volume. The mute key and hold-to-mute still work."
+                            : "Xiaomi's double volume-down mute is enabled. This switch affects only that gesture.");
+                });
+            } catch (Exception error) {
+                runOnUiThread(() -> {
+                    volumeMute.setChecked(volumeMuteDisabled);
+                    volumeMute.setEnabled(value != null);
+                    volumeStatus.setText("Volume gesture control unavailable. It requires a supported Xiaomi firmware, "
+                            + "System Framework selected in LSPosed, and a reboot after installation. "
+                            + "Other module features work independently. " + error.getMessage());
+                });
+            }
+        }, "launcherx-volume-gesture").start();
     }
 
     private TextView text(String value, int size) {

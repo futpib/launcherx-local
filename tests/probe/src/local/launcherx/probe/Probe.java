@@ -9,9 +9,12 @@ public final class Probe extends BroadcastReceiver {
     @Override public void onReceive(Context context, Intent request) {
         PendingResult result = goAsync();
         boolean keys = request.getBooleanExtra("keys", false);
-        Intent intent = new Intent(keys ? "local.launcherx.patch.INJECT_KEY" : "local.launcherx.patch.APP_CHANNELS")
-                .setPackage(keys ? "android" : "com.google.android.apps.tv.launcherx")
-                .putExtra("operation", "send").putExtra("code", 138)
+        boolean volume = request.getBooleanExtra("volume", false);
+        Intent intent = new Intent(volume ? "local.launcherx.patch.VOLUME_GESTURE"
+                : keys ? "local.launcherx.patch.INJECT_KEY" : "local.launcherx.patch.APP_CHANNELS")
+                .setPackage(keys || volume ? "android" : "com.google.android.apps.tv.launcherx")
+                .putExtra("operation", volume ? "set" : "send").putExtra("code", 138)
+                .putExtra("disabled", false)
                 .putExtra("local.launcherx.patch.deadline", SystemClock.elapsedRealtime() + 10000);
         context.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
             @Override public void onReceive(Context unused, Intent response) {

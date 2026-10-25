@@ -1,0 +1,43 @@
+{
+  "result": "passed",
+  "module_version": "0.15",
+  "apk_sha256": "6b815a4ea3dd72fc136540a1c3597209bb39d36a62378ac4d1249e041dfb7a39",
+  "checks": [
+    "stock-double-mutes",
+    "single-down",
+    "single-up",
+    "fixed-double",
+    "fixed-triple",
+    "explicit-mute",
+    "explicit-unmute",
+    "held volume-down still lowers volume",
+    "disabled-restores-stock",
+    "reboot-preserves-fix",
+    "different-signed app cannot change the setting"
+  ],
+  "physical_tv_patch_tested": false,
+  "fixture": {
+    "services_sha256": "d09f1610b9521b695a74f1703054e0adfd142ff2f5d94fd756ab29a31b4d57ca",
+    "production_sources": {
+      "module/src/local/launcherx/patch/SystemAudio.java": "1435c0657220a47c96bb72f1f807c8b7a50d8a4286c03e82aa3b49c8a03793c8",
+      "module/src/local/launcherx/patch/HookRequest.java": "7036ac6fe6cfd3d388453618a3d69a83ba30a7f694cb5c2206893db969ea1dbf"
+    },
+    "original_smali": {
+      "MitvAudioService$1.smali": "b2aa703ad63c8545771d037094a0663c403e4a66e791617684430062b6011c27",
+      "MitvAudioService.smali": "f929976bc244180cd2e68e2c46a998bd3fa0b583f084f8b1a0dd4b835460163b"
+    },
+    "apk_sha256": "38b43f25e8986210c432d5f241a3067970bdf2c1ae19d7ac2df0e38ca3b9b059",
+    "adaptations": [
+      "Relocated Xiaomi class descriptors",
+      "AudioServiceBridge delegates to actual emulator AudioService",
+      "Xiaomi analytics is a no-op",
+      "Fixture enters production registration after its own emulator guard"
+    ]
+  },
+  "limitations": [
+    "Emulator runs original Xiaomi gesture bytecode with an AOSP audio adapter.",
+    "Production firmware gate is not bypassed in the release APK.",
+    "No post-patch physical TV test or physical remote test was performed."
+  ],
+  "cleanup": "Fixture and probe uninstalled; emulator rebooted; original volume, mute and setting restored."
+}
