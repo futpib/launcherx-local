@@ -2,6 +2,7 @@ package local.launcherx.patch;
 
 import android.content.Context;
 import android.os.Process;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -33,10 +34,15 @@ public final class VolumeFixture implements IXposedHookLoadPackage {
                     Context context = (Context) XposedHelpers.getObjectField(hook.thisObject, "mContext");
                     Class<?> xiaomi = Class.forName("local.launcherx.fixture.MitvAudioService", true, getClass().getClassLoader());
                     XposedHelpers.callStaticMethod(xiaomi, "init", context, new AudioServiceBridge(service));
-                    // Keep production guards intact; only the fixture directly enters registration.
-                    Method register = SystemAudio.class.getDeclaredMethod("register", Context.class, Class.class);
-                    register.setAccessible(true);
-                    register.invoke(null, context, xiaomi);
+                    // Keep production guards intact; only the fixture directly enters installation.
+                    boolean enabled = Settings.Global.getInt(context.getContentResolver(),
+                            "launcherx_test_volume_hook", 1) == 1;
+                    if (enabled) {
+                        Method install = SystemAudio.class.getDeclaredMethod("install", Class.class);
+                        install.setAccessible(true);
+                        install.invoke(null, xiaomi);
+                    }
+                    Log.i("LauncherXVolumeFixture", "Production hook enabled=" + enabled);
                     XposedHelpers.findAndHookMethod(audioService, "handleVolumeKey", KeyEvent.class,
                             boolean.class, String.class, String.class, new XC_MethodHook() {
                         @Override protected void beforeHookedMethod(MethodHookParam event) {

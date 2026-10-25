@@ -10,7 +10,6 @@ import android.util.Base64;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Switch;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +22,6 @@ public final class SetupActivity extends Activity {
     private final List<Button> buttons = new ArrayList<>();
     private TextView status;
     private LinearLayout content;
-    private Switch volumeMute;
-    private TextView volumeStatus;
-    private boolean volumeMuteDisabled;
 
     @Override public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
@@ -37,57 +33,14 @@ public final class SetupActivity extends Activity {
         scroll.addView(content);
         setContentView(scroll);
         text("LauncherX Local", 28);
-        text("Incognito and Google profiles for supported Google TV Home versions.\n"
-                + "Enable Zygisk in Magisk and install LSPosed. In LSPosed, enable LauncherX Local "
-                + "with Google TV selected, then restart Google TV or reboot. Home activates automatically. "
-                + "On the supported Xiaomi TV, also select TV service (mitv.service) and reboot to customize all six app buttons.\n"
-                + "Use Home's profile button to add or choose a Google account, or return to Incognito. "
-                + "Your selected profile is remembered. Apps keep their own accounts and history.\n"
-                + "Hold an app button to choose its shortcut. Restore default or Restore all button defaults removes custom assignments. "
-                + "Send key adds Play/Pause, other Android keys and No action. To send keys, select TV service (Xiaomi) or System Framework in LSPosed, then reboot. No companion-app superuser grant is needed. "
-                + "To return to all stock button handlers, disable the module in LSPosed and reboot.", 17);
-        status = text("Checking compatibility…", 18);
+        text("Enable LauncherX Local in LSPosed. Select the features you want:\n"
+                + "Google TV: local Home and app shortcuts.\n"
+                + "TvService: Xiaomi remote buttons.\n"
+                + "System Framework: disable Xiaomi double volume-down mute.\n\n"
+                + "Reboot after changing scope. Hold an app button to change its shortcut.", 17);
+        status = text("Checking launcher…", 18);
         button("Choose app content", () -> channels(null));
-        volumeMute = new Switch(this);
-        volumeMute.setText("Disable double volume-down mute");
-        volumeMute.setTextSize(18);
-        content.addView(volumeMute, new LinearLayout.LayoutParams(-1, -2));
-        volumeStatus = text("Optional Xiaomi TV fix. Select System Framework in LSPosed and reboot once. "
-                + "This option works independently of the launcher and app-button patches.", 17);
-        volumeMute.setOnClickListener(view -> volumeMute(volumeMute.isChecked()));
-        volumeMute(null);
         check();
-    }
-
-    private void volumeMute(Boolean value) {
-        volumeMute.setEnabled(false);
-        new Thread(() -> {
-            try {
-                verifyUser();
-                Intent request = new Intent(SystemAudio.ACTION).setPackage("android")
-                        .putExtra("operation", value == null ? "get" : "set");
-                if (value != null) request.putExtra("disabled", value.booleanValue());
-                String reply = HookRequest.call(this, request);
-                if (!"disabled".equals(reply) && !"enabled".equals(reply)) throw new IllegalStateException(reply);
-                boolean disabled = "disabled".equals(reply);
-                runOnUiThread(() -> {
-                    volumeMuteDisabled = disabled;
-                    volumeMute.setChecked(disabled);
-                    volumeMute.setEnabled(true);
-                    volumeStatus.setText(disabled
-                            ? "Double volume-down only lowers the volume. The mute key and hold-to-mute still work."
-                            : "Xiaomi's double volume-down mute is enabled. This switch affects only that gesture.");
-                });
-            } catch (Exception error) {
-                runOnUiThread(() -> {
-                    volumeMute.setChecked(volumeMuteDisabled);
-                    volumeMute.setEnabled(value != null);
-                    volumeStatus.setText("Volume gesture control unavailable. It requires a supported Xiaomi firmware, "
-                            + "System Framework selected in LSPosed, and a reboot after installation. "
-                            + "Other module features work independently. " + error.getMessage());
-                });
-            }
-        }, "launcherx-volume-gesture").start();
     }
 
     private TextView text(String value, int size) {
@@ -120,7 +73,7 @@ public final class SetupActivity extends Activity {
     }
 
     private void check() {
-        busy(true, "Checking the installed launcher's executable code…");
+        busy(true, "Checking launcher…");
         new Thread(() -> {
             String message;
             try {
@@ -129,7 +82,7 @@ public final class SetupActivity extends Activity {
                 boolean enabled = getPackageManager().getComponentEnabledSetting(new ComponentName(
                         TARGET, TARGET + ".home.HomeActivity")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
                 message = "Compatible launcher. Home is " + (enabled ? "selected" : "not selected")
-                        + ". This checks the installed launcher; activation follows the module in LSPosed.";
+                        + ".";
             } catch (Exception error) {
                 message = "Unsupported launcher: " + error.getMessage();
             }

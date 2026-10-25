@@ -104,6 +104,7 @@ def open_setup(name, expected):
     assert any(expected in node.get('text', '') for node in nodes), expected
     buttons = [node.get('text') for node in nodes if node.get('class') == 'android.widget.Button']
     assert buttons == ['Choose app content'], buttons
+    assert not any(node.get('class') == 'android.widget.Switch' for node in nodes)
 
 
 def negative_apk(directory, kind):

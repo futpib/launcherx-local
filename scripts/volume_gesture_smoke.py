@@ -6,11 +6,11 @@ import time
 import xml.etree.ElementTree as ET
 
 from build import ROOT
-from build_publisher import build
 from lab import adb, guard, shell, wait_boot
 
 FIXTURE = 'local.launcherx.volumefixture'
-SETTING = 'launcherx_disable_double_volume_down_mute'
+SETTING = 'launcherx_test_volume_hook'
+LEGACY_SETTING = 'launcherx_disable_double_volume_down_mute'
 OUT = ROOT / 'artifacts/volume-gesture-smoke'
 CHECKS = []
 
@@ -63,27 +63,6 @@ def enable_fixture():
     assert len([n for n in view if n.get('class') == 'android.widget.CheckBox' and n.get('checked') == 'true']) == 1
 
 
-def set_switch(disabled, name):
-    shell('am force-stop local.launcherx.patch')
-    shell('am start -W -n local.launcherx.patch/.SetupActivity')
-    for attempt in range(12):
-        view = nodes(name + '-open-' + str(attempt))
-        switches = [n for n in view if n.get('text') == 'Disable double volume-down mute']
-        if switches and switches[0].get('enabled') == 'true':
-            switch = switches[0]
-            break
-        shell('input keyevent KEYCODE_DPAD_DOWN')
-        time.sleep(.5)
-    else:
-        raise AssertionError('Volume switch unavailable: ' + str([n.attrib for n in view]))
-    if (switch.get('checked') == 'true') != disabled:
-        tap(switch)
-    view = nodes(name + '-saved')
-    switch = next(n for n in view if n.get('text') == 'Disable double volume-down mute')
-    assert (switch.get('checked') == 'true') == disabled and switch.get('enabled') == 'true'
-    assert shell('settings get global ' + SETTING) == ('1' if disabled else '0')
-
-
 def state(name):
     dump = shell('dumpsys audio')
     (OUT / (name + '-audio.txt')).write_text(dump)
@@ -119,38 +98,54 @@ def press(codes, name, muted, index):
     print(name, result, flush=True)
 
 
-def boot_fixture():
+def boot_fixture(enabled):
     adb('reboot')
     wait_boot()
     log = adb('logcat', '-d', '-s', 'LauncherXVolumeFixture:I', 'LauncherXLocal:I', '*:S')
-    (OUT / 'boot-log.txt').write_text(log)
+    (OUT / ('boot-enabled.txt' if enabled else 'boot-stock.txt')).write_text(log)
     assert 'Original Xiaomi gesture bytecode active in emulator system_server' in log, log
-    assert 'Registered Xiaomi volume gesture control' in log, log
+    assert 'Production hook enabled=' + str(enabled).lower() in log, log
+    assert ('Disabled Xiaomi double volume-down mute' in log) == enabled, log
+
+
+def restore_setting(name, value):
+    shell('settings delete global ' + name if value == 'null'
+          else 'settings put global ' + name + ' ' + value)
 
 
 def main():
     guard()
     OUT.mkdir(parents=True, exist_ok=True)
     assert not shell('pm list packages ' + FIXTURE), 'Remove any prior fixture first'
-    assert not shell('pm list packages local.launcherx.probe'), 'Remove any prior probe first'
     original = state('original')
     previous = shell('settings get global ' + SETTING)
-    assert previous == 'null' or previous in ('0', '1'), previous
+    legacy = shell('settings get global ' + LEGACY_SETTING)
+    for value in (previous, legacy):
+        assert value in ('null', '0', '1'), value
     try:
         print(adb('install', '--no-incremental', '-r', ROOT / 'build/apps/launcherx-local.apk'), flush=True)
         shell('settings put global ' + SETTING + ' 0')
         print(adb('install', '--no-incremental', ROOT / 'build/volume-fixture/volume-fixture.apk'), flush=True)
         enable_fixture()
-        boot_fixture()
-        set_switch(False, 'stock')
+        boot_fixture(False)
         volume(10)
         press([25, 25], 'stock-double-mutes', True, 8)
         volume(10)
-        set_switch(True, 'enable-fix')
+        shell('settings put global ' + SETTING + ' 1')
+        shell('settings put global ' + LEGACY_SETTING + ' 0')
+        boot_fixture(True)
+        shell('am start -W -n local.launcherx.patch/.SetupActivity')
+        time.sleep(2)
+        view = nodes('simplified-setup')
+        assert not any(n.get('class') == 'android.widget.Switch' for n in view)
+        assert [n.get('text') for n in view if n.get('class') == 'android.widget.Button'] == ['Choose app content']
+        CHECKS.append('setup has one app-content button and no volume toggle')
+        volume(10)
+        press([25, 25], 'hook-active-without-preference', False, 8)
+        CHECKS.append('obsolete volume preference cannot disable the hook')
+        volume(10)
         press([25], 'single-down', False, 9)
         press([24], 'single-up', False, 10)
-        volume(10)
-        press([25, 25], 'fixed-double', False, 8)
         volume(10)
         press([25, 25, 25], 'fixed-triple', False, 7)
         volume(10)
@@ -161,31 +156,19 @@ def main():
         hold = state('hold')
         assert not hold['muted'] and 0 < hold['volume'] < 10, hold
         CHECKS.append('held volume-down still lowers volume')
-        volume(10)
-        set_switch(False, 'disable-fix')
-        press([25, 25], 'disabled-restores-stock', True, 8)
-        volume(10)
-        set_switch(True, 'reenable-fix')
-        boot_fixture()
-        set_switch(True, 'persisted')
+        boot_fixture(True)
         volume(10)
         press([25, 25], 'reboot-preserves-fix', False, 8)
-        print(adb('install', '--no-incremental', '-r', build('probe')), flush=True)
-        reply = shell('am broadcast -n local.launcherx.probe/.Probe --ez volume true')
-        assert 'permission=-1;reply=null' in reply, reply
-        assert shell('settings get global ' + SETTING) == '1'
-        CHECKS.append('different-signed app cannot change the setting')
         (OUT / 'hook-log.txt').write_text(adb('logcat', '-d', '-s', 'LauncherXLocal:I', '*:S'))
     except Exception:
         (OUT / 'failure-log.txt').write_text(adb('logcat', '-d', '-s', 'LauncherXVolumeFixture:V',
                                                'LauncherXLocal:V', 'MitvAudioService:V', 'AndroidRuntime:E', '*:S'))
         raise
     finally:
-        for package in (FIXTURE, 'local.launcherx.probe'):
-            if shell('pm list packages ' + package):
-                print(adb('uninstall', package), flush=True)
-        shell('settings delete global ' + SETTING if previous == 'null'
-              else 'settings put global ' + SETTING + ' ' + previous)
+        if shell('pm list packages ' + FIXTURE):
+            print(adb('uninstall', FIXTURE), flush=True)
+        restore_setting(SETTING, previous)
+        restore_setting(LEGACY_SETTING, legacy)
         time.sleep(1)
         adb('reboot')
         wait_boot()
@@ -195,20 +178,17 @@ def main():
         assert state('restored') == original
         assert not shell('pm list packages ' + FIXTURE)
         assert shell('settings get global ' + SETTING) == previous
-        shell('am start -W -n local.launcherx.patch/.SetupActivity')
-        time.sleep(2)
-        view = nodes('stock-emulator-restored')
-        switches = [n for n in view if n.get('text') == 'Disable double volume-down mute']
-        assert switches and switches[0].get('enabled') == 'false'
+        assert shell('settings get global ' + LEGACY_SETTING) == legacy
         shell('input keyevent KEYCODE_HOME')
     release = json.loads((ROOT / 'build/apps/receipt.json').read_text())
     report = {'result': 'passed', 'module_version': release['version_name'], 'apk_sha256': release['sha256'],
               'checks': CHECKS, 'physical_tv_patch_tested': False,
               'fixture': json.loads((ROOT / 'build/volume-fixture/receipt.json').read_text()),
               'limitations': ['Emulator runs original Xiaomi gesture bytecode with an AOSP audio adapter.',
+                              'A fixture-only setting selects the stock baseline or the production hook at boot.',
                               'Production firmware gate is not bypassed in the release APK.',
-                              'No post-patch physical TV test or physical remote test was performed.'],
-              'cleanup': 'Fixture and probe uninstalled; emulator rebooted; original volume, mute and setting restored.'}
+                              'This emulator run does not test the physical TV or remote.'],
+              'cleanup': 'Fixture uninstalled; emulator rebooted; original volume, mute and settings restored.'}
     (ROOT / 'validation-volume-gesture.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2), flush=True)
 

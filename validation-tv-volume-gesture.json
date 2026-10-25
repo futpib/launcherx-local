@@ -1,0 +1,84 @@
+{
+  "result": "passed",
+  "module_version": "0.17",
+  "apk_sha256": "c55fe16afec91f4149feeabc003e41448de5cb14f0a482dc11ce1d0626d7b3ca",
+  "device": "MiTV-MOEU0",
+  "android_sdk": 34,
+  "launcher_version_code": 835645,
+  "services_sha256": "d09f1610b9521b695a74f1703054e0adfd142ff2f5d94fd756ab29a31b4d57ca",
+  "scope": [
+    "com.google.android.apps.tv.launcherx",
+    "mitv.service",
+    "android"
+  ],
+  "reboot": true,
+  "boot_before": "7a674143-99b4-4e0b-82b9-a5ce991aa61c",
+  "boot_after": "b2750bcf-e0ae-49c2-ac7f-ef6d88e1d96e",
+  "control": "LSPosed System Framework scope only; no companion toggle, preference or volume broadcast receiver",
+  "setup_screen": "Short scope guide, compatibility status and Choose app content button; no switches",
+  "checks": [
+    {
+      "name": "double-down",
+      "audio": {
+        "muted": false,
+        "volume": 10
+      }
+    },
+    {
+      "name": "single-down",
+      "audio": {
+        "muted": false,
+        "volume": 11
+      }
+    },
+    {
+      "name": "single-up",
+      "audio": {
+        "muted": false,
+        "volume": 12
+      }
+    },
+    {
+      "name": "triple-down",
+      "audio": {
+        "muted": false,
+        "volume": 9
+      }
+    },
+    {
+      "name": "explicit-mute",
+      "audio": {
+        "muted": true,
+        "volume": 12
+      }
+    },
+    {
+      "name": "explicit-unmute",
+      "audio": {
+        "muted": false,
+        "volume": 12
+      }
+    }
+  ],
+  "existing_button_assignments_unchanged": true,
+  "original_audio": {
+    "muted": false,
+    "volume": 12
+  },
+  "final_audio": {
+    "muted": false,
+    "volume": 12
+  },
+  "obsolete_preference_removed": true,
+  "volume_receiver_absent": true,
+  "fixture_installed_on_tv": false,
+  "physical_remote_tested": false,
+  "limitations": [
+    "Synthetic key events passed through the real TV input dispatcher and Xiaomi AudioService.",
+    "Bluetooth/IR remote delivery and audible output were not tested.",
+    "Long-hold mute was left unchanged but was not exercised on the TV.",
+    "The final TV build was tested with System Framework selected; scope-off behavior was not reboot-tested on the TV."
+  ],
+  "evidence_directory": "artifacts/tv-volume-scope-0.17",
+  "app_content_dialog": "Opened successfully from the simplified setup screen; cancelled without saving"
+}

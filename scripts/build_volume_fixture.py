@@ -37,8 +37,7 @@ def build(services, apktool):
     tools = SDK / 'build-tools/37.0.0'
     android = SDK / 'platforms/android-34/android.jar'
     source = ROOT / 'tests/volume'
-    production = [ROOT / 'module/src/local/launcherx/patch' / (name + '.java')
-                  for name in ('SystemAudio', 'HookRequest')]
+    production = [ROOT / 'module/src/local/launcherx/patch/SystemAudio.java']
     run('javac', '-source', '8', '-target', '8', '-Xlint:-options', '-bootclasspath', android,
         '-classpath', f'{android}:{api}', '-d', output / 'classes', *production,
         *sorted((source / 'src').rglob('*.java')))
@@ -59,7 +58,7 @@ def build(services, apktool):
         'original_smali': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in originals},
         'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
         'adaptations': ['Relocated Xiaomi class descriptors', 'AudioServiceBridge delegates to actual emulator AudioService',
-                        'Xiaomi analytics is a no-op', 'Fixture enters production registration after its own emulator guard'],
+                        'Xiaomi analytics is a no-op', 'Fixture enters production installation after its own emulator guard'],
     }, indent=2) + '\n')
     return apk
 

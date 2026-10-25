@@ -1,13 +1,7 @@
 package local.launcherx.patch;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Process;
-import android.provider.Settings;
 import android.util.Log;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -19,10 +13,7 @@ import java.security.MessageDigest;
 
 /** Optional Xiaomi audio fix, independent of launcher compatibility and input injection. */
 final class SystemAudio {
-    static final String ACTION = "local.launcherx.patch.VOLUME_GESTURE";
-    private static final String SETTING = "launcherx_disable_double_volume_down_mute";
     private static final String SERVICES_SHA256 = "d09f1610b9521b695a74f1703054e0adfd142ff2f5d94fd756ab29a31b4d57ca";
-    private static volatile boolean disabled;
 
     static void load(XC_LoadPackage.LoadPackageParam param) {
         if (!"android".equals(param.processName) || Process.myUid() != Process.SYSTEM_UID) return;
@@ -30,22 +21,7 @@ final class SystemAudio {
         try {
             verifyFirmware();
             Class<?> audio = XposedHelpers.findClass("com.android.server.audio.MitvAudioService", param.classLoader);
-            Method timer = audio.getDeclaredMethod("JudgeMuteTimer");
-            if (!Modifier.isStatic(timer.getModifiers()) || timer.getReturnType() != void.class) {
-                throw new IllegalStateException("Unexpected Xiaomi mute timer signature");
-            }
-            XposedHelpers.findAndHookMethod("com.android.server.input.InputManagerService",
-                    param.classLoader, "systemRunning", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam hook) {
-                    try {
-                        Context context = (Context) XposedHelpers.getObjectField(hook.thisObject, "mContext");
-                        register(context, audio);
-                    } catch (Throwable error) {
-                        disabled = false;
-                        Log.e("LauncherXLocal", "Xiaomi volume gesture hook unavailable", error);
-                    }
-                }
-            });
+            install(audio);
         } catch (Throwable error) {
             Log.e("LauncherXLocal", "Xiaomi volume gesture hook refused", error);
         }
@@ -63,43 +39,17 @@ final class SystemAudio {
         if (!SERVICES_SHA256.contentEquals(hex)) throw new IllegalStateException("Unreviewed services.jar");
     }
 
-    private static void register(Context context, Class<?> audio) {
-        disabled = Settings.Global.getInt(context.getContentResolver(), SETTING, 0) == 1;
-        XC_MethodHook.Unhook timer = XposedHelpers.findAndHookMethod(audio, "JudgeMuteTimer", new XC_MethodHook() {
+    private static void install(Class<?> audio) throws Exception {
+        Method timer = audio.getDeclaredMethod("JudgeMuteTimer");
+        if (!Modifier.isStatic(timer.getModifiers()) || timer.getReturnType() != void.class) {
+            throw new IllegalStateException("Unexpected Xiaomi mute timer signature");
+        }
+        XposedHelpers.findAndHookMethod(audio, "JudgeMuteTimer", new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam hook) {
-                if (!disabled) return;
                 // Skip only this gesture's delayed mute; all volume-key handling stays original.
                 hook.setResult(null);
-                Log.i("LauncherXLocal", "Suppressed Xiaomi double volume-down mute");
             }
         });
-        try {
-            HookRequest.register(context, new BroadcastReceiver() {
-                @Override public void onReceive(Context unused, Intent intent) {
-                    try {
-                        HookRequest.validate(this, intent);
-                        String operation = intent.getStringExtra("operation");
-                        if ("set".equals(operation)) {
-                            if (!intent.hasExtra("disabled")) throw new IllegalArgumentException("Missing setting");
-                            boolean value = intent.getBooleanExtra("disabled", false);
-                            if (!Settings.Global.putInt(context.getContentResolver(), SETTING, value ? 1 : 0)) {
-                                throw new IllegalStateException("Cannot save volume gesture setting");
-                            }
-                            disabled = value;
-                        } else if (!"get".equals(operation)) {
-                            throw new IllegalArgumentException("Unknown volume gesture operation");
-                        }
-                        setResultData(disabled ? "disabled" : "enabled");
-                    } catch (Exception error) {
-                        setResultData("Volume gesture request failed: " + error.getMessage());
-                    }
-                }
-            }, ACTION, new Handler(Looper.getMainLooper()));
-            Log.i("LauncherXLocal", "Registered Xiaomi volume gesture control; disabled=" + disabled);
-        } catch (RuntimeException error) {
-            timer.unhook();
-            disabled = false;
-            throw error;
-        }
+        Log.i("LauncherXLocal", "Disabled Xiaomi double volume-down mute");
     }
 }

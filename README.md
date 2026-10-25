@@ -2,10 +2,10 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.15** adds an independent, opt-in **Disable double volume-down mute**
-switch for the reviewed Xiaomi firmware. Select System Framework in LSPosed and
-reboot once to use it; later toggle changes apply immediately. See
-[Xiaomi volume gesture](docs/volume-gesture.md) for scope and verification limits.
+Version **0.17** disables Xiaomi's double volume-down mute gesture whenever
+**System Framework** is selected in LSPosed. That scope checkbox controls the fix;
+there is no separate app toggle. Reboot after changing scope. See
+[Xiaomi volume gesture](docs/volume-gesture.md) for supported firmware and checks.
 Key bindings use Android's input dispatcher,
 including Play/Pause for apps such as TV Bro. The companion app needs no
 superuser grant. Both reviewed
@@ -18,9 +18,8 @@ stay inside Google's launcher. The launcher APK is not modified or re-signed.
 
 This is an **LSPosed module APK**, hosted by Magisk and Zygisk. It is not a ZIP to
 flash directly in Magisk. Enabling it in LSPosed activates Home on the next
-launcher start. The companion app has **Choose app content**, the optional volume
-gesture switch, setup instructions and automatic compatibility status. No ADB
-commands are needed.
+launcher start. The companion app has **Choose app content**, a short scope guide
+and launcher compatibility status. No ADB commands are needed.
 
 ## Compatibility
 
