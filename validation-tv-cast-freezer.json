@@ -1,0 +1,34 @@
+{
+  "result": "passed",
+  "module_version": "0.19",
+  "apk_sha256": "161d1f571dfcb31aa87a132d35b044d457dfb74319ca56ec9702eb0ca3ac86f5",
+  "device": "MiTV-MOEU0",
+  "android_sdk": 34,
+  "launcher_version_code": 837595,
+  "scope": "Existing LSPosed System Framework selection",
+  "boot_before": "4ebd7d0a-3dd6-4436-bbe9-d2a40cacc4ef",
+  "boot_after": "ff58e0d0-5746-4cdc-8cd4-b608a77fd07a",
+  "global_freezer_setting_before": "disabled",
+  "global_freezer_setting_after": "null (system default)",
+  "runtime_use_freezer": true,
+  "cast_is_freeze_exempt": true,
+  "cast_is_frozen": false,
+  "other_frozen_processes_observed": 27,
+  "checks": [
+    "Same built APK installed on physical TV and loaded after reboot",
+    "Cast main process has the native freezer exemption",
+    "Receiver restart creates a new process with the exemption",
+    "Global freezer default restored and other cached apps freeze",
+    "TV responds to LAN Google Cast mDNS discovery",
+    "DIAL descriptor and Cast TCP 8009 respond after receiver restart",
+    "Companion scope guide and launcher compatibility shown on TV",
+    "Incognito Home and Your apps shown after returning Home"
+  ],
+  "standby_policy": "Unchanged; low-energy standby can still block Cast networking while asleep",
+  "limitations": [
+    "Cached-state Cast plus unrelated-app freezing exercised on emulator; physical Cast currently has active service importance.",
+    "Phone-to-TV media playback and physical remote input were not tested.",
+    "System Framework scope removal was not reboot-tested on the physical TV."
+  ],
+  "evidence_directory": "artifacts/cast-freezer-tv"
+}

@@ -36,7 +36,7 @@ public final class SetupActivity extends Activity {
         text("Enable LauncherX Local in LSPosed. Select the features you want:\n"
                 + "Google TV: local Home and app shortcuts.\n"
                 + "TvService: Xiaomi remote buttons.\n"
-                + "System Framework: disable Xiaomi double volume-down mute.\n\n"
+                + "System Framework: keep Cast available and disable Xiaomi double volume-down mute.\n\n"
                 + "Reboot after changing scope. Hold an app button to change its shortcut.", 17);
         status = text("Checking launcher…", 18);
         button("Choose app content", () -> channels(null));

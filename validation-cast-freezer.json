@@ -1,0 +1,18 @@
+{
+  "result": "passed",
+  "module_version": "0.19",
+  "apk_sha256": "161d1f571dfcb31aa87a132d35b044d457dfb74319ca56ec9702eb0ca3ac86f5",
+  "checks": [
+    "Real system_server sets the system Cast process freezer exemption at boot",
+    "Cast remains exempt and unfrozen while cached",
+    "Unrelated cached app freezes automatically while Cast stays unfrozen",
+    "Android restarts Cast with a fresh exempt process record"
+  ],
+  "physical_tv_tested": false,
+  "limitations": [
+    "Framework integration tested on the actual Android 14 emulator.",
+    "Assistant binding temporarily disabled and service inactivity shortened to exercise cached Cast.",
+    "No phone-to-TV playback or standby network policy changes tested."
+  ],
+  "cleanup": "Unrelated probe removed; original freezer, inactivity and voice settings restored."
+}

@@ -2,6 +2,10 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
+Version **0.19** keeps the system Google Cast receiver exempt from Android 14's
+cached-app freezer when **System Framework** is selected in LSPosed. Other apps
+keep their original freezer policy. Reboot after upgrading. See
+[Cast freezer exemption](docs/cast-freezer.md) for its scope and standby limits.
 Version **0.18** adds Google TV Home **837595**, retains **702401** and **835645**,
 and cautiously matches compatible future builds. See
 [compatibility matching](docs/compatibility.md) for its limits.
@@ -40,7 +44,12 @@ and launcher compatibility status. No ADB commands are needed.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
 
-Version **0.18** is installed on the physical TV running **837595**. Incognito
+Version **0.19** is installed on the physical TV running **837595**. Its Cast-only
+freezer exemption passed reboot, receiver restart and LAN discovery checks while
+other cached apps still froze. The global freezer override was removed. See
+[Cast validation](validation-tv-cast-freezer.json).
+
+Version **0.18** was tested on the same physical TV. Incognito
 Home, local rows, the profile chooser, native app launching, shortcut controls,
 content settings and the store picker passed device checks. Remote navigation
 was injected through ADB. The native shortcut store was rewritten at startup;
@@ -116,7 +125,8 @@ See [no-superuser validation](validation-no-superuser.json),
    selected. On the supported Xiaomi TV, also select **TvService**
    (`mitv.service`) for the Netflix, Prime Video, Live TV and Xiaomi TV+ buttons.
    To send keys without Xiaomi's service (including the emulator), select
-   **System Framework** instead. Home and content choices need only Google TV.
+   **System Framework** instead. System Framework also protects Cast from freezing
+   on Android 14. Home and content choices need only Google TV.
 6. Restart Google TV (force stop it in Android Settings, then press Home), or
    reboot. The verified module selects Home automatically inside the launcher.
    There is no separate activation button or Magisk root prompt for this step.

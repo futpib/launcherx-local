@@ -29,6 +29,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam param) {
         if ("android".equals(param.packageName)) {
+            CastFreezer.load(param);
             SystemAudio.load(param);
             if (BuildConfig.APPS_ONLY) KeyInjection.loadSystem(param);
             return;
