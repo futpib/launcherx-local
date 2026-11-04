@@ -2,6 +2,9 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
+Version **0.20** enables Ambient Mode settings for Incognito Home using the
+existing Google TV scope. See [Ambient Mode and device settings](docs/ambient-mode.md)
+for the setup-gate audit and account-dependent features.
 Version **0.19** keeps the system Google Cast receiver exempt from Android 14's
 cached-app freezer when **System Framework** is selected in LSPosed. Other apps
 keep their original freezer policy. Reboot after upgrading. See
@@ -44,7 +47,11 @@ and launcher compatibility status. No ADB commands are needed.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
 
-Version **0.19** is installed on the physical TV running **837595**. Its Cast-only
+Version **0.20** is installed on the physical TV running **837595**. Ambient's
+native editor, setting persistence, screensaver start and exit passed device
+checks using ADB input. See [Ambient validation](validation-tv-ambient.json).
+
+Version **0.19** was tested on the same physical TV. Its Cast-only
 freezer exemption passed reboot, receiver restart and LAN discovery checks while
 other cached apps still froze. The global freezer override was removed. See
 [Cast validation](validation-tv-cast-freezer.json).

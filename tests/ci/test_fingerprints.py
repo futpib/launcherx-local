@@ -117,7 +117,9 @@ class FingerprintTest(unittest.TestCase):
         self.assertEqual({702401, 835645, 837595}, {item['version_code'] for item in versions})
         profile = json.loads((ROOT / 'module/assets/compatibility-837595.json').read_text())
         self.assertEqual(profile['binding_version'], 837595)
-        self.assertGreaterEqual(len(profile['classes']), 85)
+        self.assertGreaterEqual(len(profile['classes']), 86)
+        self.assertEqual(profile['classes']['ambient_account_provider']['name'],
+                         'com.google.android.apps.tv.launcherx.coreservices.account.AccountModeContentProvider')
         for value in profile['classes'].values():
             self.assertEqual(len(value['code']), 64)
             self.assertTrue(set(value['links'].values()) <= profile['classes'].keys())

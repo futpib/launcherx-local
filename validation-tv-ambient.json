@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-04",
+  "module_version": "0.20",
+  "apk_sha256": "7e59ba1ab127ad3351ec4d2581b392c5ff4b6ac099f207eaac841e9f2ea27667",
+  "installed_apk_hash_verified": true,
+  "target": {
+    "model": "MiTV-MOEU0",
+    "device": "ladybird",
+    "android": 14,
+    "launcher_version_code": 837595,
+    "dream_version_code": 556208,
+    "dream_version_name": "3.3.20.999207020"
+  },
+  "result": "passed",
+  "checks": [
+    "Native Ambient menu opens with Start now and Settings; setup error is absent",
+    "Native full editor loads Source, Art Gallery categories, Slideshow speed and On-screen info",
+    "Slideshow speed changed from 1 min to 30 sec and survived stopping and reopening DreamX",
+    "Original 1 min slideshow speed restored and visually confirmed",
+    "On-screen info exposes weather, time, attribution and device-info preferences",
+    "Start now binds the real Backdrop service with isPreview=false and mBound=true",
+    "Full-screen artwork, weather and time render; Home exits dream and returns to Incognito launcher",
+    "Ordinary root account query remains mode 2 with empty identity and unchanged lock/network fields",
+    "Installed APK read back and SHA256 equals tested build"
+  ],
+  "other_setup_gates": {
+    "method": "Disassembly of TV settings and launcher plus live setup-provider availability",
+    "settings_basic_mode": false,
+    "reason": "Setupwraith is disabled; the unavailable provider makes BasicModeFeatureProviderImplX return false",
+    "consumers": [
+      "Cast settings visibility",
+      "App update settings",
+      "Wi-Fi enable setup redirect",
+      "Energy modes availability",
+      "Setup suggestions, account routing, Help and quick settings",
+      "Assistant and purchase-settings visibility"
+    ]
+  },
+  "limits": [
+    "Input injected through ADB, not physical remote presses",
+    "Automatic idle-timeout activation and prolonged standby not exercised",
+    "Account-dependent Google services still require real authentication; no signed-in switching tested",
+    "Other setup-gate audit does not certify every underlying service",
+    "DreamX future-version semantics are not covered by launcher structural matching",
+    "Existing Cast framework hook retained unchanged from 0.19; no extra framework reload needed for Ambient"
+  ],
+  "private_evidence_directory": "artifacts/ambient-validation/tv-ambient",
+  "screenshot_sha256": {
+    "slideshow-reopened.png": "50bc2bc4b122901e84e3e59a5eba7834de79869609ba1b384b5a2e92e31e4f74",
+    "slideshow-options.png": "c8d58f901b1b92e28eca4f7acec07ccad9f347e56e44d9164bbe8034893cb59b",
+    "on-screen-info.png": "cd49e3d044da1dc237d7e9d350e206c77446f0a902bd05f19098c0ca4fe9f231",
+    "slideshow-restored-final.png": "165b48bfc90e8daebc3a7706364bf567956227dfc7ba70abbd5b173a191a27b5",
+    "options.png": "039e0a6f0cdbea6926e9acecf59b3e5f90452671a5d891b59b7c3066be85c539",
+    "start-now.png": "a17a2d50f5da12fc6b00f5eb7a7dfe947cae885f541adcfa28181943c22ae42c",
+    "art-gallery-options.png": "dfafaca56de759cde0e501eeea415a1c0515aafd354e7924b8baeef7abe89340",
+    "return-home.png": "ae1e16be96386b9463323123d569ccb71a289443a44d1c1f517d72b936338742",
+    "menu.png": "65ddd2bec6ed84298c15e5af0819d17d400e24bb754402e07432abdc06ed1724"
+  }
+}

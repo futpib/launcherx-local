@@ -19,6 +19,7 @@ final class LauncherSymbols extends ClassLoader {
     LauncherSymbols(ClassLoader parent, long version) {
         super(parent);
         this.version = version;
+        classes.put("ambient_account_provider", Compatibility.TARGET + ".coreservices.account.AccountModeContentProvider");
         recent = version == 837595;
         modern = version == 835645 || recent;
         if (version != 702401 && !modern) throw new IllegalArgumentException("No bindings for " + version);

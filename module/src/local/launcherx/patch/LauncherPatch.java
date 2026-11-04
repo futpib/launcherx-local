@@ -53,6 +53,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                         if (BuildConfig.APPS_ONLY) {
                             List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
                             try {
+                                AmbientSettings.install(context, loader, hooks);
                                 new NativeShortcuts(context, loader).install(hooks, true);
                                 new RemoteButtons(context, loader).install(hooks);
                             } catch (Throwable error) {
@@ -135,6 +136,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         profiles = BuildConfig.APPS_ONLY ? new Profiles(context, loader) : null;
         List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
         try {
+            if (BuildConfig.APPS_ONLY) AmbientSettings.install(context, loader, hooks);
             if (BuildConfig.APPS_ONLY) new NativeShortcuts(context, loader).install(hooks, false);
             if (BuildConfig.EMULATOR_NETWORK) hooks.add(EmulatorNetwork.install(context, loader));
             if (profiles != null) profiles.install(hooks);

@@ -1,0 +1,32 @@
+{
+  "apk_sha256": "7e59ba1ab127ad3351ec4d2581b392c5ff4b6ac099f207eaac841e9f2ea27667",
+  "result": "passed",
+  "checks": [
+    "Android cursor probe preserves identity, locks, extras and other account modes",
+    "ordinary root caller still sees mode 2; unauthorized shell query remains rejected",
+    "native Ambient menu opens with Start now and Settings, without setup error",
+    "native Start now binds the real Backdrop dream service",
+    "Home exits the screensaver and returns to Incognito with unchanged account state"
+  ],
+  "physical_tv_tested": false,
+  "limit": "Full settings editor needs valid Cast device credentials; tested separately on TV.",
+  "module_version": "0.20",
+  "date": "2026-11-04",
+  "launcher_version_code": 837597,
+  "dream_version_code": 556210,
+  "dream_version_name": "3.3.20.999207020",
+  "setup_regression": [
+    "Basic TV automatically becomes Incognito Home when the module loads",
+    "disabling in LSPosed and restarting restores stock signed-out setup UI with zero accounts",
+    "re-enabling in LSPosed and restarting automatically restores Incognito Home",
+    "settings app has only Choose app content and passive compatibility status",
+    "real launcher activates through the heuristic path with its exact profile withheld",
+    "heuristic-mismatch mismatch refuses hooks, automatic activation and channel changes",
+    "dex mismatch refuses hooks, automatic activation and channel changes"
+  ],
+  "host_checks": [
+    "12 CI unit tests passed",
+    "Signed APK verification passed"
+  ],
+  "older_launchers": "702401 and 835645 retained; named provider/query contract reviewed in their disassembly; Ambient not runtime-tested on those builds"
+}

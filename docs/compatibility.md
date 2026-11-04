@@ -23,7 +23,7 @@ and account flows remain native.
    and exercises this path in the x86 emulator. Executable split APKs prevent
    an exact-code match.
 3. A version newer than 837595 with different executable code can use the
-   structural profile in `module/assets/compatibility-837595.json`. All 85
+   structural profile in `module/assets/compatibility-837595.json`. All 86
    required classes must match uniquely and consistently before any launcher
    hooks or Home activation are installed. Missing, conflicting or ambiguous
    targets refuse the patch.
