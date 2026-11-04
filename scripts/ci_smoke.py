@@ -104,8 +104,9 @@ def main():
         installed.append(MODULE)
         device.adb('logcat', '-c')
         expected_code = json.loads((ROOT / 'compatibility.json').read_text())['version_code']
-        cases = [('missing', None, TARGET), ('version', 1, 'Unsupported launcher version 1'),
-                 ('dex', expected_code, 'Unexpected executable code entries')]
+        cases = [('missing', None, TARGET), ('version', 1, 'Unrecognized launcher signing certificate'),
+                 ('dex', expected_code, 'Unexpected executable code entries'),
+                 ('future-signer', 999999, 'Unrecognized launcher signing certificate')]
         for name, code, expected in cases:
             if code is not None:
                 with tempfile.TemporaryDirectory(prefix='launcherx-ci-negative-') as directory:
@@ -123,7 +124,8 @@ def main():
         logs = device.adb('logcat', '-d', '-s', 'AndroidRuntime:E')
         assert 'FATAL EXCEPTION' not in logs, logs
         result = {'result': 'passed', 'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
-                  'checks': ['missing launcher refusal', 'wrong version refusal', 'wrong executable refusal',
+                  'checks': ['missing launcher refusal', 'unrecognized signing certificate refusal',
+                             'future version with unrecognized signing certificate refusal', 'wrong executable refusal',
                              'DPAD channel chooser refuses without switching Home', 'no fatal exception'],
                   'coverage': 'stock Android setup safety only; no Xposed, root, real launcher or Home integration'}
         (ARTIFACTS / 'result.json').write_text(json.dumps(result, indent=2) + '\n')

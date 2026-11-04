@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Test real TvContract rows and native DPAD links in the guarded emulator."""
+import argparse
 import hashlib
 import json
 import re
@@ -69,7 +70,11 @@ def inspect(name, expected=(), absent=(), pixels=False):
                     crop = image.convert('RGB').crop((int(width * left), int(height * top),
                                                      int(width * right), int(height * bottom)))
                     source = ARTIFACTS / (name + '-ocr.png')
-                    ImageOps.invert(crop).save(source)
+                    crop = ImageOps.invert(crop)
+                    if name.startswith('content-chooser'):
+                        # Keep bright dialog text; omit the dimmed settings text behind it.
+                        crop = crop.convert('L').point(lambda value: 255 if value > 140 else 0)
+                    crop.save(source)
             xml = subprocess.check_output(['tesseract', str(source), 'stdout', '--psm', '6'],
                                           stderr=subprocess.DEVNULL, text=True)
             (ARTIFACTS / (name + '.txt')).write_text(xml)
@@ -125,9 +130,12 @@ def check_logs(name):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--emulator-network', action='store_true', help='Use the prebuilt ARM-on-x86 network fixture module')
+    args = parser.parse_args()
     guard()
     ARTIFACTS.mkdir(exist_ok=True)
-    apk = ROOT / 'build/apps/launcherx-local.apk'
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     digest = hashlib.sha256(apk.read_bytes()).hexdigest()
     fixture = build()
     print(adb('install', '--no-incremental', '-r', apk), flush=True)
@@ -161,7 +169,9 @@ def main():
         inspect('content-chooser', ['App content on Home', 'Fixture recommendations'])
         choices = root("content query --uri content://android.media.tv/channel "
                        "--projection _id:package_name:display_name --where \"type='TYPE_PREVIEW'\" --sort _id")
-        rows = [row for row in choices.splitlines() if row.startswith('Row:')]
+        available = {line.removeprefix('package:') for line in shell('pm list packages -e').splitlines()}
+        rows = [row for row in choices.splitlines() if row.startswith('Row:')
+                and re.search(r'package_name=([^,]+)', row)[1] in available]
         hidden = next(index for index, row in enumerate(rows)
                       if 'package_name=' + PACKAGE + ',' in row and 'display_name=Hidden fixture channel' in row)
         shell('input keyevent ' + ' '.join(['KEYCODE_DPAD_DOWN'] * hidden + ['KEYCODE_DPAD_CENTER']))
@@ -279,7 +289,7 @@ def main():
         check_logs('content')
         result = {'result': 'passed', 'module_version': ET.parse(ROOT / 'module/AndroidManifest.xml').getroot().get(
                       '{http://schemas.android.com/apk/res/android}versionName'),
-                  'apk_sha256': digest,
+                  'apk_sha256': digest, 'emulator_network': args.emulator_network,
                   'publisher_sha256': hashlib.sha256(fixture.read_bytes()).hexdigest(),
                   'accounts': 0, 'checks': checks, 'physical_tv_tested': False,
                   'fixture': 'isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback'}

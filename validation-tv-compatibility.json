@@ -1,0 +1,47 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-04",
+  "module_version": "0.18",
+  "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+  "device": "MiTV-MOEU0",
+  "android": 14,
+  "launcher_version_code": 837595,
+  "launcher_version_name": "1.0.1009811201",
+  "compatibility_mode": "reviewed",
+  "reboot": false,
+  "cause": "Google Play installed launcher 837595; module 0.17 refused that unreviewed version.",
+  "checks": [
+    "Guarded ADB confirmed the physical TV identity before access; saved the previous module APK for rollback",
+    "Installed module 0.18 with the same key and verified its on-device APK SHA256",
+    "Home and core-services loaded the reviewed 837595 bindings after launcher restart",
+    "Incognito Home rendered installed apps, Continue watching and SmartTube Subscriptions; hook reported 10 local rows",
+    "Native profile chooser displayed Incognito and Add account; Back returned Home",
+    "Synthetic DPAD navigation launched TV Bro from its native app tile and Home returned to the launcher",
+    "Injected YouTube long press opened the native shortcut chooser with Restore and Send key controls; cancelled without assigning a button",
+    "Companion status reported compatibility; its content dialog displayed SmartTube, YouTube and Jellyfin channels; cancelled without saving",
+    "Native Add apps tile opened the Android chooser with Aurora Store, F-Droid, Obtainium and Google Play Store; cancelled",
+    "No module refusal, hook exception or fatal exception in the captured deployment log"
+  ],
+  "shortcut_state": {
+    "before": "2d0a7c1453f4c9fa0e827a7ebe87240053431b3e2fda06f89eec4ed5b0135d7d  /data/user/0/com.google.android.apps.tv.launcherx/files/remote_button_configuration/data/35/content",
+    "after_startup": "8a487f91b5817a53a9296c1b314cf7f62fc1046b8c49a858869fa19663a18613  /data/user/0/com.google.android.apps.tv.launcherx/files/remote_button_configuration/data/36/content",
+    "note": "The native store was rewritten on launcher startup. Star retains launcherx-key:85 (Play/Pause). No button assignments were made during validation. Full before/after assignment preservation is not proven because the pre-install snapshot contains hashes, not the previous payload.",
+    "final_build_update_byte_preserved": true
+  },
+  "limitations": [
+    "Remote events were injected by ADB, not sent by the physical remote",
+    "No physical playback, authenticated Google profile, reboot or full six-button assignment test",
+    "Heuristic matching was exercised in the emulator; the TV used its reviewed exact-code profile",
+    "Persistent System Framework and Xiaomi service hooks were not changed by this update or reloaded by this deployment",
+    "Content dialog was visually verified after whole-screen OCR omitted its text"
+  ],
+  "evidence_directory": "artifacts/launcher-837595/tv",
+  "earlier_ui_build_sha256": "7f32c753b1b3503132b37e1af017814af131489b38e0b214d54589e37e210fd6",
+  "final_build_checks": [
+    "Exact installed APK SHA256",
+    "Home and core-services hook loading",
+    "Rendered Incognito Home and local rows",
+    "Native profile chooser remained open for 10 seconds, then Back returned Home",
+    "No module refusal or fatal exception"
+  ]
+}

@@ -2,13 +2,16 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
+Version **0.18** adds Google TV Home **837595**, retains **702401** and **835645**,
+and cautiously matches compatible future builds. See
+[compatibility matching](docs/compatibility.md) for its limits.
 Version **0.17** disables Xiaomi's double volume-down mute gesture whenever
 **System Framework** is selected in LSPosed. That scope checkbox controls the fix;
 there is no separate app toggle. Reboot after changing scope. See
 [Xiaomi volume gesture](docs/volume-gesture.md) for supported firmware and checks.
 Key bindings use Android's input dispatcher,
 including Play/Pause for apps such as TV Bro. The companion app needs no
-superuser grant. Both reviewed
+superuser grant. All three reviewed
 Google TV Home builds and centered local artwork remain supported, including
 SmartTube's padded thumbnails.
 The six app buttons support Play/Pause, other Android keys and **No action**.
@@ -24,13 +27,33 @@ and launcher compatibility status. No ADB commands are needed.
 ## Compatibility
 
 - Google TV package `com.google.android.apps.tv.launcherx`, versions
-  **1.0.785572138 / 702401** and **1.0.1002449598 / 835645**, with the exact executable hashes in
+  **1.0.785572138 / 702401**, **1.0.1002449598 / 835645**, and
+  **1.0.1009811201 / 837595**, with the exact executable hashes in
   [`compatibility.json`](compatibility.json).
+- Google-signed variants with identical executable code also use the reviewed
+  bindings; **837597** is the tested x86 variant of **837595**.
+- Later Google-signed builds can use structural matching if all required classes
+  match uniquely. This is conditional compatibility, not a guarantee for future updates.
 - Tested on a Xiaomi **MiTV-MOEU0**, Android 14, ARM32, and an isolated Google TV
   Android 14 emulator running the same original launcher APK.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
+
+Version **0.18** is installed on the physical TV running **837595**. Incognito
+Home, local rows, the profile chooser, native app launching, shortcut controls,
+content settings and the store picker passed device checks. Remote navigation
+was injected through ADB. The native shortcut store was rewritten at startup;
+Star still holds Play/Pause, but complete before/after assignment preservation
+was not proven. See the [device record](validation-tv-compatibility.json) and
+[matching rules](docs/compatibility.md).
+
+Regression runs cover Home and the full local-content suite on **702401** and
+**835645**, using original ARM APKs with the emulator's guarded network shim.
+The **837597** x86 launcher exercises matching, activation/refusal, profiles and
+all six shortcut buttons. Host tests also check renamed classes and rejected
+structural changes. See the [compatibility validation record](validation-compatibility.json)
+for exact APK hashes, earlier-build coverage and remaining limits.
 
 Physical-device validation covers the initial **0.2** setup, the **0.4** store
 picker, the **0.5** channel defaults, and the **0.6** update. On the TV, 0.6
@@ -59,11 +82,13 @@ the user confirmed YouTube, Netflix and Prime long-press customization.
 See the [0.11 deployment record](validation-tv-key-latency.json) and
 [prior physical remote checks](validation-tv-remote.json) for the boundaries.
 
-Other launcher versions and device/framework combinations are not yet supported
-by evidence from this project. An unfamiliar version or DEX hash is refused
-before hooks are installed or Home is activated. Keep launcher updates in mind:
-a new launcher build needs a new compatibility review, not just an edited version
-number. Disable the module in LSPosed and restart Google TV to use stock behavior.
+Other device/framework combinations are not yet supported by evidence from this
+project. A changed DEX hash on a reviewed version is refused. An unfamiliar version
+must pass the signing-certificate check and either match reviewed executable code
+or the complete structural profile before hooks are installed or Home is activated.
+An automatic match is identified in the companion app's status. Updates can still
+require a new compatibility review; see [the matching rules](docs/compatibility.md).
+Disable the module in LSPosed and restart Google TV to use stock behavior.
 
 Version **0.14** is tested in the isolated emulator with the companion app's
 Magisk root policy explicitly denied, including real TV Bro Play/Pause and

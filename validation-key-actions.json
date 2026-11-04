@@ -1,7 +1,7 @@
 {
   "result": "passed",
-  "module_version": "0.15",
-  "apk_sha256": "6b815a4ea3dd72fc136540a1c3597209bb39d36a62378ac4d1249e041dfb7a39",
+  "module_version": "0.18",
+  "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
   "checks": [
     "Key broker rejects an unrelated shell caller",
     "Saved Play/Pause reaches the focused window, then Android falls back to a real MediaSession exactly once per press",
@@ -13,7 +13,8 @@
     "All six supported source buttons can send Play/Pause through the Google receiver",
     "Back action uses Android input dispatch to leave the receiver app",
     "YouTube can send the actual TV Home key without opening Google Home setup",
-    "Individual and all-button restoration remove key actions and retain native defaults"
+    "Individual and all-button restoration remove key actions and retain native defaults",
+    "Native network reconnect handoff is suppressed while the chooser and saved key actions remain usable"
   ],
   "physical_tv_tested": false,
   "accounts": 0,

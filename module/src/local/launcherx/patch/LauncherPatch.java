@@ -46,7 +46,8 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 if (installed) return;
                 context = (Context) hook.args[0];
                 try {
-                    LauncherSymbols loader = new LauncherSymbols(param.classLoader, Compatibility.verify(context));
+                    Compatibility.Result compatibility = Compatibility.resolve(context);
+                    LauncherSymbols loader = new LauncherSymbols(param.classLoader, compatibility);
                     if (coreServices) {
                         if (BuildConfig.APPS_ONLY) {
                             List<XC_MethodHook.Unhook> hooks = new ArrayList<>();
@@ -62,7 +63,8 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                         installHooks(loader, (Application) hook.thisObject);
                     }
                     installed = true;
-                    event("installed mode=" + BuildConfig.MODE + " version=" + loader.version
+                    event("installed mode=" + BuildConfig.MODE + " version=" + compatibility.version
+                            + " compatibility=" + compatibility.mode
                             + " process=" + param.processName);
                 } catch (Throwable error) {
                     Log.e(TAG, "Patch refused; launcher remains unmodified", error);
@@ -118,7 +120,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         Method refreshDestinations = destinations.getDeclaredMethod("b");
         localHome.getDeclaredConstructor(Object.class);
         localHome.getDeclaredMethod(loader.pick("d", "c"));
-        futures.getDeclaredMethod(loader.pick("W", "ae"), Object.class);
+        futures.getDeclaredMethod(loader.pick("W", "ae", "r"), Object.class);
         cacheResult.getDeclaredMethod("a", Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
@@ -158,7 +160,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                             Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
                             home = XposedHelpers.callStaticMethod(cacheResult, "a", home, expiry);
                         }
-                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae"), home);
+                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae", "r"), home);
                         // The newer loader may use its prefetched future without calling d().
                         if (loader.modern && "a".equals(hook.method.getName())) {
                             result = XposedHelpers.newInstance(loader.loadClass("xhu"), result);

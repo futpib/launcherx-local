@@ -76,6 +76,21 @@ python3 scripts/smoke.py --reboot
 The script installs the default module, verifies zero accounts and the clean
 Home UI, navigates to TV Bro using DPAD, checks that Google TV launched it,
 returns with Home, checks a process restart, and optionally checks a reboot.
+
+When testing an original ARM launcher against x86-only emulator Play Services,
+its downloaded Cronet library can fail to load. The existing guarded fixture
+selects Android's platform HttpEngine for these network requests:
+
+```sh
+python3 scripts/build.py --emulator-network
+python3 scripts/smoke.py --emulator-network
+python3 scripts/content_smoke.py --emulator-network
+```
+
+These commands use `build/apps-emulator/launcherx-local.apk`, record the fixture
+in their receipts and remain locked to `launcherx_local14`. The fixture module
+must not be deployed to the TV. The normal x86 launcher variant uses the default
+production module without this shim.
 Screenshots, hierarchy dumps, activity records, logs, and the exact output APK
 hash are saved in `artifacts/smoke-*`.
 
@@ -169,9 +184,12 @@ The setup test verifies automatic activation from Basic TV without opening the
 companion app, then uses the real LSPosed UI to disable the module, check the stock
 signed-out screen, re-enable it and check automatic Home activation again. It
 asserts the companion app has only Choose app content and passive status text.
-Negative variants with incorrect version and DEX metadata must refuse hooks,
-activation and channel changes. A `finally` block restores the normal APK and
-enabled module. These variants also exercise builds without a proprietary APK.
+On an unfamiliar newer version, withholding its identical-code profile must
+activate Home through structural matching and identify that mode in the status.
+Negative variants with a changed structural fingerprint or reviewed DEX hash
+must refuse hooks, activation and channel changes. A `finally` block restores
+the normal APK and enabled module. These variants also exercise builds without
+a proprietary APK in the build inputs.
 
 The profile test uses Tesseract, screenshots and DPAD to select Incognito, open
 Google's actual sign-in screen, cancel, restart Home and reboot. It asserts zero

@@ -32,6 +32,9 @@ def verify(directory):
     assert package and package[1] == "local.launcherx.patch", badging
     assert int(package[2]) == receipt["version_code"] and package[3] == receipt["version_name"]
     with zipfile.ZipFile(apk) as archive:
+        profile = archive.read("assets/compatibility-837595.json")
+        assert profile == (ROOT / "module/assets/compatibility-837595.json").read_bytes()
+        assert receipt["fingerprint_sha256"] == hashlib.sha256(profile).hexdigest()
         assert archive.read("assets/xposed_init").decode().strip() == "local.launcherx.patch.LauncherPatch"
         assert not any(name.endswith((".apk", ".jar", ".keystore", ".jks")) for name in archive.namelist())
         assert not any(name.startswith("lib/") for name in archive.namelist()), "Expected a universal Java-only module"

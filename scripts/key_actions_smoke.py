@@ -12,7 +12,7 @@ from PIL import Image
 from all_shortcuts_smoke import KEYS, choose_app, restore, send
 from build_publisher import build
 from lab import ARTIFACTS, ROOT, adb, guard, root, shell
-from profile_smoke import zero_accounts
+from profile_smoke import inspect, zero_accounts
 from remote_smoke import CHOOSER, FIXTURE, STORE, foreground, send as send_native
 from smoke import BROWSER, HOME, TARGET, fresh_home, screen
 
@@ -71,8 +71,10 @@ def dialog(name, expected):
 
 def choose(code, index, label, custom=None, cancel=False):
     fresh_home()
+    inspect('keys-home-ready', ['Your apps'])
     send(code, 'long')
     foreground('keys-chooser', CHOOSER)
+    inspect('keys-chooser-ready', ['Create a shortcut'], any_of=['Send key', 'Key:'])
     shell('input keyevent KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT '
           'KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER')
     dialog('keys-list', 'Send key for')
@@ -212,6 +214,10 @@ def main():
         checks.append('Individual and all-button restoration remove key actions and retain native defaults')
         logs = adb('logcat', '-d', binary=True).decode('utf-8', errors='replace')
         (ARTIFACTS / 'keys-logcat.txt').write_text(logs)
+        version = int(re.search(r'versionCode=(\d+)', shell('dumpsys package ' + TARGET))[1])
+        if version >= 837595:
+            assert 'keeping local Home on Basic TV network reconnect' in logs
+            checks.append('Native network reconnect handoff is suppressed while the chooser and saved key actions remain usable')
         for error in ['Could not save shortcut key', 'Could not send shortcut key', 'E LSPosed-Bridge:', 'FATAL EXCEPTION']:
             assert error not in logs, error
         zero_accounts()

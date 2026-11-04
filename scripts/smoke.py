@@ -65,10 +65,11 @@ def check_home(name, timeout=30):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reboot", action="store_true")
+    parser.add_argument("--emulator-network", action="store_true", help="Use the prebuilt ARM-on-x86 network fixture module")
     args = parser.parse_args()
     guard()
     ARTIFACTS.mkdir(exist_ok=True)
-    apk = ROOT / "build/apps/launcherx-local.apk"
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     print(adb("install", "--no-incremental", "-r", apk), flush=True)
     time.sleep(2)
     root("am force-stop " + BROWSER)
@@ -110,13 +111,14 @@ def main():
     logs = adb("logcat", "-d")
     (ARTIFACTS / "smoke-logcat.txt").write_text(logs)
     hook_logs = "\n".join(line for line in logs.splitlines() if "LauncherXLocal" in line)
-    assert "installed mode=apps version=702401" in hook_logs
+    version = re.search(r'versionCode=(\d+)', shell('dumpsys package ' + TARGET))[1]
+    assert "installed mode=apps version=" + version in hook_logs
     assert "rendering official local apps channel" in hook_logs
     assert "Patch refused" not in hook_logs
-    assert "EMULATOR FIXTURE" not in hook_logs
+    assert ("EMULATOR FIXTURE" in hook_logs) == args.emulator_network
     assert "FATAL EXCEPTION" not in adb("logcat", "-d", "-s", "AndroidRuntime:E")
     receipt = {"result": "passed", "apk_sha256": hashlib.sha256(apk.read_bytes()).hexdigest(),
-               "accounts": 0, "apps": apps, "reboot": args.reboot,
+               "accounts": 0, "apps": apps, "reboot": args.reboot, "emulator_network": args.emulator_network,
                "checks": ["clean official Home", "native DPAD app launch", "Home return",
                           "process restart", "no launcher fatal exception"],
                "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"}

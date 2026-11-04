@@ -119,7 +119,7 @@ final class Profiles {
                 if (!activity.getClass().getName().equals(Compatibility.TARGET + ".home.HomeActivity")) return;
                 home = new WeakReference<>(hook.thisObject);
                 if (!enabled()) return;
-                activeType = (String) XposedHelpers.callMethod(hook.args[0], loader.pick("co", "ad"));
+                activeType = (String) XposedHelpers.callMethod(hook.args[0], loader.pick("co", "ad", "y"));
                 preferences.edit().putBoolean("incognito", ANONYMOUS.equals(activeType)).apply();
                 Log.i(TAG, "active launcher profile: " + activeType);
             }
@@ -129,7 +129,7 @@ final class Profiles {
                 View view = (View) hook.thisObject;
                 Object peer = home.get();
                 // This pinned resource is the native account button in both tab layouts.
-                if (!enabled() || view.getId() != loader.pick(0x7f0b05fb, 2131429037) || peer == null
+                if (!enabled() || view.getId() != loader.pick(0x7f0b05fb, 2131429037, 0x7f0b06b1) || peer == null
                         || !(ANONYMOUS.equals(activeType) || "google".equals(activeType))) return;
                 Activity activity = (Activity) XposedHelpers.getObjectField(peer, "b");
                 if (activity.isFinishing() || activity.isDestroyed()

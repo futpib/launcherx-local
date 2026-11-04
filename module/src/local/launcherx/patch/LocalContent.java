@@ -133,7 +133,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         try {
             List<Object> cards = watchCards();
             if (!cards.isEmpty()) result.add(row("launcherx-local:watch-next",
-                    context.getString(loader.pick(0x7f140654, 2132018634)), cards, false));
+                    context.getString(loader.pick(0x7f140654, 2132018634, 0x7f1405cd)), cards, false));
         } catch (Throwable error) {
             Log.w(TAG, "Watch Next unavailable; keeping app rows", error);
         }
@@ -195,8 +195,8 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
                     long position = Math.max(0, number(cursor, "last_playback_position_millis"));
                     set(entry, "o", duration); set(entry, "p", Math.min(position, duration));
                     Object distributor = builder("aaug");
-                    set(distributor, "b", "local:" + owner);
-                    set(distributor, "c", context.getPackageManager().getApplicationLabel(
+                    set(distributor, loader.pick("b", "c"), "local:" + owner);
+                    set(distributor, loader.pick("c", "d"), context.getPackageManager().getApplicationLabel(
                             context.getPackageManager().getApplicationInfo(owner, 0)).toString());
                     Object card = watchConverter.invoke(null, context, finish(entry), finish(distributor), defaultValue("aahl"));
                     // The stock converter understands film/series/season/episode. Other TvContract
@@ -282,7 +282,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         set(row, "e", title); set(row, "o", id);
         set(row, "c", preview ? 24 : 11);
         set(row, "d", defaultValue(preview ? "abbi" : "aaff"));
-        XposedHelpers.callMethod(row, loader.pick("bg", "bc"), cards);
+        XposedHelpers.callMethod(row, loader.pick("bg", "bc", "be"), cards);
         return rowConstructor.newInstance(id, finish(row), null);
     }
 

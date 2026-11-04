@@ -20,6 +20,7 @@ final class RemoteButtons {
     private final Method launchCallback;
     private final Method anonymousCheck;
     private final Method basicInternetRule;
+    private final Method networkRedirect;
     private final Class<?> launchManager;
     private final boolean modern;
     private final ThreadLocal<Gate> current = new ThreadLocal<>();
@@ -38,6 +39,8 @@ final class RemoteButtons {
     RemoteButtons(Context context, LauncherSymbols loader) throws Exception {
         this.context = context;
         modern = loader.modern;
+        networkRedirect = loader.recent ? loader.loadClass("basic_network_exit").getDeclaredMethod(
+                "b", int.class, Context.class, loader.loadClass("basic_exit_reason")) : null;
         launchManager = loader.loadClass("ibq");
         loader.loadClass("gbp").getDeclaredField("e");
         if (modern) {
@@ -75,6 +78,16 @@ final class RemoteButtons {
 
     void install(List<XC_MethodHook.Unhook> hooks) {
         try {
+            if (networkRedirect != null) hooks.add(XposedBridge.hookMethod(networkRedirect, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam hook) {
+                    // Reason 6 is the reviewed pseudonymous network callback's
+                    // VANILLA_BLOCK_INTERNET handoff, not user navigation or sign-in.
+                    if ((Integer) hook.args[0] == 6 && enabled()) {
+                        hook.setResult(null);
+                        Log.i(TAG, "keeping local Home on Basic TV network reconnect");
+                    }
+                }
+            }));
             if (!modern) hooks.add(XposedBridge.hookMethod(keyCallback, scope(anonymousCheck)));
             hooks.add(XposedBridge.hookMethod(launchCallback, scope(basicInternetRule)));
             XC_MethodHook predicate = new XC_MethodHook() {

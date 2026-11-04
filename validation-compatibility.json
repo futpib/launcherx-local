@@ -1,0 +1,297 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-04",
+  "module_version": "0.18",
+  "production_apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+  "fingerprint_sha256": "403bef07c33c8bfb09d537a157ff253e71797f3fdf6da09667cf49b152b77431",
+  "reviewed_launcher_versions": [
+    702401,
+    835645,
+    837595
+  ],
+  "host_checks": [
+    "12 CI unit tests passed",
+    "All three original launcher DEX profiles verified",
+    "All 85 structural targets matched the real 837597 APK",
+    "Production APK signature, manifest, bundled profile and receipt verified"
+  ],
+  "current_x86_emulator": {
+    "launcher_version_code": 837597,
+    "mode": "identical-code using 837595 bindings",
+    "runs": {
+      "setup": {
+        "result": "passed",
+        "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+        "checks": [
+          "Basic TV automatically becomes Incognito Home when the module loads",
+          "disabling in LSPosed and restarting restores stock signed-out setup UI with zero accounts",
+          "re-enabling in LSPosed and restarting automatically restores Incognito Home",
+          "settings app has only Choose app content and passive compatibility status",
+          "real launcher activates through the heuristic path with its exact profile withheld",
+          "heuristic-mismatch mismatch refuses hooks, automatic activation and channel changes",
+          "dex mismatch refuses hooks, automatic activation and channel changes"
+        ],
+        "physical_tv_tested": false,
+        "fixture": "isolated emulator; actual LSPosed UI; negative module metadata variants"
+      },
+      "profiles": {
+        "result": "passed",
+        "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+        "checks": [
+          "first-run Incognito default and native chooser entry",
+          "native DPAD Incognito selection returns to Home",
+          "native Add account launches real Google Play Services sign-in",
+          "cancelled sign-in leaves Incognito selected and creates no account",
+          "Incognito selection survives launcher restart",
+          "Incognito selection and chooser survive emulator reboot",
+          "no launcher fatal exception in uninterrupted remote sequences"
+        ],
+        "accounts": 0,
+        "physical_tv_tested": false,
+        "authenticated_google_roundtrip_tested": false,
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      },
+      "shortcuts": {
+        "result": "passed",
+        "module_version": "0.18",
+        "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+        "checks": [
+          "Key broker rejects an unrelated shell caller",
+          "Saved Play/Pause reaches the focused window, then Android falls back to a real MediaSession exactly once per press",
+          "An injected fallback key cannot recursively trigger another Send key action",
+          "Opening the chooser, cancelling a replacement and restarting the launcher retain the saved key action",
+          "Custom symbolic Android key is saved and the scoped input hook reaches the focused app window",
+          "Single lowercase and uppercase letters, numeric codes and full names save and deliver the same F key",
+          "Choosing a favorite app replaces a saved key action",
+          "All six supported source buttons can send Play/Pause through the Google receiver",
+          "Back action uses Android input dispatch to leave the receiver app",
+          "YouTube can send the actual TV Home key without opening Google Home setup",
+          "Individual and all-button restoration remove key actions and retain native defaults",
+          "Native network reconnect handoff is suppressed while the chooser and saved key actions remain usable"
+        ],
+        "physical_tv_tested": false,
+        "accounts": 0,
+        "limitations": [
+          "Silent AudioTrack and MediaSession fixture is not a third-party player.",
+          "Source KeyEvents enter the Google receiver; physical buttons and Xiaomi forwarding are not exercised.",
+          "Custom key effects depend on the receiving app and Android policy.",
+          "Stock YouTube uses isolated clean private data; original data is restored after the CLI run."
+        ],
+        "cleanup": "Native shortcut store restored; test APK and helper removed. CLI also restores the isolated YouTube data."
+      },
+      "latest_home": {
+        "result": "passed",
+        "apk_sha256": "54f8f919b98d99ffb4019a042ffa3518661aa4a603f9634f796e1716a059758c",
+        "accounts": 0,
+        "apps": [
+          "YouTube",
+          "YouTube Music",
+          "Aurora Store",
+          "SmartTube",
+          "TV Bro",
+          "LauncherX Local",
+          "Exploring Abandoned Movie Sets on Google Maps!",
+          "Sontan | Full Drama | Irfan Sajjad | Aisha Khan | Partho Sheikh | Sadnima | Bangla New Natok",
+          "\u099c\u09ae\u09cd\u09af\u09be\u09a8\u09cd\u099f\u09b0\u09be | Gopal Bhar | Full Episode | Episode 469",
+          "\u10db\u10e8\u10dd\u10d1\u10da\u10d4\u10d1\u10d6\u10d4 \u10d3\u10d0\u10db\u10dd\u10d9\u10d8\u10d3\u10d4\u10d1\u10e3\u10da\u10d8 \u10e1\u10d8\u10eb\u10d4 | \u10d0\u10ee\u10d0\u10da\u10d8 \u10e8\u10d0\u10d1\u10d0\u10d7\u10d8\u10e1 \u10e8\u10dd\u10e3",
+          "\u10d0\u10e0 \u10e8\u10d4\u10d4\u10ee\u10dd \u10ec\u10e7\u10d0\u10da\u10e1 ROBLOX -\u10e8\u10d8! | DON'T SPLASH",
+          "\u0413\u0422\u0410 5, \u041d\u041e \u0412\u041e\u0414\u0410 \u041f\u041e\u0414\u041d\u0418\u041c\u0410\u0415\u0422\u0421\u042f \u041a\u0410\u0416\u0414\u0423\u042e \u0421\u0415\u041a\u0423\u041d\u0414\u0423!",
+          "\u10db\u10d0\u10ec\u10d5\u10d8\u10db\u10e1 \u2764\ufe0f",
+          "Grand Theft Auto VI Launch Trailer"
+        ],
+        "reboot": false,
+        "emulator_network": false,
+        "checks": [
+          "clean official Home",
+          "native DPAD app launch",
+          "Home return",
+          "process restart",
+          "no launcher fatal exception"
+        ],
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      }
+    }
+  },
+  "older_arm_emulator": {
+    "module_apk_sha256": "6348e49f2c3ebac00b5875bf4e70d81a218a3aff987186bf49e238a0176382a4",
+    "emulator_network_fixture": true,
+    "runs": {
+      "702401": {
+        "smoke": {
+          "result": "passed",
+          "apk_sha256": "6348e49f2c3ebac00b5875bf4e70d81a218a3aff987186bf49e238a0176382a4",
+          "accounts": 0,
+          "apps": [
+            "YouTube",
+            "YouTube Music",
+            "Aurora Store",
+            "SmartTube",
+            "TV Bro",
+            "LauncherX Local",
+            "Exploring Abandoned Movie Sets on Google Maps!",
+            "Sontan | Full Drama | Irfan Sajjad | Aisha Khan | Partho Sheikh | Sadnima | Bangla New Natok",
+            "\u099c\u09ae\u09cd\u09af\u09be\u09a8\u09cd\u099f\u09b0\u09be | Gopal Bhar | Full Episode | Episode 469",
+            "\u0985\u09b2\u09b8 \u09ac\u0989 | Tonmoy Sohel, Farzana Ahsan Mihi | Mohin Khan | New Bangla Natok 2026 | Global TV Online",
+            "\u10d0\u10e0 \u10e8\u10d4\u10d4\u10ee\u10dd \u10ec\u10e7\u10d0\u10da\u10e1 ROBLOX -\u10e8\u10d8! | DON'T SPLASH",
+            "\u0413\u0422\u0410 5, \u041d\u041e \u0412\u041e\u0414\u0410 \u041f\u041e\u0414\u041d\u0418\u041c\u0410\u0415\u0422\u0421\u042f \u041a\u0410\u0416\u0414\u0423\u042e \u0421\u0415\u041a\u0423\u041d\u0414\u0423!",
+            "\u10db\u10d0\u10ec\u10d5\u10d8\u10db\u10e1 \u2764\ufe0f",
+            "Grand Theft Auto VI Launch Trailer"
+          ],
+          "reboot": false,
+          "emulator_network": true,
+          "checks": [
+            "clean official Home",
+            "native DPAD app launch",
+            "Home return",
+            "process restart",
+            "no launcher fatal exception"
+          ],
+          "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
+          "launcher_version_code": 702401
+        },
+        "content_smoke": {
+          "result": "passed",
+          "module_version": "0.18",
+          "apk_sha256": "6348e49f2c3ebac00b5875bf4e70d81a218a3aff987186bf49e238a0176382a4",
+          "emulator_network": true,
+          "publisher_sha256": "d36e389f08ac4fffd0ef2cea42b1fc4918567e5086a033df63eff5e084ab742f",
+          "accounts": 0,
+          "checks": [
+            "empty providers keep apps-only Home",
+            "all existing preview channels enabled automatically on first discovery",
+            "remote-controlled setup chooser hides only the selected preview channel",
+            "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
+            "DPAD opens both provider deep links with extras intact",
+            "non-film Watch Next clip renders and opens through native resume card",
+            "provider updates refresh visible Home without a process restart",
+            "updated resume position and playback extras",
+            "deletions made while away are reflected on Home resume",
+            "channel visibility changes remove and restore rows live",
+            "newly published channel enabled and rendered live without reviving hidden channels",
+            "external channel hide survives launcher restart",
+            "rows and playback links work with launcher IPv4/IPv6 egress blocked",
+            "populated rows and explicit channel hides survive emulator reboot",
+            "deleting the last entries removes empty rows live"
+          ],
+          "physical_tv_tested": false,
+          "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback",
+          "launcher_version_code": 702401
+        }
+      },
+      "835645": {
+        "smoke": {
+          "result": "passed",
+          "apk_sha256": "6348e49f2c3ebac00b5875bf4e70d81a218a3aff987186bf49e238a0176382a4",
+          "accounts": 0,
+          "apps": [
+            "YouTube",
+            "YouTube Music",
+            "Aurora Store",
+            "SmartTube",
+            "TV Bro",
+            "LauncherX Local",
+            "Lemmings Indigestion | Grizzy & the Lemmings | 35' Compilation | \ud83d\udc3b\ud83d\udc39 Nostalgic Cartoon",
+            "Sontan | Full Drama | Irfan Sajjad | Aisha Khan | Partho Sheikh | Sadnima | Bangla New Natok",
+            "Exploring Abandoned Movie Sets on Google Maps!",
+            "Upin & Ipin - Ros Gergasi (Episode Penuh)",
+            "\u10d0\u10e0 \u10e8\u10d4\u10d4\u10ee\u10dd \u10ec\u10e7\u10d0\u10da\u10e1 ROBLOX -\u10e8\u10d8! | DON'T SPLASH",
+            "\u0413\u0422\u0410 5, \u041d\u041e \u0412\u041e\u0414\u0410 \u041f\u041e\u0414\u041d\u0418\u041c\u0410\u0415\u0422\u0421\u042f \u041a\u0410\u0416\u0414\u0423\u042e \u0421\u0415\u041a\u0423\u041d\u0414\u0423!",
+            "\u10db\u10d0\u10ec\u10d5\u10d8\u10db\u10e1 \u2764\ufe0f",
+            "Grand Theft Auto VI Launch Trailer"
+          ],
+          "reboot": false,
+          "emulator_network": true,
+          "checks": [
+            "clean official Home",
+            "native DPAD app launch",
+            "Home return",
+            "process restart",
+            "no launcher fatal exception"
+          ],
+          "fixture": "Google TV API 34 x86 with ARM translation; original TV APK",
+          "launcher_version_code": 835645
+        },
+        "content_smoke": {
+          "result": "passed",
+          "module_version": "0.18",
+          "apk_sha256": "6348e49f2c3ebac00b5875bf4e70d81a218a3aff987186bf49e238a0176382a4",
+          "emulator_network": true,
+          "publisher_sha256": "9210bd6b83c92319566f3f20f1c41e9f6b55a867c0fc94592225c3b734cb368b",
+          "accounts": 0,
+          "checks": [
+            "empty providers keep apps-only Home",
+            "all existing preview channels enabled automatically on first discovery",
+            "remote-controlled setup chooser hides only the selected preview channel",
+            "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
+            "DPAD opens both provider deep links with extras intact",
+            "non-film Watch Next clip renders and opens through native resume card",
+            "provider updates refresh visible Home without a process restart",
+            "updated resume position and playback extras",
+            "deletions made while away are reflected on Home resume",
+            "channel visibility changes remove and restore rows live",
+            "newly published channel enabled and rendered live without reviving hidden channels",
+            "external channel hide survives launcher restart",
+            "rows and playback links work with launcher IPv4/IPv6 egress blocked",
+            "populated rows and explicit channel hides survive emulator reboot",
+            "deleting the last entries removes empty rows live"
+          ],
+          "physical_tv_tested": false,
+          "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback",
+          "launcher_version_code": 835645
+        }
+      }
+    },
+    "scope": "Original Google-signed ARM launcher APKs and final hook code, with the existing guarded platform HttpEngine shim for x86-only Play Services; not production APK validation on ARM hardware"
+  },
+  "earlier_content_run": {
+    "result": "passed",
+    "module_version": "0.18",
+    "apk_sha256": "cfce4a49852361df47ddc294b9fcb82cb1e93bf1d7abaaa0e8a54cbb6e0f08d3",
+    "publisher_sha256": "999350b64d0602000032c1d1eabe2bfebca2795443c540e70a83663a306175cd",
+    "accounts": 0,
+    "checks": [
+      "empty providers keep apps-only Home",
+      "all existing preview channels enabled automatically on first discovery",
+      "remote-controlled setup chooser hides only the selected preview channel",
+      "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
+      "DPAD opens both provider deep links with extras intact",
+      "non-film Watch Next clip renders and opens through native resume card",
+      "provider updates refresh visible Home without a process restart",
+      "updated resume position and playback extras",
+      "deletions made while away are reflected on Home resume",
+      "channel visibility changes remove and restore rows live",
+      "newly published channel enabled and rendered live without reviving hidden channels",
+      "external channel hide survives launcher restart",
+      "rows and playback links work with launcher IPv4/IPv6 egress blocked",
+      "populated rows and explicit channel hides survive emulator reboot",
+      "deleting the last entries removes empty rows live"
+    ],
+    "physical_tv_tested": false,
+    "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback"
+  },
+  "earlier_stock_ci_run": {
+    "result": "passed",
+    "apk_sha256": "5d5251e9db10eee41455ceb931402e1fd237a41164f42288419d26a589ed1eb2",
+    "checks": [
+      "missing launcher refusal",
+      "unrecognized signing certificate refusal",
+      "future version with unrecognized signing certificate refusal",
+      "wrong executable refusal",
+      "DPAD channel chooser refuses without switching Home",
+      "no fatal exception"
+    ],
+    "coverage": "stock Android setup safety only; no Xposed, root, real launcher or Home integration"
+  },
+  "physical_tv_record": "validation-tv-compatibility.json",
+  "limitations": [
+    "No unreleased launcher can be guaranteed compatible; heuristic activation requires every profiled target to match uniquely",
+    "The positive rooted heuristic test uses the real current launcher with its exact profile withheld; host tests separately exercise class renaming and unrelated code changes",
+    "The full latest-launcher content suite and stock CI refusals used the earlier APK hashes recorded above; their relevant content and certificate logic is unchanged in the final APK",
+    "702401 first hit an Android ViewRootImpl accessibility-focus exception during UI inspection; a fresh-boot repeat passed with the strict fatal-exception check retained",
+    "Older-version testing is emulator coverage with ARM translation and an explicit network shim",
+    "No authenticated Google account round trip or physical remote delivery was tested in this update",
+    "The emulator private launcher data was restored and hashes compared while the package was disabled. Test publishers and firewall rules were removed. Some pre-existing emulator provider rows/visibility changed during test isolation; full TvProvider state preservation is not claimed",
+    "The proposed Skip to apps fallback is not implemented in this release"
+  ],
+  "evidence_directory": "artifacts/launcher-837595"
+}
