@@ -153,6 +153,19 @@ final class NativeShortcuts {
     }
 
     void install(List<XC_MethodHook.Unhook> hooks, boolean core) throws Exception {
+        ShortcutBackup backup = new ShortcutBackup(context, loader);
+        Class<?> configClass = loader.loadClass("tzh");
+        hooks.add(XposedBridge.hookMethod(setupClass.getDeclaredMethod(loader.pick("f", "h"),
+                configClass, configClass), new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam hook) {
+                if (hook.hasThrowable()) return;
+                try {
+                    hook.setResult(backup.reconcile(hook.args[1], hook.getResult()));
+                } catch (Throwable error) {
+                    Log.e(TAG, "Could not preserve shortcut assignments", error);
+                }
+            }
+        }));
         hooks.addAll(XposedBridge.hookAllConstructors(setupClass, new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam hook) throws Throwable {
                 Object nativeSetup = hook.thisObject;

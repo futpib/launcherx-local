@@ -44,7 +44,8 @@ def restore(code, label, all_buttons=False, cancel=False):
     fresh_home()
     send(code, 'long')
     foreground('buttons-restore-chooser', CHOOSER)
-    shell('input keyevent KEYCODE_DPAD_UP KEYCODE_DPAD_LEFT')
+    inspect('buttons-restore-ready', ['Create a shortcut', 'Restore ' + label + ' default'])
+    shell('input keyevent KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT')
     if all_buttons:
         shell('input keyevent KEYCODE_DPAD_RIGHT')
     shell('input keyevent KEYCODE_DPAD_CENTER')
@@ -173,4 +174,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    from shortcut_test_state import isolated_backup
+    with isolated_backup():
+        main()

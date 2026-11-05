@@ -1,0 +1,28 @@
+{
+  "result": "passed",
+  "module_version": "0.21",
+  "apk_sha256": "da5f243f1cd551f1a087bdfc2e1346dcedff645e32b6c41d9c583baa1d517b03",
+  "checks": [
+    "Native chooser saved apps, media/custom keys and No action; checkpoint matches all assignments",
+    "Real unhooked Home pruned OEM/YouTube bindings; restoring module recovered every action and survived restart",
+    "Recovered apps launch; custom keys and Play/Pause reach the fixture; No action stays inert",
+    "An individually restored default is not resurrected after another compatibility gap",
+    "Restore all clears the checkpoint actions and remains reset across stock cleanup"
+  ],
+  "limits": [
+    "Real Google TV x86 emulator; receiver-injected events, not a physical remote",
+    "Compatibility refusal was forced on the installed launcher; no Play Store update was downloaded"
+  ],
+  "cleanup": "Original native store and independent checkpoint restored; test fixtures removed",
+  "actual_apk_upgrades": {
+    "result": "passed",
+    "checks": [
+      "702401 native Home loads hooks and checkpoints all six seeded assignments",
+      "Real 702401 to 835645 APK upgrade preserves all six actions and reads the older checkpoint",
+      "Real 835645 to 837597 APK upgrade with refused hooks prunes bindings; compatible module restores all six from the older checkpoint"
+    ],
+    "fixture": "Original Google-signed APK upgrades on guarded Android 14 emulator; older ARM builds use network shim",
+    "evidence_directory": "artifacts/shortcut-persistence"
+  },
+  "host_checks": "12 CI tests passed; production APK signature, manifest, receipt and packaging verified"
+}

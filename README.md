@@ -2,6 +2,10 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
+Version **0.21** preserves remote-button assignments across launcher and module
+updates. A separate local checkpoint restores assignments that stock Home prunes
+while the module cannot load; intentional resets remain reset. See
+[binding persistence](docs/key-actions.md#persistence-across-updates).
 Version **0.20** enables Ambient Mode settings for Incognito Home using the
 existing Google TV scope. See [Ambient Mode and device settings](docs/ambient-mode.md)
 for the setup-gate audit and account-dependent features.
@@ -47,7 +51,13 @@ and launcher compatibility status. No ADB commands are needed.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
 
-Version **0.20** is installed on the physical TV running **837595**. Ambient's
+Version **0.21** is installed on the physical TV running **837595**. Its existing
+bindings were preserved byte-for-byte and captured in the independent checkpoint.
+Stock cleanup, recovery and intentional resets passed in the emulator. See
+[TV binding validation](validation-tv-shortcut-persistence.json) and
+[recovery validation](validation-shortcut-persistence.json).
+
+Version **0.20** was tested on the same TV. Ambient's
 native editor, setting persistence, screensaver start and exit passed device
 checks using ADB input. See [Ambient validation](validation-tv-ambient.json).
 

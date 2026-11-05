@@ -119,5 +119,7 @@ def main():
 
 
 if __name__ == '__main__':
-    with clean_youtube():
-        main()
+    from shortcut_test_state import isolated_backup
+    with isolated_backup():
+        with clean_youtube():
+            main()

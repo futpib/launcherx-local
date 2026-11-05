@@ -13,6 +13,11 @@ On 837595 it suppresses the native signed-out network-block redirect that could
 interrupt the shortcut chooser after a network reconnect. Other Home navigation
 and account flows remain native.
 
+Version 0.21 also keeps a separate shortcut checkpoint. Compatibility refusal
+still leaves unfamiliar launcher code unhooked, but assignments stripped by
+stock Home can be recovered when compatible hooks return. See
+[binding persistence](key-actions.md#persistence-across-updates).
+
 ## Matching order
 
 1. A reviewed version must have exactly the DEX entries and hashes recorded in

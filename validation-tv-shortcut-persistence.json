@@ -1,0 +1,23 @@
+{
+  "result": "passed",
+  "module_version": "0.21",
+  "verified_date": "2026-11-05",
+  "apk_sha256": "da5f243f1cd551f1a087bdfc2e1346dcedff645e32b6c41d9c583baa1d517b03",
+  "device": "MiTV-MOEU0",
+  "launcher_version_code": 837595,
+  "native_before_sha256": "0b542b074ead43be4899543ec370cab76ceae4866f41424adab1fbf601611eab",
+  "native_after_sha256": "0b542b074ead43be4899543ec370cab76ceae4866f41424adab1fbf601611eab",
+  "checkpoint_sha256": "0b542b074ead43be4899543ec370cab76ceae4866f41424adab1fbf601611eab",
+  "checks": [
+    "Same-key module update from 0.20 to 0.21; installed APK hash verified",
+    "Native shortcut store preserved byte-for-byte",
+    "Independent checkpoint captured every current assignment",
+    "Home and core-services loaded compatible hooks without backup errors",
+    "Existing SmartTube playback activity and task resumed"
+  ],
+  "limits": [
+    "No physical remote presses or audible playback test",
+    "Destructive stock cleanup was exercised on the emulator only"
+  ],
+  "evidence_directory": "artifacts/tv-shortcut-persistence"
+}

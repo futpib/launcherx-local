@@ -148,4 +148,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    from shortcut_test_state import isolated_backup
+    with isolated_backup():
+        main()

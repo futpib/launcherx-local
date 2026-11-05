@@ -34,6 +34,46 @@ Before disabling or uninstalling the module, restore any key or No action
 assignments using these controls. Stock Google TV cannot execute the module's
 saved key actions; normal favorite-app assignments remain native Google TV data.
 
+## Persistence across updates
+
+Starting with **0.21**, the loaded module checkpoints the native button
+configuration in Google TV's private `files/launcherx_shortcut_backup/bindings.pb`.
+This directory is separate from Google's `remote_button_configuration` store.
+Existing bindings are captured when Home next initializes its shortcut store;
+native app assignments, Send key and No action are included. No root grant,
+network service or extra LSPosed scope is needed.
+
+An unsupported Home update can temporarily prevent the module from loading.
+Stock Home then removes the added Xiaomi button definitions and YouTube's
+generic-app mode, discarding their assignments. Once a compatible module loads,
+it restores the saved action only when that button or supported mode disappeared.
+It keeps the new launcher's button metadata and uses its native store to persist
+the recovered assignment. Custom actions remain unavailable during the period
+when the hooks cannot load.
+
+Normal edits, **Restore default** and **Restore all button defaults** retain
+the extended button definitions, so they update the checkpoint and are not
+undone by recovery. A file lock coordinates the launcher processes, atomic
+writes protect the checkpoint, and stale native-store callbacks cannot replace
+it with an older snapshot. Unchanged configuration does not rewrite the file.
+
+Install this version and restart Google TV before the next update to capture
+the existing assignments. The checkpoint survives ordinary APK updates; clearing
+Google TV's app data or uninstalling Google TV removes it. It cannot recover
+assignments lost before the checkpoint was created. Before intentionally
+removing the module, restore custom key actions using the native controls.
+
+`python3 scripts/shortcut_persistence_smoke.py` exercises native chooser saves,
+actual stock cleanup with compatibility-refused hooks, recovery, delivered
+actions, and individual/all-button resets across another cleanup. It restores
+both stores and removes its fixtures. See
+[the persistence validation](../validation-shortcut-persistence.json).
+The same record includes actual Google-signed APK upgrades from 702401 to
+835645 and then 837597, with a forced compatibility refusal during the last
+upgrade. The physical TV's 0.20-to-0.21 module update preserved the native store
+byte-for-byte and captured its bindings in the checkpoint; see
+[TV validation](../validation-tv-shortcut-persistence.json).
+
 ## Delivery and access
 
 Starting with **0.14**, all key bindings use Android's input dispatcher, including
