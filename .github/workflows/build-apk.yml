@@ -45,6 +45,15 @@ jobs:
             --keystore "$RUNNER_TEMP/launcherx-release.jks" --key-alias "$KEY_ALIAS" \
             --version-name "$VERSION_NAME" --version-code "$VERSION_CODE"
           python3 scripts/verify_apk.py
+      - name: Upload installable release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: launcherx-local-${{ steps.version.outputs.tag }}
+          if-no-files-found: error
+          path: |
+            build/apps/launcherx-local.apk
+            build/apps/SHA256SUMS
+            build/apps/receipt.json
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
@@ -56,7 +65,7 @@ jobs:
             Install **launcherx-local.apk**. It is universal and contains no native CPU-specific libraries.
             In Obtainium, add https://github.com/${{ github.repository }}.
 
-            Requires Magisk/Zygisk, LSPosed, and the launcher build pinned in compatibility.json.
+            Requires Magisk/Zygisk, LSPosed, and a compatible Google TV Home build. See compatibility.json and docs/compatibility.md for reviewed builds and automatic matching limits.
             This is a regular module APK, not a ZIP to install in Magisk.
 
             Built from ${{ github.sha }}. SHA256SUMS and receipt.json describe this APK.

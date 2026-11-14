@@ -396,9 +396,12 @@ emulator system overlay or its network-workaround research build on a TV.
 
 [![Test](https://github.com/futpib/launcherx-local/actions/workflows/test.yml/badge.svg)](https://github.com/futpib/launcherx-local/actions/workflows/test.yml)
 
-Pushes and pull requests run the **Test** workflow. The manual **Build APK**
-workflow publishes a signed universal `launcherx-local.apk`, checksums and a
-build receipt to [GitHub Releases](https://github.com/futpib/launcherx-local/releases).
+Pushes and pull requests to `master` run the **Test** workflow. Its APK artifacts
+use temporary signing keys and are for testing. Users should install the signed
+universal `launcherx-local.apk` from
+[GitHub Releases](https://github.com/futpib/launcherx-local/releases).
+The manual **Build APK** workflow uploads the verified APK, checksums and build
+receipt as a workflow artifact, then publishes those same files as a release.
 Configure the persistent signing key before publishing; see [CI setup, signing
 and local reproduction](docs/ci.md). Public CI verifies building and setup
 refusal on stock Android; full Home integration uses the private rooted lab.

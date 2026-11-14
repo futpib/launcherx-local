@@ -9,7 +9,7 @@ serialized release, complete release-history and checksum conventions.
 
 ## Setup and publishing
 
-The **Test** workflow runs on pushes and pull requests to `main`, and can also be
+The **Test** workflow runs on pushes and pull requests to `master`, and can also be
 started manually. It builds and verifies the APK, tests release versioning, and
 uses a stock Android 15 emulator to verify that setup refuses a missing launcher,
 an unsupported version and incorrect executable code. The sole **Choose app content** button must refuse via DPAD, leaving
@@ -21,7 +21,9 @@ date-based names (`YY.MM.DD.HH.MM+code`), increasing Android version codes, and 
 signed APK on GitHub Releases. It uses ScreenCast's stricter signing requirement
 and checks every previous release to allocate the next code. Releases contain
 `launcherx-local.apk`, `SHA256SUMS` and `receipt.json`. One APK supports all CPU
-architectures. Obtainium can follow this repository's GitHub releases.
+architectures. The same verified files are also uploaded as a workflow artifact
+named `launcherx-local-<release tag>` before publication. Obtainium can follow
+this repository's GitHub releases.
 
 Configure these repository Actions secrets before publishing:
 
@@ -35,7 +37,7 @@ key from the machine holding `.cache/local.keystore`, using an authenticated `gh
 
 ```sh
 base64 -w 0 .cache/local.keystore | gh secret set KEYSTORE_BASE64 --repo futpib/launcherx-local
-gh workflow run build-apk.yml --repo futpib/launcherx-local --ref main
+gh workflow run build-apk.yml --repo futpib/launcherx-local --ref master
 ```
 
 For a different key, configure its password and alias secrets too. Reusing an
