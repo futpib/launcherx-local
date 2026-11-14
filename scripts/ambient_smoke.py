@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Exercise Incognito Ambient's native entry and dream service in the guarded AVD."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -39,6 +40,9 @@ def cursor_probe():
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--emulator-network', action='store_true', help='Use the ARM-on-x86 network fixture')
+    args = parser.parse_args()
     guard()
     ARTIFACTS.mkdir(exist_ok=True)
     cursor_probe()
@@ -78,7 +82,8 @@ def main():
     assert 'Incognito' in (ARTIFACTS / 'ambient-home.xml').read_text()
     assert root(QUERY) == before
     checks.append('Home exits the screensaver and returns to Incognito with unchanged account state')
-    result = {'apk_sha256': hashlib.sha256((ROOT / 'build/apps/launcherx-local.apk').read_bytes()).hexdigest(),
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
+    result = {'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
               'result': 'passed', 'checks': checks, 'physical_tv_tested': False,
               'limit': 'Full settings editor needs valid Cast device credentials; tested separately on TV.'}
     (ARTIFACTS / 'ambient-result.json').write_text(json.dumps(result, indent=2) + '\n')

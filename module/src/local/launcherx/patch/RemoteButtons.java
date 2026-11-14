@@ -23,6 +23,7 @@ final class RemoteButtons {
     private final Method networkRedirect;
     private final Class<?> launchManager;
     private final boolean modern;
+    private final boolean mergedLaunch;
     private final ThreadLocal<Gate> current = new ThreadLocal<>();
 
     private static final class Gate {
@@ -39,8 +40,9 @@ final class RemoteButtons {
     RemoteButtons(Context context, LauncherSymbols loader) throws Exception {
         this.context = context;
         modern = loader.modern;
+        mergedLaunch = loader.latest;
         networkRedirect = loader.recent ? loader.loadClass("basic_network_exit").getDeclaredMethod(
-                "b", int.class, Context.class, loader.loadClass("basic_exit_reason")) : null;
+                loader.latest ? "n" : "b", int.class, Context.class, loader.loadClass("basic_exit_reason")) : null;
         launchManager = loader.loadClass("ibq");
         loader.loadClass("gbp").getDeclaredField("e");
         if (modern) {
@@ -50,9 +52,11 @@ final class RemoteButtons {
             anonymousCheck = null;
             Class<?> launch = loader.loadClass("inw");
             launchCallback = launch.getDeclaredMethod("a", Object.class);
-            if (launch.getDeclaredField("a").getType() != launchManager) {
+            if (launch.getDeclaredField("a").getType() != (mergedLaunch ? Object.class : launchManager)) {
                 throw new IllegalStateException("Unexpected app launch callback");
             }
+            if (mergedLaunch && launch.getDeclaredField("$cid").getType() != int.class)
+                throw new IllegalStateException("Unexpected merged app launch callback");
             basicInternetRule = loader.loadClass("oro").getDeclaredMethod("b", Context.class);
             return;
         }
@@ -123,6 +127,7 @@ final class RemoteButtons {
                 } else {
                     // The legacy merged callback needs an additional case guard.
                     if ((!modern && XposedHelpers.getIntField(hook.thisObject, "e") != 4)
+                            || (mergedLaunch && XposedHelpers.getIntField(hook.thisObject, "$cid") != 3)
                             || !launchManager.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
                             || !"pseudonymous".equals(XposedHelpers.getObjectField(hook.args[0], "e"))) return;
                 }

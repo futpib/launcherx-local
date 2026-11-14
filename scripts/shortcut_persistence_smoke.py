@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Reproduce stock cleanup during a compatibility gap and recover real native bindings."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -91,8 +92,11 @@ def gap(refused, apk, name):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--emulator-network", action="store_true", help="Use the ARM-on-x86 network fixture")
+    args = parser.parse_args()
     guard()
-    apk = ROOT / 'build/apps/launcherx-local.apk'
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     backup = '/data/local/tmp/launcherx-persistence-' + str(time.time_ns())
     root('am force-stop ' + TARGET)
     root('mkdir ' + backup)
@@ -116,7 +120,7 @@ def main():
         checks.append('Native chooser saved apps, media/custom keys and No action; checkpoint matches all assignments')
         print(checks[-1], flush=True)
         with tempfile.TemporaryDirectory(prefix='launcherx-refusal-') as directory:
-            refused = negative_apk(Path(directory), 'dex')
+            refused = negative_apk(Path(directory), 'dex', args.emulator_network)
             restored = gap(refused, apk, 'persistence-first')
             assert restored == original, (restored, original)
             checkpoint(original)
@@ -164,7 +168,7 @@ def main():
         root('restorecon -DRF ' + STORE)
         root('rm -rf ' + backup + ' ' + FIXTURE)
         adb('uninstall', APP)
-    report = {'result': 'passed', 'module_version': '0.21',
+    report = {'result': 'passed', 'module_version': json.loads((apk.parent / 'receipt.json').read_text())['version_name'],
               'apk_sha256': hashlib.sha256(apk.read_bytes()).hexdigest(), 'checks': checks,
               'limits': ['Real Google TV x86 emulator; receiver-injected events, not a physical remote',
                          'Compatibility refusal was forced on the installed launcher; no Play Store update was downloaded'],

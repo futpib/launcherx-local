@@ -35,6 +35,11 @@ def verify(directory):
         profile = archive.read("assets/compatibility-837595.json")
         assert profile == (ROOT / "module/assets/compatibility-837595.json").read_bytes()
         assert receipt["fingerprint_sha256"] == hashlib.sha256(profile).hexdigest()
+        assets = {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                  for path in (ROOT / 'module/assets').glob('compatibility-*.json')}
+        assert receipt['fingerprint_assets'] == assets
+        for name, expected in assets.items():
+            assert hashlib.sha256(archive.read('assets/' + name)).hexdigest() == expected
         assert archive.read("assets/xposed_init").decode().strip() == "local.launcherx.patch.LauncherPatch"
         assert not any(name.endswith((".apk", ".jar", ".keystore", ".jks")) for name in archive.namelist())
         assert not any(name.startswith("lib/") for name in archive.namelist()), "Expected a universal Java-only module"

@@ -122,7 +122,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         Method refreshDestinations = destinations.getDeclaredMethod("b");
         localHome.getDeclaredConstructor(Object.class);
         localHome.getDeclaredMethod(loader.pick("d", "c"));
-        futures.getDeclaredMethod(loader.pick("W", "ae", "r"), Object.class);
+        futures.getDeclaredMethod(loader.pick("W", "ae", "r", "n"), Object.class);
         cacheResult.getDeclaredMethod("a", Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
@@ -163,7 +163,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                             Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
                             home = XposedHelpers.callStaticMethod(cacheResult, "a", home, expiry);
                         }
-                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae", "r"), home);
+                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae", "r", "n"), home);
                         // The newer loader may use its prefetched future without calling d().
                         if (loader.modern && "a".equals(hook.method.getName())) {
                             result = XposedHelpers.newInstance(loader.loadClass("xhu"), result);

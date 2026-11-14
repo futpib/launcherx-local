@@ -104,11 +104,16 @@ def main():
                                         for name, digest in version["dex_sha256"]) + "}"
                             for version in versions)
     fingerprint_sha256 = hashlib.sha256((ROOT / "module/assets/compatibility-837595.json").read_bytes()).hexdigest()
+    fingerprint_assets = [[path.name, hashlib.sha256(path.read_bytes()).hexdigest()]
+                          for path in sorted((ROOT / 'module/assets').glob('compatibility-*.json'),
+                                             key=lambda path: int(path.stem.split('-')[-1]), reverse=True)]
     generated.write_text("package local.launcherx.patch;\npublic final class BuildConfig {\n"
                          "public static final long[] VERSIONS = {"
                          + ",".join(str(version["version_code"]) + "L" for version in versions) + "};\n"
                          + "public static final String[][][] PROFILE_HASHES = {" + profiles + "};\n"
                          + 'public static final String FINGERPRINT_SHA256 = "' + fingerprint_sha256 + '";\n'
+                         + 'public static final String[][] FINGERPRINT_ASSETS = {'
+                         + ','.join('{' + ','.join(map(json.dumps, item)) + '}' for item in fingerprint_assets) + '};\n'
                          f'public static final String MODE = "{args.mode}";\n'
                          f"public static final boolean APPS_ONLY = {str(args.mode == 'apps').lower()};\n"
                          f"public static final boolean EMULATOR_NETWORK = {str(args.emulator_network).lower()};\n"
@@ -141,6 +146,7 @@ def main():
         "version_name": version_name, "version_code": version_code,
         "emulator_network": args.emulator_network, "apk": str(output),
         "fingerprint_sha256": fingerprint_sha256,
+        "fingerprint_assets": dict(fingerprint_assets),
         "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
         "launcher_profiles": [{"version_code": version["version_code"],
                                "version_name": version["version_name"],

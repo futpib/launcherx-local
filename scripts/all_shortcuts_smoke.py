@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Test independent native bindings and restoration for the six remote buttons."""
+import argparse
 import hashlib
 import json
 import re
@@ -77,9 +78,12 @@ def restore(code, label, all_buttons=False, cancel=False):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--emulator-network", action="store_true", help="Use the ARM-on-x86 network fixture")
+    args = parser.parse_args()
     guard()
     zero_accounts()
-    apk = ROOT / 'build/apps/launcherx-local.apk'
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     backup = '/data/local/tmp/launcherx-buttons-backup-' + str(time.time_ns())
     root('am force-stop ' + TARGET)
     existed = root('test -d ' + STORE + ' && echo yes || echo no') == 'yes'

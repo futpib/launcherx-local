@@ -57,8 +57,8 @@ public final class Compatibility {
             }
         }
         if (version <= 837595) throw new IllegalStateException("Unsupported launcher version " + version);
-        Map<String, String> classes = HeuristicCompatibility.resolve(context, info.applicationInfo);
-        return remember(key, version, 837595, "heuristic", classes);
+        HeuristicCompatibility.Match match = HeuristicCompatibility.resolve(context, info.applicationInfo, version);
+        return remember(key, version, match.bindings, "heuristic", match.classes);
     }
 
     private static Result remember(String key, long version, long bindings, String mode, Map<String, String> classes) {

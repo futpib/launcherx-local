@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Exercise automatic activation, LSPosed disable, and compatibility refusal in the AVD."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -128,7 +129,7 @@ def open_setup(name, expected):
     assert not any(node.get('class') == 'android.widget.Switch' for node in nodes)
 
 
-def negative_apk(directory, kind):
+def negative_apk(directory, kind, emulator_network=False):
     shutil.copytree(ROOT / 'module', directory / 'module')
     (directory / 'scripts').mkdir()
     shutil.copy2(ROOT / 'scripts/build.py', directory / 'scripts/build.py')
@@ -147,21 +148,24 @@ def negative_apk(directory, kind):
     else:
         # Remove the newest exact profile to exercise structural matching on the real APK.
         config['additional_versions'] = [item for item in profiles[1:] if item['version_code'] < 837595]
-        profile_path = directory / 'module/assets/compatibility-837595.json'
-        profile = json.loads(profile_path.read_text())
-        if kind == 'heuristic-mismatch':
-            profile['classes']['isa']['code'] = '0' * 64
-        profile_path.write_text(json.dumps(profile))
+        for profile_path in (directory / 'module/assets').glob('compatibility-*.json'):
+            profile = json.loads(profile_path.read_text())
+            if kind == 'heuristic-mismatch':
+                profile['classes']['isa']['code'] = '0' * 64
+            profile_path.write_text(json.dumps(profile))
     (directory / 'compatibility.json').write_text(json.dumps(config))
-    subprocess.run(['python3', str(directory / 'scripts/build.py')], check=True)
-    return directory / 'build/apps/launcherx-local.apk'
+    subprocess.run(['python3', str(directory / 'scripts/build.py'), *(['--emulator-network'] if emulator_network else [])], check=True)
+    return directory / 'build' / ('apps-emulator' if emulator_network else 'apps') / 'launcherx-local.apk'
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--emulator-network", action="store_true", help="Use the ARM-on-x86 network fixture")
+    args = parser.parse_args()
     guard()
     zero_accounts()
     version = int(re.search(r'versionCode=(\d+)', shell('dumpsys package ' + TARGET))[1])
-    apk = ROOT / 'build/apps/launcherx-local.apk'
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     print(adb('install', '--no-incremental', '-r', apk), flush=True)
     checks = []
     try:
@@ -193,7 +197,7 @@ def main():
         cases = [('dex', 'Code mismatch: classes.dex')]
         if version > 837595:
             with tempfile.TemporaryDirectory(prefix='launcherx-heuristic-') as directory:
-                matched = negative_apk(Path(directory), 'heuristic')
+                matched = negative_apk(Path(directory), 'heuristic', args.emulator_network)
                 basic_fixture()
                 print(adb('install', '--no-incremental', '-r', matched), flush=True)
                 adb('logcat', '-c')
@@ -206,7 +210,7 @@ def main():
             cases.insert(0, ('heuristic-mismatch', 'Heuristic mismatch'))
         for kind, expected in cases:
             with tempfile.TemporaryDirectory(prefix='launcherx-negative-') as directory:
-                bad = negative_apk(Path(directory), kind)
+                bad = negative_apk(Path(directory), kind, args.emulator_network)
                 basic_fixture()
                 print(adb('install', '--no-incremental', '-r', bad), flush=True)
                 adb('logcat', '-c')

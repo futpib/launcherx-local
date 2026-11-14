@@ -77,6 +77,45 @@ class FingerprintTest(unittest.TestCase):
         self.assertIn('root=b', result)
         self.assertIn('leaf=d', result)
 
+    def test_method_contract_survives_unrelated_members_but_rejects_target_changes(self):
+        source = ('public class NAME { public NAME(Object x) {} public int used(int x) { return x + 3; } '
+                  'public int unrelated() { return 7; } }')
+        old = self.fixture('contract-old', {'a': source.replace('NAME', 'a')})
+        selection = '<init>(Ljava/lang/Object;)V,used'
+        shape, code, _ = self.fingerprints(old, ['a#' + selection])['La;']
+        rows = [['target', shape, code, '', selection]]
+        updated = source.replace('return 7', 'return 19').replace('public int unrelated()',
+                    'public NAME(String x) {} public int added() { return 5; } public int unrelated()')
+        new = self.fixture('contract-new', {'b': updated.replace('NAME', 'b')})
+        self.assertIn('target=b', self.match(new, rows))
+        for index, changed in enumerate([updated.replace('x + 3', 'x + 4'),
+                                         updated.replace('int used(int x)', 'int used(long x)').replace('x + 3', '(int) x + 3'),
+                                         updated.replace('public class NAME {', 'public class NAME { public int state;')]):
+            apk = self.fixture('contract-changed-' + str(index), {'b': changed.replace('NAME', 'b')})
+            self.assertIn('Heuristic mismatch', self.match(apk, rows, False))
+        ambiguous = self.fixture('contract-ambiguous', {n: updated.replace('NAME', n) for n in ['b', 'c']})
+        self.assertIn('Ambiguous heuristic', self.match(ambiguous, rows, False))
+
+    def test_missing_targets_are_reported_together_in_stable_order(self):
+        apk = self.fixture('missing-targets', {'a': 'public class a {}'})
+        result = self.match(apk, [[n, '0' * 64, '0' * 64, ''] for n in ['zeta', 'alpha']], False)
+        self.assertIn('missing targets [alpha, zeta]', result)
+
+    def test_selected_methods_keep_cross_class_reference_constraints(self):
+        old = self.fixture('contract-graph-old', {
+            'a': 'public class a { public c target; public int used() { return 3; } }',
+            'c': 'public class c {}'})
+        values = self.fingerprints(old, ['a#used', 'c'])
+        shape, code, refs = values['La;']
+        rows = [['root', shape, code, str(refs.split(',').index('Lc;')) + ':leaf', 'used'],
+                ['leaf', *values['Lc;'][:2], '', '']]
+        new = self.fixture('contract-graph-new', {
+            'b': 'public class b { public d target; public int used() { return 3; } public void added() {} }',
+            'd': 'public class d {}', 'e': 'public class e {}'})
+        result = self.match(new, rows)
+        self.assertIn('root=b', result)
+        self.assertIn('leaf=d', result)
+
     def test_strings_static_values_and_exception_handlers_affect_fingerprint(self):
         source = ('public class NAME { public static final int NUMBER = 7; '
                   'public String value(int x) { try { return "anchor" + (3 / x); } '
@@ -114,7 +153,7 @@ class FingerprintTest(unittest.TestCase):
     def test_reviewed_versions_and_complete_profile_are_retained(self):
         profiles = json.loads((ROOT / 'compatibility.json').read_text())
         versions = [profiles, *profiles['additional_versions']]
-        self.assertEqual({702401, 835645, 837595}, {item['version_code'] for item in versions})
+        self.assertEqual({702401, 835645, 837595, 841183}, {item['version_code'] for item in versions})
         profile = json.loads((ROOT / 'module/assets/compatibility-837595.json').read_text())
         self.assertEqual(profile['binding_version'], 837595)
         self.assertGreaterEqual(len(profile['classes']), 86)
@@ -123,3 +162,8 @@ class FingerprintTest(unittest.TestCase):
         for value in profile['classes'].values():
             self.assertEqual(len(value['code']), 64)
             self.assertTrue(set(value['links'].values()) <= profile['classes'].keys())
+        latest = json.loads((ROOT / 'module/assets/compatibility-841183.json').read_text())
+        self.assertEqual(latest['binding_version'], 841183)
+        self.assertEqual(latest['format'], 2)
+        self.assertEqual(set(latest['classes']), set(profile['classes']))
+        self.assertEqual(latest['classes']['hsx']['methods'], ['<init>(Ljava/lang/Object;)V', 'a', 'b', 'c', 'd', 'e'])

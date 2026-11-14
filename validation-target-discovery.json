@@ -1,0 +1,221 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-14",
+  "module_version": "0.22",
+  "production_apk_sha256": "49a2d9a2ee4f0cc5a7e1d5fdc2da7c10d542982e162fdbaca41c6bbf1619f9ef",
+  "emulator_apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+  "fingerprint_assets": {
+    "compatibility-841183.json": "810b7dedbad7ae66e63558cb88345bd684fd0fb66f4da91708de8a846344fead",
+    "compatibility-837595.json": "5ad5f99267b115f271017810e8af3ea51d27a1c228ee0e2a81db5ec054566700"
+  },
+  "launcher": {
+    "version_name": "1.0.1018641540",
+    "version_code": 841183,
+    "base_apk_sha256": "22f23f5f5e831aade46a6808ba8f9834cab8bb1eb4459e62ca52e95a0743ed44",
+    "signer_sha256": "5202f9072a0f75c831b2296428755df2548296947d11804e7579a934a5f700ae",
+    "source": "Original Google-signed base and split APKs pulled from the physical TV"
+  },
+  "host_checks": [
+    "16 CI unit tests passed",
+    "Production APK manifest, signature, profiles and receipt verified",
+    "Old 837595 and new 841183 original APKs each matched all 86 targets with their own profile",
+    "New discovery report matched all 86 targets; old profile correctly reported 52 missing on 841183",
+    "Typed provider path and renderer signature each had exactly one match in all four reviewed original DEX builds",
+    "Python compilation and git diff whitespace checks passed"
+  ],
+  "member_contracts": [
+    {
+      "version": 702401,
+      "provider_paths": [
+        [
+          "at",
+          "c"
+        ]
+      ],
+      "render_methods": [
+        "w"
+      ]
+    },
+    {
+      "version": 835645,
+      "provider_paths": [
+        [
+          "ar",
+          "c"
+        ]
+      ],
+      "render_methods": [
+        "w"
+      ]
+    },
+    {
+      "version": 837595,
+      "provider_paths": [
+        [
+          "ar",
+          "c"
+        ]
+      ],
+      "render_methods": [
+        "w"
+      ]
+    },
+    {
+      "version": 841183,
+      "provider_paths": [
+        [
+          "aq",
+          "c"
+        ]
+      ],
+      "render_methods": [
+        "x"
+      ]
+    }
+  ],
+  "emulator": {
+    "fixture": "Guarded launcherx_local14 Google TV API 34 x86 AVD; original ARM launcher with translation and the emulator-only network adapter",
+    "launcher_version_code": 841183,
+    "suites": {
+      "content": {
+        "result": "passed",
+        "module_version": "0.22",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "emulator_network": true,
+        "accounts": 0,
+        "checks": [
+          "empty providers keep apps-only Home",
+          "all existing preview channels enabled automatically on first discovery",
+          "remote-controlled setup chooser hides only the selected preview channel",
+          "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
+          "DPAD opens both provider deep links with extras intact",
+          "non-film Watch Next clip renders and opens through native resume card",
+          "provider updates refresh visible Home without a process restart",
+          "updated resume position and playback extras",
+          "deletions made while away are reflected on Home resume",
+          "channel visibility changes remove and restore rows live",
+          "newly published channel enabled and rendered live without reviving hidden channels",
+          "external channel hide survives launcher restart",
+          "rows and playback links work with launcher IPv4/IPv6 egress blocked",
+          "populated rows and explicit channel hides survive emulator reboot",
+          "deleting the last entries removes empty rows live"
+        ],
+        "physical_tv_tested": false,
+        "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback"
+      },
+      "profile": {
+        "result": "passed",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "checks": [
+          "first-run Incognito default and native chooser entry",
+          "native DPAD Incognito selection returns to Home",
+          "native Add account launches real Google Play Services sign-in",
+          "cancelled sign-in leaves Incognito selected and creates no account",
+          "Incognito selection survives launcher restart",
+          "Incognito selection and chooser survive emulator reboot",
+          "no launcher fatal exception in uninterrupted remote sequences"
+        ],
+        "accounts": 0,
+        "physical_tv_tested": false,
+        "authenticated_google_roundtrip_tested": false,
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      },
+      "all-shortcuts": {
+        "result": "passed",
+        "module_version": "0.22",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "checks": [
+          "Star: native long-press chooser saves and short press launches TV Bro",
+          "YouTube: native long-press chooser saves and short press launches TV Bro",
+          "Netflix: native long-press chooser saves and short press launches TV Bro",
+          "Prime Video: native long-press chooser saves and short press launches TV Bro",
+          "Live TV: native long-press chooser saves and short press launches TV Bro",
+          "Xiaomi TV+: native long-press chooser saves and short press launches TV Bro",
+          "All six native assignments survive launcher process restart",
+          "Cancelling restoration keeps the custom assignment",
+          "Restoring YouTube returns its native action and preserves the other five bindings",
+          "A cancelled key-up does not launch a saved app",
+          "Restore all clears custom bindings, restores native star/YouTube and selects OEM fallback paths"
+        ],
+        "physical_tv_tested": false,
+        "accounts": 0,
+        "limitations": [
+          "KeyEvent receiver injection does not exercise the physical remote or Xiaomi bridge.",
+          "OEM default branches were selected; actual Xiaomi app/fallback launches require the TV.",
+          "Authenticated and managed-profile paths were not exercised."
+        ],
+        "cleanup": "Previous native shortcut store restored; test helper removed."
+      },
+      "setup": {
+        "result": "passed",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "checks": [
+          "Basic TV automatically becomes Incognito Home when the module loads",
+          "disabling in LSPosed and restarting restores stock signed-out setup UI with zero accounts",
+          "re-enabling in LSPosed and restarting automatically restores Incognito Home",
+          "settings app has only Choose app content and passive compatibility status",
+          "real launcher activates through the heuristic path with its exact profile withheld",
+          "heuristic-mismatch mismatch refuses hooks, automatic activation and channel changes",
+          "dex mismatch refuses hooks, automatic activation and channel changes"
+        ],
+        "physical_tv_tested": false,
+        "fixture": "isolated emulator; actual LSPosed UI; negative module metadata variants"
+      },
+      "persistence": {
+        "result": "passed",
+        "module_version": "0.22",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "checks": [
+          "Native chooser saved apps, media/custom keys and No action; checkpoint matches all assignments",
+          "Real unhooked Home pruned OEM/YouTube bindings; restoring module recovered every action and survived restart",
+          "Recovered apps launch; custom keys and Play/Pause reach the fixture; No action stays inert",
+          "An individually restored default is not resurrected after another compatibility gap",
+          "Restore all clears the checkpoint actions and remains reset across stock cleanup"
+        ],
+        "limits": [
+          "Real Google TV x86 emulator; receiver-injected events, not a physical remote",
+          "Compatibility refusal was forced on the installed launcher; no Play Store update was downloaded"
+        ],
+        "cleanup": "Original native store and independent checkpoint restored; test fixtures removed"
+      },
+      "ambient": {
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "result": "passed",
+        "checks": [
+          "Android cursor probe preserves identity, locks, extras and other account modes",
+          "ordinary root caller still sees mode 2; unauthorized shell query remains rejected",
+          "native Ambient menu opens with Start now and Settings, without setup error",
+          "native Start now binds the real Backdrop dream service",
+          "Home exits the screensaver and returns to Incognito with unchanged account state"
+        ],
+        "physical_tv_tested": false,
+        "limit": "Full settings editor needs valid Cast device credentials; tested separately on TV."
+      },
+      "final-smoke": {
+        "result": "passed",
+        "apk_sha256": "1584a5981ee0ed705ad94069e53f6d0d94021161e374a9bb989f94c74f56ae76",
+        "accounts": 0,
+        "reboot": false,
+        "emulator_network": true,
+        "checks": [
+          "clean official Home",
+          "native DPAD app launch",
+          "Home return",
+          "process restart",
+          "no launcher fatal exception"
+        ],
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      }
+    }
+  },
+  "physical_tv_record": "validation-tv-target-discovery.json",
+  "limits": [
+    "Future updates can still require review if required bodies, member names, layouts or resources change",
+    "Heuristic activation uses the real current launcher with its exact version profile withheld; unrelated-method drift and ambiguity are separately exercised by host fixtures",
+    "Older builds were checked by original DEX matching and member discovery; their runtime suites were not rerun in this update",
+    "No authenticated Google account round trip or physical remote presses were tested",
+    "Content mutation, network isolation, reboot and reset tests use the emulator; physical-device checks are recorded separately"
+  ],
+  "cleanup": "Emulator native shortcut store and checkpoint restored; test helpers removed; content fixture removed and pre-existing channel visibility restored",
+  "evidence_directory": "artifacts/target-discovery-20261114"
+}

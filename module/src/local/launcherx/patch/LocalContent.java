@@ -53,6 +53,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
     private final Runnable refresh = this::load;
     private Handler worker;
     private Object provider;
+    private final java.lang.reflect.Field[] providerPath;
     private boolean foreground;
     private List<Object> rows = Collections.emptyList();
 
@@ -63,7 +64,8 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         Class<?> row = loader.loadClass("lfs"), proto = loader.loadClass("aagk");
         rowConstructor = row.getConstructor(String.class, proto, loader.loadClass("wyc"));
         rowsConstructor = loader.loadClass("lft").getConstructor(List.class);
-        render = loader.loadClass("igc").getDeclaredMethod("w", loader.loadClass("lft"), boolean.class);
+        render = MemberTargets.method(loader.loadClass("igc"), void.class, false, loader.loadClass("lft"), boolean.class);
+        providerPath = MemberTargets.fieldPath(loader.loadClass("igc"), loader.loadClass("lji"));
         watchConverter = loader.loadClass("lhj").getMethod("a", Context.class,
                 loader.loadClass("abbc"), loader.loadClass("aaug"), loader.loadClass("aahl"));
         previewColumns = (String[]) XposedHelpers.getStaticObjectField(loader.loadClass("ljh"), "a");
@@ -95,7 +97,11 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
 
     private void start(Object tab) {
         Log.i(TAG, "observing local Watch Next and preview providers");
-        provider = XposedHelpers.getObjectField(XposedHelpers.getObjectField(tab, loader.pick("at", "ar")), "c");
+        try {
+            provider = providerPath[1].get(providerPath[0].get(tab));
+        } catch (ReflectiveOperationException error) {
+            throw new IllegalStateException("Cannot resolve local preview provider", error);
+        }
         HandlerThread thread = new HandlerThread("LauncherXLocalContent");
         thread.start();
         worker = new Handler(thread.getLooper());
@@ -133,7 +139,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         try {
             List<Object> cards = watchCards();
             if (!cards.isEmpty()) result.add(row("launcherx-local:watch-next",
-                    context.getString(loader.pick(0x7f140654, 2132018634, 0x7f1405cd)), cards, false));
+                    context.getString(loader.pick(0x7f140654, 2132018634, 0x7f1405cd, 0x7f1405d5)), cards, false));
         } catch (Throwable error) {
             Log.w(TAG, "Watch Next unavailable; keeping app rows", error);
         }
@@ -157,7 +163,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
                         continue;
                     }
                     // Calling through the hooked method preserves the native row diff/focus logic.
-                    XposedHelpers.callMethod(tab.getKey(), "w", tab.getValue(), false);
+                    render.invoke(tab.getKey(), tab.getValue(), false);
                 } catch (Throwable error) {
                     Log.w(TAG, "Local row refresh failed", error);
                 }
@@ -282,7 +288,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         set(row, "e", title); set(row, "o", id);
         set(row, "c", preview ? 24 : 11);
         set(row, "d", defaultValue(preview ? "abbi" : "aaff"));
-        XposedHelpers.callMethod(row, loader.pick("bg", "bc", "be"), cards);
+        XposedHelpers.callMethod(row, loader.pick("bg", "bc", "be", "bd"), cards);
         return rowConstructor.newInstance(id, finish(row), null);
     }
 

@@ -67,6 +67,29 @@
           "992c1a21befa23eebe7f902a4d04125eb91ebcdf12166c9d13b5670d635cc035"
         ]
       ]
+    },
+    {
+      "version_name": "1.0.1018641540",
+      "version_code": 841183,
+      "apk_sha256": "22f23f5f5e831aade46a6808ba8f9834cab8bb1eb4459e62ca52e95a0743ed44",
+      "dex_sha256": [
+        [
+          "classes.dex",
+          "c92cb198ad704a8c466246b1c2bc3e12007944b4399efa8258eb8a3458f2f8b8"
+        ],
+        [
+          "classes2.dex",
+          "3c476138bb55c3cc6fe6ccddb808854a008e00bd460e77837e440d291f72b47f"
+        ],
+        [
+          "classes3.dex",
+          "328b6824c321db80309303a3e2e8534cb3f0f763cfeae6d4c5403b6387890885"
+        ],
+        [
+          "classes4.dex",
+          "59dc41d5c4a44087a62a8aea0549ea580acd76a2759e60e045dd04743f3501f6"
+        ]
+      ]
     }
   ]
 }

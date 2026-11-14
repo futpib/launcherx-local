@@ -28,6 +28,11 @@ final class DexFingerprint {
     }
 
     static Map<String, Node> read(String[] paths, Set<String> shapes, Set<String> names) throws Exception {
+        return read(paths, shapes, names, Collections.singletonMap("", Collections.emptySet()));
+    }
+
+    static Map<String, Node> read(String[] paths, Set<String> shapes, Set<String> names,
+            Map<String, Set<String>> selections) throws Exception {
         Map<String, Node> result = new HashMap<>();
         Set<String> seen = new HashSet<>();
         long total = 0;
@@ -48,7 +53,7 @@ final class DexFingerprint {
                         out.write(buffer, 0, count);
                     }
                 }
-                new Reader(out.toByteArray()).classes(result, shapes, names, seen);
+                new Reader(out.toByteArray()).classes(result, shapes, names, seen, selections);
             }
         }
         return result;
@@ -64,6 +69,10 @@ final class DexFingerprint {
 
     static Map<String, String> match(Map<String, DexFingerprint.Node> nodes, Map<String, Set<String>> candidates,
             Map<String, Map<Integer, String>> links) {
+        List<String> missing = new ArrayList<>();
+        for (String alias : candidates.keySet()) if (candidates.get(alias).isEmpty()) missing.add(alias);
+        Collections.sort(missing);
+        if (!missing.isEmpty()) throw new IllegalStateException("Heuristic mismatch: missing targets " + missing);
         boolean changed;
         do {
             changed = false;
@@ -72,14 +81,18 @@ final class DexFingerprint {
                 for (Map.Entry<Integer, String> edge : links.get(alias).entrySet()) {
                     Set<String> targets = candidates.get(edge.getValue());
                     if (targets == null) throw new IllegalStateException("Unknown fingerprint link");
+                    Set<String> targetNames = new HashSet<>();
+                    for (String target : targets) targetNames.add(nodes.get(target).name);
                     Set<String> possible = new HashSet<>();
                     for (Iterator<String> it = sources.iterator(); it.hasNext();) {
                         DexFingerprint.Node node = nodes.get(it.next()); int index = edge.getKey();
-                        if (index < 0 || index >= node.references.size() || !targets.contains(node.references.get(index))) {
+                        if (index < 0 || index >= node.references.size() || !targetNames.contains(node.references.get(index))) {
                             it.remove(); changed = true;
                         } else possible.add(node.references.get(index));
                     }
-                    if (targets.retainAll(possible)) changed = true;
+                    for (Iterator<String> it = targets.iterator(); it.hasNext();) {
+                        if (!possible.contains(nodes.get(it.next()).name)) { it.remove(); changed = true; }
+                    }
                 }
                 if (sources.isEmpty()) throw new IllegalStateException("Heuristic mismatch: " + alias);
             }
@@ -87,7 +100,7 @@ final class DexFingerprint {
         Map<String, String> result = new HashMap<>(); Set<String> used = new HashSet<>();
         for (Map.Entry<String, Set<String>> entry : candidates.entrySet()) {
             if (entry.getValue().size() != 1) throw new IllegalStateException("Ambiguous heuristic target: " + entry.getKey());
-            String name = entry.getValue().iterator().next();
+            String name = nodes.get(entry.getValue().iterator().next()).name;
             if (!used.add(name)) throw new IllegalStateException("Heuristic targets overlap");
             result.put(entry.getKey(), name.substring(1, name.length() - 1).replace('/', '.'));
         }
@@ -192,6 +205,13 @@ final class DexFingerprint {
             int p = methods + 8 * index;
             out.type(types[u16(p)]); out.add(strings[u32(p + 4)]); proto(out, u16(p + 2));
         }
+        String signature(int index) {
+            int p = methods + 8 * index, proto = protos + 12 * u16(p + 2);
+            StringBuilder name = new StringBuilder(strings[u32(p + 4)]).append('(');
+            int offset = u32(proto + 8), count = offset == 0 ? 0 : u32(offset);
+            for (int i = 0; i < count; i++) name.append(types[u16(offset + 4 + i * 2)]);
+            return name.append(')').append(types[u32(proto + 4)]).toString();
+        }
         void value(Part out, Cursor c, int depth) {
             if (depth > 32) throw new IllegalStateException("Deep DEX value");
             int header = data[c.p++] & 255, kind = header & 31, arg = header >>> 5;
@@ -260,52 +280,67 @@ final class DexFingerprint {
                     || op >= 0x2d && op <= 0x6d || op >= 0x90 && op <= 0xaf || op >= 0xd0) return 2;
             return 1;
         }
-        void classes(Map<String, Node> result, Set<String> wantedShapes, Set<String> wantedNames, Set<String> seen) throws Exception {
+        void classes(Map<String, Node> result, Set<String> wantedShapes, Set<String> wantedNames, Set<String> seen,
+                Map<String, Set<String>> selections) throws Exception {
             int count = u32(96), offset = u32(100);
             for (int i = 0; i < count; i++) {
                 int p = offset + i * 32; String name = types[u32(p)];
                 if (!seen.add(name)) throw new IllegalStateException("Duplicate DEX class " + name);
+                if (wantedNames != null && !wantedNames.contains(name)) continue;
                 Part header = new Part(name); header.add(u32(p + 4));
                 if (u32(p + 8) != -1) header.type(types[u32(p + 8)]);
                 typeList(header, u32(p + 12));
                 int classData = u32(p + 24), statics = u32(p + 28);
-                List<Part> declarations = new ArrayList<>(); List<int[]> bodies = new ArrayList<>();
+                List<Part> fieldsOnly = new ArrayList<>(); List<int[]> bodies = new ArrayList<>();
                 if (classData != 0) {
                     Cursor c = new Cursor(classData);
                     int sf = c.leb(), inf = c.leb(), dm = c.leb(), vm = c.leb();
                     for (int n : new int[]{sf, inf}) {
                         int index = 0;
-                        for (int j = 0; j < n; j++) { index += c.leb(); Part f = new Part(name); f.add("field"); f.add(c.leb()); field(f, index); declarations.add(f); }
+                        for (int j = 0; j < n; j++) { index += c.leb(); Part f = new Part(name); f.add("field"); f.add(c.leb()); field(f, index); fieldsOnly.add(f); }
                     }
                     for (int n : new int[]{dm, vm}) {
                         int index = 0;
                         for (int j = 0; j < n; j++) {
                             index += c.leb(); int flags = c.leb(), body = c.leb();
-                            Part m = new Part(name); m.add("method"); m.add(flags); method(m, index); declarations.add(m);
                             bodies.add(new int[]{index, flags, body});
                         }
                     }
                 }
-                Collections.sort(declarations); Part shape = new Part(name); shape.append(header);
-                for (Part member : declarations) shape.append(member);
-                String shapeHash = hash(shape.text.toString());
-                if (wantedNames != null && !wantedNames.contains(name) || wantedShapes != null && !wantedShapes.contains(shapeHash)) continue;
-                try {
-                    List<Part> implementations = new ArrayList<>();
+                for (Map.Entry<String, Set<String>> selection : selections.entrySet()) {
+                    List<Part> declarations = new ArrayList<>(fieldsOnly);
+                    List<int[]> selectedBodies = new ArrayList<>(); Set<String> found = new HashSet<>();
                     for (int[] body : bodies) {
-                        Part m = new Part(name); method(m, body[0]); m.add(body[1]); code(m, body[2]); implementations.add(m);
+                        String methodName = strings[u32(methods + 4 + 8 * body[0])];
+                        String signature = signature(body[0]);
+                        if (!selection.getValue().isEmpty() && !selection.getValue().contains(methodName)
+                                && !selection.getValue().contains(signature)) continue;
+                        found.add(methodName); found.add(signature); selectedBodies.add(body);
+                        Part m = new Part(name); m.add("method"); m.add(body[1]); method(m, body[0]); declarations.add(m);
                     }
-                    Collections.sort(implementations); Part all = new Part(name); all.append(shape);
-                    for (Part body : implementations) all.append(body);
-                    if (statics != 0) {
-                        Cursor c = new Cursor(statics); int size = c.leb(); all.add(size);
-                        for (int j = 0; j < size; j++) value(all, c, 0);
+                    if (!found.containsAll(selection.getValue())) continue;
+                    Collections.sort(declarations); Part shape = new Part(name); shape.append(header);
+                    for (Part member : declarations) shape.append(member);
+                    String shapeHash = hash(shape.text.toString());
+                    if (wantedShapes != null && !wantedShapes.contains(shapeHash)) continue;
+                    try {
+                        List<Part> implementations = new ArrayList<>();
+                        for (int[] body : selectedBodies) {
+                            Part m = new Part(name); method(m, body[0]); m.add(body[1]); code(m, body[2]); implementations.add(m);
+                        }
+                        Collections.sort(implementations); Part all = new Part(name); all.append(shape);
+                        for (Part body : implementations) all.append(body);
+                        if (statics != 0) {
+                            Cursor c = new Cursor(statics); int size = c.leb(); all.add(size);
+                            for (int j = 0; j < size; j++) value(all, c, 0);
+                        }
+                        String key = selection.getKey().isEmpty() ? name : name + "#" + selection.getKey();
+                        if (result.put(key, new Node(name, shapeHash, hash(all.text.toString()), all.refs)) != null)
+                            throw new IllegalStateException("Duplicate DEX class " + name);
+                    } catch (IllegalStateException unsupported) {
+                        if (wantedNames != null) throw unsupported;
+                        // Unsupported instruction formats cannot become heuristic candidates.
                     }
-                    if (result.put(name, new Node(name, shapeHash, hash(all.text.toString()), all.refs)) != null)
-                        throw new IllegalStateException("Duplicate DEX class " + name);
-                } catch (IllegalStateException unsupported) {
-                    if (wantedNames != null) throw unsupported;
-                    // Unsupported instruction formats cannot become heuristic candidates.
                 }
             }
         }

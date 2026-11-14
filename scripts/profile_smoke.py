@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Exercise native Incognito selection and Google sign-in cancellation in the AVD."""
+import argparse
 import hashlib
 import json
 import re
@@ -64,9 +65,12 @@ def check_logs(name):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--emulator-network", action="store_true", help="Use the ARM-on-x86 network fixture")
+    args = parser.parse_args()
     guard()
     zero_accounts()
-    apk = ROOT / 'build/apps/launcherx-local.apk'
+    apk = ROOT / 'build' / ('apps-emulator' if args.emulator_network else 'apps') / 'launcherx-local.apk'
     print(adb('install', '--no-incremental', '-r', apk), flush=True)
     root('am force-stop ' + TARGET)
     # Reset only the new module preference to exercise its first-run default.

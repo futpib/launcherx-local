@@ -1,0 +1,68 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-14",
+  "module_version": "0.22",
+  "production_apk_sha256": "49a2d9a2ee4f0cc5a7e1d5fdc2da7c10d542982e162fdbaca41c6bbf1619f9ef",
+  "device": {
+    "model": "MiTV-MOEU0",
+    "android": 14,
+    "architecture": "ARM32",
+    "launcher_version_name": "1.0.1018641540",
+    "launcher_version_code": 841183
+  },
+  "update": {
+    "installer": "com.android.vending",
+    "last_update_local": "2026-11-14 08:27:45 UTC+04:00",
+    "previous_module_version": "0.21",
+    "failure": "Heuristic mismatch: fyt",
+    "old_profile_missing_targets": 52,
+    "required_targets": 86
+  },
+  "checks": [
+    "Production module installed and device APK hash verified",
+    "Both Home processes loaded reviewed 841183 hooks",
+    "Incognito Home rendered apps, Continue watching and app-published local rows; 10 content rows in logs",
+    "Native profile chooser opened and Incognito selection returned to Home",
+    "Injected YouTube long press opened the extended native shortcut chooser",
+    "Injected Netflix long press traversed the Xiaomi bridge and showed the saved Space assignment",
+    "Native Add apps opened the chooser with Google Play, Obtainium, F-Droid and Aurora",
+    "DPAD launched TV Bro from the native app row",
+    "Ambient settings menu opened with Start now and Settings",
+    "All six saved assignments matched the original checkpoint after restoration and launcher restart",
+    "Recovered Xiaomi TV+ shortcut launched TV Bro through the reviewed app-launch callback",
+    "No new patch refusals, launcher fatal exceptions or local-content errors in captured validation logs"
+  ],
+  "bindings": {
+    "restored_keys": [
+      313,
+      190,
+      193,
+      194,
+      351,
+      352
+    ],
+    "before_native_sha256": "c56a3ce710e8432abae0c555f46511ff44cb5fa45744c58187b912daff1f3a50",
+    "checkpoint_before_sha256": "20e725ce3484b3b40c0f54a70317f6923fec8f816567199ce66aca7ac4ed90df",
+    "after_native_sha256": "3c5161bec679e429378f383d7708095965f457086714b78df7932199def82735"
+  },
+  "later_saved_change": {
+    "button": "YouTube",
+    "before": "org.smarttube.beta",
+    "after": "app.smarttube.fdroid",
+    "observation": "After the six restored assignments survived restart, a new YouTube assignment was saved in both the native store and checkpoint; the newer value was retained. Other five assignments remained unchanged."
+  },
+  "cleanup": {
+    "original_smarttube_task_observed_resumed": 611,
+    "temporary_ui_dump_removed": true,
+    "native_and_checkpoint_assignments_match": true,
+    "checkpoint_after_sha256": "732f27e335d8b27f9ee0a48c4bc0e351ebf57363b450e7e4a297cc286d80092c",
+    "tv_rebooted": false
+  },
+  "limits": [
+    "Inputs were injected through ADB; physical remote presses and audible playback were not tested",
+    "No authenticated Google account round trip, prolonged standby or TV reboot was tested",
+    "Full content mutation, compatibility refusal and reset suites ran only in the emulator",
+    "Future updates can still require review when required code, members or resources change"
+  ],
+  "evidence_directory": "artifacts/target-discovery-20261114"
+}
