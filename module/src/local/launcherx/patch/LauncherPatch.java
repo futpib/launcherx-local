@@ -107,10 +107,10 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         Class<?> instant = loader.loadClass("j$.time.Instant");
         Class<?> channels = loader.loadClass("lft");
         Class<?> profileObserver = loader.loadClass("idj");
-        Method profile = profileObserver.getDeclaredMethod("b", Object.class);
-        Method theme = activityPeer.getDeclaredMethod("x", String.class);
-        Method showHome = rootPeer.getDeclaredMethod(loader.pick("h", "f"), boolean.class);
-        Method appsOnly = appsOnlyObserver.getDeclaredMethod("b", Object.class);
+        Method profile = profileObserver.getDeclaredMethod(loader.member("idj", "profile_update", "b"), Object.class);
+        Method theme = activityPeer.getDeclaredMethod(loader.member("isa", "theme", "x"), String.class);
+        Method showHome = rootPeer.getDeclaredMethod(loader.member("isn", "show_home", loader.pick("h", "f")), boolean.class);
+        Method appsOnly = appsOnlyObserver.getDeclaredMethod(loader.member("isf", "update", "b"), Object.class);
         Method recovery = accountCallback.getDeclaredMethod("apply", Object.class);
         rootPeer.getDeclaredField(loader.member("isn", "anonymous_flag", loader.pick("r", "u")));
         rootPeer.getDeclaredField(loader.member("isf", "apps_only_flag", loader.pick("A", "w")));
@@ -122,11 +122,11 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         localHome.getDeclaredConstructor(Object.class);
         localHome.getDeclaredMethod(loader.member("hsx", "destination", loader.pick("d", "c")));
         futures.getDeclaredMethod(loader.member("xgr", "immediate", loader.pick("W", "ae", "r", "n")), Object.class);
-        cacheResult.getDeclaredMethod("a", Object.class, instant);
+        cacheResult.getDeclaredMethod(loader.member("vuw", "cache", "a"), Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
         if (loader.modern) {
-            destinations.getDeclaredMethod("a");
+            destinations.getDeclaredMethod(loader.member("lhw", "prefetch", "a"));
             loader.loadClass("xhu").getDeclaredConstructor(loader.loadClass("xje"));
         }
         LocalContent content = BuildConfig.APPS_ONLY ? new LocalContent(context, loader, this::anonymous) : null;
@@ -158,13 +158,13 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                         if (!anonymous()) return;
                         Object factory = localHome.getConstructor(Object.class).newInstance(context);
                         Object home = XposedHelpers.callMethod(factory, loader.member("hsx", "destination", loader.pick("d", "c")));
-                        if (!"b".equals(hook.method.getName())) {
+                        if (!refreshDestinations.equals(hook.method)) {
                             Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
-                            home = XposedHelpers.callStaticMethod(cacheResult, "a", home, expiry);
+                            home = XposedHelpers.callStaticMethod(cacheResult, loader.member("vuw", "cache", "a"), home, expiry);
                         }
                         Object result = XposedHelpers.callStaticMethod(futures, loader.member("xgr", "immediate", loader.pick("W", "ae", "r", "n")), home);
                         // The newer loader may use its prefetched future without calling d().
-                        if (loader.modern && "a".equals(hook.method.getName())) {
+                        if (loader.modern && hook.method.getName().equals(loader.member("lhw", "prefetch", "a"))) {
                             result = XposedHelpers.newInstance(loader.loadClass("xhu"), result);
                         }
                         hook.setResult(result);
@@ -174,7 +174,7 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                 hooks.add(XposedBridge.hookMethod(loadDestinations, localDestinations));
                 hooks.add(XposedBridge.hookMethod(refreshDestinations, localDestinations));
                 if (loader.modern) hooks.add(XposedBridge.hookMethod(
-                        destinations.getDeclaredMethod("a"), localDestinations));
+                        destinations.getDeclaredMethod(loader.member("lhw", "prefetch", "a")), localDestinations));
                 XC_MethodHook appsChannelOnly = new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam hook) throws Throwable {
                         if (!anonymous() || hook.hasThrowable()) return;

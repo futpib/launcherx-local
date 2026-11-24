@@ -1,6 +1,6 @@
 # Compatibility and launcher updates
 
-LauncherX Local 0.23 supports Google TV Home 844979 through shared member
+LauncherX Local 0.24 supports Google TV Home 844979 through shared member
 contracts. The same rules match 841183. Earlier reviewed builds 702401, 835645,
 837595 and 841183 retain their exact-code profiles. Google's APK stays signed
 and unmodified.
@@ -13,7 +13,7 @@ and unmodified.
    complete executable code matches a reviewed profile, it uses that profile's
    bindings. This covers the tested 837597 x86 variant of 837595.
 3. Other versions at least 841183 use `module/assets/contracts.json`. Every one
-   of its 85 required classes and every named member must resolve uniquely.
+   of its 85 required classes and 45 named member roles must resolve uniquely.
    Missing, overlapping or ambiguous targets refuse the patch.
 4. Unfamiliar versions between 837595 and 841183 retain the older fingerprint
    matcher and its eligible baselines. Older unfamiliar builds are refused.
@@ -26,6 +26,15 @@ code paths, including the anonymous-profile flag and remote-button state maps.
 Shared callbacks are scoped by their captured receiver's type instead of a
 numeric synthetic case ID.
 
+Version 0.24 removes 25 more obfuscated-name requirements from Home entry,
+theme handling and remote-button dispatch, configuration and saving. Hooks use
+the resolved names as well as the class mapping. Unique signatures identify
+most of these roles; the theme method also must write a String field on its
+receiver, shortcut saving must retain its diagnostic anchor, and the remote
+configuration field comes from the constructor's assignment. Multiple matching
+methods or fields still refuse the patch. These rules match both saved builds;
+they do not establish compatibility with unseen versions.
+
 The profile button is recognized through its native view type. Continue
 watching resolves its native string using the English value and the APK's
 resource table, retaining translations. Neither depends on a fixed resource ID.
@@ -35,7 +44,8 @@ still part of a contract must retain that name; changed required signatures,
 anchors, schemas or relationships need another review. A unique match cannot
 prove unchanged runtime behavior in an unreleased build. Certificate rotation
 also requires review. DEX and resource parsing are bounded; duplicate DEX
-classes are rejected. See [regression evidence](../validation-contracts.json).
+classes are rejected. See [initial regression evidence](../validation-contracts.json)
+and [member resilience checks](../validation-resilience.json).
 
 The companion app identifies automatic matches as unreviewed. Logs distinguish
 `reviewed`, `identical-code`, `contracts` and `heuristic` modes. The contract

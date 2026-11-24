@@ -27,7 +27,7 @@ final class NavigationDetails {
                 Object home = XposedHelpers.callMethod(factory.getConstructor(Object.class).newInstance(context), loader.member("hsx", "destination", "c"));
                 Object navigation = XposedHelpers.callMethod(hook.thisObject, "q", home);
                 Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
-                hook.setResult(XposedHelpers.callStaticMethod(cache, "a", navigation, expiry));
+                hook.setResult(XposedHelpers.callStaticMethod(cache, loader.member("vuw", "cache", "a"), navigation, expiry));
                 Log.i("LauncherXLocal", "using bundled local navigation without a feed request");
             }
         }));

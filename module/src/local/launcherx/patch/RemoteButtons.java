@@ -51,7 +51,7 @@ final class RemoteButtons {
             keyCallback = null;
             anonymousCheck = null;
             Class<?> launch = loader.loadClass("inw");
-            launchCallback = launch.getDeclaredMethod("a", Object.class);
+            launchCallback = launch.getDeclaredMethod(loader.member("inw", "launch", "a"), Object.class);
             if (launch.getDeclaredField("a").getType() != (mergedLaunch ? Object.class : launchManager)) {
                 throw new IllegalStateException("Unexpected app launch callback");
             }

@@ -308,12 +308,12 @@
       ],
       "methods": [
         {
-          "name": "a",
           "type": "@xje",
           "static": false,
           "parameters": [
             "Ljava/lang/Object;"
-          ]
+          ],
+          "id": "launch"
         }
       ],
       "strings": [
@@ -672,14 +672,14 @@
       "fields": [],
       "methods": [
         {
-          "name": "e",
           "type": "@xje",
           "static": false,
           "parameters": [
             "Ljava/lang/String;",
             "Landroid/content/Intent;",
             "Z"
-          ]
+          ],
+          "id": "launch"
         }
       ],
       "strings": [
@@ -703,12 +703,12 @@
       "fields": [],
       "methods": [
         {
-          "name": "b",
           "type": "V",
           "static": false,
           "parameters": [
             "Ljava/lang/Object;"
-          ]
+          ],
+          "id": "profile_update"
         }
       ],
       "strings": [
@@ -732,15 +732,14 @@
       ],
       "methods": [
         {
-          "name": "e",
           "type": "V",
           "static": false,
           "parameters": [
             "@yjv"
-          ]
+          ],
+          "id": "account_update"
         },
         {
-          "name": "k",
           "type": "V",
           "static": false,
           "parameters": [
@@ -752,14 +751,22 @@
             "Z",
             "Z",
             "@vhe"
-          ]
+          ],
+          "id": "open_home"
         },
         {
-          "name": "x",
           "type": "V",
           "static": false,
           "parameters": [
             "Ljava/lang/String;"
+          ],
+          "id": "theme",
+          "references": [
+            {
+              "owner": "@isa",
+              "type": "Ljava/lang/String;",
+              "opcode": 91
+            }
           ]
         }
       ],
@@ -777,7 +784,6 @@
       ],
       "methods": [
         {
-          "name": "b",
           "type": "V",
           "static": false,
           "parameters": [
@@ -805,12 +811,12 @@
       "fields": [],
       "methods": [
         {
-          "name": "f",
           "type": "V",
           "static": false,
           "parameters": [
             "Z"
-          ]
+          ],
+          "id": "show_home"
         },
         {
           "name": "<init>",
@@ -1188,10 +1194,10 @@
       "fields": [],
       "methods": [
         {
-          "name": "a",
           "type": "@xhu",
           "static": false,
-          "parameters": []
+          "parameters": [],
+          "id": "prefetch"
         },
         {
           "name": "b",
@@ -1295,24 +1301,23 @@
     "llx": {
       "fields": [
         {
-          "name": "a",
           "type": "@lma",
-          "static": false
+          "static": false,
+          "id": "listener"
         },
         {
-          "name": "b",
           "type": "@xje",
-          "static": false
+          "static": false,
+          "id": "account_future"
         },
         {
-          "name": "c",
           "type": "Landroid/view/KeyEvent;",
-          "static": false
+          "static": false,
+          "id": "event"
         }
       ],
       "methods": [
         {
-          "name": "a",
           "type": "@xje",
           "static": false,
           "parameters": [],
@@ -1336,9 +1341,9 @@
     "lma": {
       "fields": [
         {
-          "name": "d",
           "type": "@ibq",
-          "static": false
+          "static": false,
+          "id": "launch_manager"
         },
         {
           "type": "@key_id",
@@ -1348,7 +1353,6 @@
       ],
       "methods": [
         {
-          "name": "a",
           "type": "@xje",
           "static": false,
           "parameters": [
@@ -1358,7 +1362,6 @@
           "id": "a"
         },
         {
-          "name": "b",
           "type": "@xje",
           "static": false,
           "parameters": [
@@ -1369,7 +1372,6 @@
           "id": "b"
         },
         {
-          "name": "c",
           "type": "V",
           "static": false,
           "parameters": [
@@ -1406,10 +1408,10 @@
       "fields": [],
       "methods": [
         {
-          "name": "D",
           "type": "@lma",
           "static": false,
-          "parameters": []
+          "parameters": [],
+          "id": "listener"
         }
       ],
       "interface": true
@@ -1633,12 +1635,12 @@
       ],
       "methods": [
         {
-          "name": "b",
           "type": "@tzf",
           "static": true,
           "parameters": [
             "I"
-          ]
+          ],
+          "id": "from_number"
         }
       ],
       "strings": [
@@ -1722,44 +1724,61 @@
       ]
     },
     "tzk": {
-      "fields": [
-        {
-          "name": "b",
-          "type": "@tzh",
-          "static": false
-        }
-      ],
+      "fields": [],
       "methods": [
         {
-          "name": "c",
           "type": "@xje",
           "static": false,
           "parameters": [
             "@tzg"
+          ],
+          "id": "save",
+          "strings": [
+            "Updating magic button mode without an activity launcher"
           ]
         },
         {
-          "name": "k",
           "type": "@tze",
           "static": false,
           "parameters": [
             "I",
             "Ljava/lang/Integer;",
             "Ljava/lang/String;"
-          ]
+          ],
+          "id": "create_button"
         },
         {
-          "name": "h",
           "type": "@tzh",
           "static": false,
           "parameters": [
             "@tzh",
             "@tzh"
+          ],
+          "id": "merge"
+        },
+        {
+          "id": "constructor",
+          "name": "<init>",
+          "type": "V",
+          "parameters": [
+            "..."
+          ],
+          "strings": [
+            "remote_button_configuration"
           ]
         }
       ],
       "strings": [
         "RemoteSetupImpl.java"
+      ],
+      "accesses": [
+        {
+          "id": "config",
+          "method": "constructor",
+          "owner": "@tzk",
+          "type": "@tzh",
+          "opcode": 91
+        }
       ]
     },
     "uzs": {
@@ -1936,13 +1955,13 @@
       "fields": [],
       "methods": [
         {
-          "name": "a",
           "type": "@vuw",
           "static": true,
           "parameters": [
             "Ljava/lang/Object;",
             "Lj$/time/Instant;"
-          ]
+          ],
+          "id": "cache"
         }
       ],
       "strings": [
@@ -2807,12 +2826,12 @@
       "fields": [],
       "methods": [
         {
-          "name": "a",
           "type": "@tzd",
           "static": false,
           "parameters": [
             "Landroid/view/KeyEvent;"
-          ]
+          ],
+          "id": "from_event"
         }
       ]
     }

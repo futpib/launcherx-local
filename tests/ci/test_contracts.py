@@ -105,6 +105,47 @@ class ContractTest(unittest.TestCase):
                 self.assertIn('/', rule['name'], alias)
         self.assertEqual(profile['classes']['isn']['accesses'][0]['after'], 'pseudonymous')
 
+    def test_production_theme_role_ignores_names_but_rejects_two_writers(self):
+        profile = json.loads((ROOT / 'module/assets/contracts.json').read_text())['classes']
+        theme = next(m for m in profile['isa']['methods'] if m.get('id') == 'theme')
+        rule = {'isa': {'methods': [theme]}}
+        for name, field, method in [('a', 'old', 'x'), ('renamed', 'state', 'newTheme')]:
+            source = ('public class NAME { String FIELD; public void METHOD(String s) { FIELD=s; } '
+                      'public void decoy(String s) { System.out.println(FIELD); } EXTRA }')
+            source = source.replace('NAME', name).replace('FIELD', field).replace('METHOD', method)
+            apk = self.fixture('theme-' + name, {name: source.replace('EXTRA', '')})
+            self.assertIn('member\tisa.theme\t' + method, self.match(apk, rule))
+            apk = self.fixture('theme-ambiguous-' + name, {name: source.replace(
+                'EXTRA', 'public void another(String s) { ' + field + '=s; }')})
+            self.assertIn('Ambiguous contract method isa.theme', self.match(apk, rule, False))
+
+    def test_production_remote_roles_follow_constructor_and_save_anchor(self):
+        profile = json.loads((ROOT / 'module/assets/contracts.json').read_text())['classes']
+        rule = {'tzk': {'methods': [m for m in profile['tzk']['methods']
+                                   if m.get('id') in ('save', 'constructor')],
+                        'accesses': profile['tzk']['accesses']},
+                'tzh': {'strings': ['fixture.config']}, 'tzg': {'strings': ['fixture.request']},
+                'xje': {'strings': ['fixture.future']}}
+        for name, field, method in [('a', 'b', 'c'), ('renamed', 'config', 'save')]:
+            source = ('public class NAME { configType FIELD, decoy; public NAME(configType value) { '
+                      'System.out.println("remote_button_configuration"); FIELD=value; EXTRA } '
+                      'public futureType METHOD(requestType r) { '
+                      'System.out.println("Updating magic button mode without an activity launcher"); return null; } '
+                      'public futureType other(requestType r) { return null; } }')
+            source = source.replace('NAME', name).replace('FIELD', field).replace('METHOD', method)
+            sources = {'configType': 'public class configType { public String s() { return "fixture.config"; } }',
+                       'requestType': 'public class requestType { public String s() { return "fixture.request"; } }',
+                       'futureType': 'public class futureType { public String s() { return "fixture.future"; } }'}
+            apk = self.fixture('remote-roles-' + name, {**sources, name: source.replace('EXTRA', '')})
+            result = self.match(apk, rule)
+            self.assertIn('member\ttzk.config\t' + field, result)
+            self.assertIn('member\ttzk.save\t' + method, result)
+            apk = self.fixture('remote-ambiguous-' + name, {**sources, name: source.replace('EXTRA', 'decoy=value;')})
+            self.assertIn('Ambiguous or missing field access tzk.config', self.match(apk, rule, False))
+            apk = self.fixture('remote-missing-' + name, {**sources, name: source.replace('EXTRA', '').replace(
+                'Updating magic button mode without an activity launcher', 'different behavior')})
+            self.assertIn('missing targets [tzk]', self.match(apk, rule, False))
+
 
 if __name__ == '__main__':
     unittest.main()

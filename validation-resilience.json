@@ -1,0 +1,229 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-24",
+  "module_version": "0.24",
+  "production_apk_sha256": "1f2ca99370b421e9d0887b9b5d064db264be68e45942f83bf3ee18900c5aaae4",
+  "emulator_apk_sha256": "3c68fbdd3469286a21ef5e542d8d9ca20b5280b4adfbf64154f4f8fe6c7f2831",
+  "contract_sha256": "f680062a26ee820f04f53ac0cb182ce1014ed4d6639d041e80f9835b5265bbcb",
+  "change": "Removed 25 fixed obfuscated member names; resolve Home entry/theme and remote dispatch, configuration and saving through signatures, references and anchors. Member roles grew from 24 to 45.",
+  "cross_version_matches": [
+    {
+      "home_version": 841183,
+      "base_apk_sha256": "22f23f5f5e831aade46a6808ba8f9834cab8bb1eb4459e62ca52e95a0743ed44",
+      "classes": 85,
+      "resolved_members": {
+        "basic_network_exit.redirect": "n",
+        "hsx.constructor": "<init>",
+        "hsx.destination": "c",
+        "hsx.error_rows": "a",
+        "hsx.rows": "b",
+        "ibq.launch": "e",
+        "idj.profile_update": "b",
+        "inw.launch": "a",
+        "isa.account_update": "e",
+        "isa.open_home": "k",
+        "isa.theme": "x",
+        "isf.apps_only_flag": "w",
+        "isf.update": "b",
+        "isn.anonymous_flag": "u",
+        "isn.constructor": "<init>",
+        "isn.show_home": "f",
+        "key_id.from_event": "a",
+        "lhw.prefetch": "a",
+        "llx.account_future": "b",
+        "llx.buttons": "m",
+        "llx.dispatch": "a",
+        "llx.event": "c",
+        "llx.listener": "a",
+        "lma.a": "a",
+        "lma.b": "b",
+        "lma.c": "c",
+        "lma.key_helper": "h",
+        "lma.launch_manager": "d",
+        "lma.onReceive": "onReceive",
+        "lma.states": "i",
+        "lmb.listener": "D",
+        "proto_builder.append_button": "av",
+        "proto_builder.append_cards": "bd",
+        "proto_builder.button_mode": "au",
+        "tzf.from_number": "b",
+        "tzk.config": "b",
+        "tzk.constructor": "<init>",
+        "tzk.create_button": "k",
+        "tzk.merge": "h",
+        "tzk.save": "c",
+        "uzs.entry": "e",
+        "vuw.cache": "a",
+        "xgr.completed": "w",
+        "xgr.immediate": "n",
+        "yjv.account_type": "Y"
+      },
+      "simultaneous_metadata_renames": 25
+    },
+    {
+      "home_version": 844979,
+      "base_apk_sha256": "dd8456333f06243dd75c59ec56731216a1c8f03c6cbec5592abfec10d273e1b9",
+      "classes": 85,
+      "resolved_members": {
+        "basic_network_exit.redirect": "e",
+        "hsx.constructor": "<init>",
+        "hsx.destination": "J",
+        "hsx.error_rows": "H",
+        "hsx.rows": "I",
+        "ibq.launch": "e",
+        "idj.profile_update": "b",
+        "inw.launch": "a",
+        "isa.account_update": "e",
+        "isa.open_home": "k",
+        "isa.theme": "x",
+        "isf.apps_only_flag": "z",
+        "isf.update": "b",
+        "isn.anonymous_flag": "w",
+        "isn.constructor": "<init>",
+        "isn.show_home": "f",
+        "key_id.from_event": "a",
+        "lhw.prefetch": "a",
+        "llx.account_future": "b",
+        "llx.buttons": "n",
+        "llx.dispatch": "a",
+        "llx.event": "c",
+        "llx.listener": "a",
+        "lma.a": "a",
+        "lma.b": "b",
+        "lma.c": "c",
+        "lma.key_helper": "i",
+        "lma.launch_manager": "d",
+        "lma.onReceive": "onReceive",
+        "lma.states": "j",
+        "lmb.listener": "D",
+        "proto_builder.append_button": "av",
+        "proto_builder.append_cards": "bd",
+        "proto_builder.button_mode": "au",
+        "tzf.from_number": "b",
+        "tzk.config": "b",
+        "tzk.constructor": "<init>",
+        "tzk.create_button": "k",
+        "tzk.merge": "h",
+        "tzk.save": "c",
+        "uzs.entry": "j",
+        "vuw.cache": "a",
+        "xgr.completed": "C",
+        "xgr.immediate": "t",
+        "yjv.account_type": "L"
+      },
+      "simultaneous_metadata_renames": 25
+    }
+  ],
+  "host_tests": {
+    "passed": 24,
+    "new_checks": [
+      "Production theme rule accepts renamed methods/fields, rejects competing writers",
+      "Production remote rules accept renamed save/configuration roles, reject competing constructor writes and missing save anchor"
+    ]
+  },
+  "mutation_test_scope": "In-memory DEX metadata from original APKs; renamed 20 methods and 5 fields together, updated field-access references, verified unchanged classes and all renamed slot results. Does not execute a modified APK.",
+  "emulator_checks": {
+    "home": {
+      "result": "passed",
+      "apk_sha256": "3c68fbdd3469286a21ef5e542d8d9ca20b5280b4adfbf64154f4f8fe6c7f2831",
+      "accounts": 0,
+      "reboot": false,
+      "emulator_network": true,
+      "checks": [
+        "clean official Home",
+        "native DPAD app launch",
+        "Home return",
+        "process restart",
+        "no launcher fatal exception"
+      ],
+      "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+    },
+    "profiles": {
+      "result": "passed",
+      "apk_sha256": "3c68fbdd3469286a21ef5e542d8d9ca20b5280b4adfbf64154f4f8fe6c7f2831",
+      "checks": [
+        "first-run Incognito default and native chooser entry",
+        "native DPAD Incognito selection returns to Home",
+        "native Add account launches real Google Play Services sign-in",
+        "cancelled sign-in leaves Incognito selected and creates no account",
+        "Incognito selection survives launcher restart",
+        "Incognito selection and chooser survive emulator reboot",
+        "no launcher fatal exception in uninterrupted remote sequences"
+      ],
+      "accounts": 0,
+      "physical_tv_tested": false,
+      "authenticated_google_roundtrip_tested": false,
+      "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+    },
+    "shortcuts": {
+      "result": "passed",
+      "module_version": "0.24",
+      "apk_sha256": "3c68fbdd3469286a21ef5e542d8d9ca20b5280b4adfbf64154f4f8fe6c7f2831",
+      "checks": [
+        "Star: native long-press chooser saves and short press launches TV Bro",
+        "YouTube: native long-press chooser saves and short press launches TV Bro",
+        "Netflix: native long-press chooser saves and short press launches TV Bro",
+        "Prime Video: native long-press chooser saves and short press launches TV Bro",
+        "Live TV: native long-press chooser saves and short press launches TV Bro",
+        "Xiaomi TV+: native long-press chooser saves and short press launches TV Bro",
+        "All six native assignments survive launcher process restart",
+        "Cancelling restoration keeps the custom assignment",
+        "Restoring YouTube returns its native action and preserves the other five bindings",
+        "A cancelled key-up does not launch a saved app",
+        "Restore all clears custom bindings, restores native star/YouTube and selects OEM fallback paths"
+      ],
+      "physical_tv_tested": false,
+      "accounts": 0,
+      "limitations": [
+        "KeyEvent receiver injection does not exercise the physical remote or Xiaomi bridge.",
+        "OEM default branches were selected; actual Xiaomi app/fallback launches require the TV.",
+        "Authenticated and managed-profile paths were not exercised."
+      ],
+      "cleanup": "Previous native shortcut store restored; test helper removed."
+    },
+    "persistence": {
+      "result": "passed",
+      "module_version": "0.24",
+      "apk_sha256": "3c68fbdd3469286a21ef5e542d8d9ca20b5280b4adfbf64154f4f8fe6c7f2831",
+      "checks": [
+        "Native chooser saved apps, media/custom keys and No action; checkpoint matches all assignments",
+        "Real unhooked Home pruned OEM/YouTube bindings; restoring module recovered every action and survived restart",
+        "Recovered apps launch; custom keys and Play/Pause reach the fixture; No action stays inert",
+        "An individually restored default is not resurrected after another compatibility gap",
+        "Restore all clears the checkpoint actions and remains reset across stock cleanup"
+      ],
+      "limits": [
+        "Real Google TV x86 emulator; receiver-injected events, not a physical remote",
+        "Compatibility refusal was forced on the installed launcher; no Play Store update was downloaded"
+      ],
+      "cleanup": "Original native store and independent checkpoint restored; test fixtures removed"
+    }
+  },
+  "physical_tv": {
+    "result": "passed",
+    "module_version": "0.24",
+    "apk_sha256": "1f2ca99370b421e9d0887b9b5d064db264be68e45942f83bf3ee18900c5aaae4",
+    "home_version": 844979,
+    "contract_mode": true,
+    "checks": [
+      "Home and core hooks installed",
+      "Native Home visible",
+      "Native YouTube chooser with Restore defaults and Send key controls verified visually",
+      "All native assignments and checkpoint actions preserved",
+      "Saved YouTube short press resumed original SmartTube playback task"
+    ],
+    "limits": [
+      "ADB input, not physical remote",
+      "No TV reboot or authenticated sign-in"
+    ],
+    "screenshots_reviewed": true
+  },
+  "limits": [
+    "841183 was matched statically; its runtime was not rerun for 0.24.",
+    "Only 844979 was exercised in the emulator and on the TV.",
+    "Required protobuf schemas, remaining named members, signatures and diagnostic anchors can still require review after a Home update.",
+    "Matching does not prove unchanged runtime semantics in an unseen build.",
+    "No authenticated Google-account round trip or physical remote input; no TV reboot.",
+    "Content-specific, Ambient and framework suites were not rerun; prior 0.23 results remain in validation-contracts.json."
+  ]
+}

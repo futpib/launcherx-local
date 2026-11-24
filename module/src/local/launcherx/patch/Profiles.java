@@ -53,16 +53,16 @@ final class Profiles {
         accountClass = loader.loadClass("vjm");
         chooserPeerClass = loader.loadClass("kxc");
         initialSelection = loader.loadClass("kve").getDeclaredMethod("a", loader.loadClass("vip"));
-        accountChanged = loader.loadClass("isa").getDeclaredMethod(loader.pick("g", "e"), loader.loadClass("yjv"));
+        accountChanged = loader.loadClass("isa").getDeclaredMethod(loader.member("isa", "account_update", loader.pick("g", "e")), loader.loadClass("yjv"));
         chooserData = loader.loadClass("kwx").getDeclaredMethod("b", Object.class);
         accountSelected = loader.loadClass("juj").getDeclaredMethod("a", loader.loadClass("wqw"));
         loader.loadClass("kve").getDeclaredField("c");
         loader.loadClass("kve").getDeclaredField("d");
         if (loader.modern) {
-            loader.loadClass("isa").getDeclaredMethod("k", boolean.class, boolean.class,
+            loader.loadClass("isa").getDeclaredMethod(loader.member("isa", "open_home", "k"), boolean.class, boolean.class,
                     String.class, boolean.class, boolean.class, boolean.class, boolean.class, loader.loadClass("vhe"));
         } else {
-            loader.loadClass("isa").getDeclaredMethod("k", boolean.class, boolean.class,
+            loader.loadClass("isa").getDeclaredMethod(loader.member("isa", "open_home", "k"), boolean.class, boolean.class,
                     String.class, boolean.class, boolean.class, loader.loadClass("vhe"));
         }
         loader.loadClass("vnq").getDeclaredMethod("a", loader.loadClass("vip"));
@@ -135,9 +135,9 @@ final class Profiles {
                 if (activity.isFinishing() || activity.isDestroyed()
                         || view.getRootView() != activity.getWindow().getDecorView().getRootView()) return;
                 if (loader.modern) {
-                    XposedHelpers.callMethod(peer, "k", false, false, null, false, false, false, false, null);
+                    XposedHelpers.callMethod(peer, loader.member("isa", "open_home", "k"), false, false, null, false, false, false, false, null);
                 } else {
-                    XposedHelpers.callMethod(peer, "k", false, false, null, false, false, null);
+                    XposedHelpers.callMethod(peer, loader.member("isa", "open_home", "k"), false, false, null, false, false, null);
                 }
                 hook.setResult(true);
             }

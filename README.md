@@ -2,7 +2,7 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.23** supports Google TV Home **844979** using shared compatibility
+Version **0.24** supports Google TV Home **844979** using shared compatibility
 rules that also match **841183**. Hooks tolerate class and helper renaming,
 moved fields, unrelated code changes and resource-ID shifts. Earlier reviewed
 builds remain supported. See [compatibility matching](docs/compatibility.md).
@@ -55,10 +55,9 @@ and launcher compatibility status. No ADB commands are needed.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
 
-Version **0.23** is installed on the physical TV running **844979**. See
-[TV validation](validation-tv-contracts.json) and
-[matching and regression validation](validation-contracts.json) for the checks
-and their limits. Earlier deployment records remain in the repository.
+Version **0.24** is installed on the physical TV running **844979**. See
+[member resilience validation](validation-resilience.json) for TV, emulator and
+matching checks and their limits. Earlier deployment records remain in the repository.
 
 Version **0.21** was installed on the physical TV running **837595**. Its existing
 bindings were preserved byte-for-byte and captured in the independent checkpoint.
