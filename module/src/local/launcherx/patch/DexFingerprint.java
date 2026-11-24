@@ -19,6 +19,35 @@ import java.util.zip.ZipFile;
 /** Conservative DEX fingerprints: ignore pool indices and obfuscated class names,
  * but retain member names, instructions, registers, literals and exception handlers. */
 final class DexFingerprint {
+    interface DexConsumer { void accept(Reader reader) throws Exception; }
+
+    private static void readFiles(String[] paths, DexConsumer consumer) throws Exception {
+        long total = 0;
+        for (String path : paths) try (ZipFile apk = new ZipFile(path)) {
+            Enumeration<? extends ZipEntry> entries = apk.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (!entry.getName().endsWith(".dex") || entry.getName().contains("/")) continue;
+                if (entry.getSize() < 112 || entry.getSize() > 64 * 1024 * 1024
+                        || (total += entry.getSize()) > 128 * 1024 * 1024) throw new IllegalStateException("DEX size limit");
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                try (InputStream in = apk.getInputStream(entry)) {
+                    byte[] buffer = new byte[32768]; int count;
+                    while ((count = in.read(buffer)) != -1) {
+                        if (out.size() + count > entry.getSize()) throw new IllegalStateException("DEX size mismatch");
+                        out.write(buffer, 0, count);
+                    }
+                }
+                consumer.accept(new Reader(out.toByteArray()));
+            }
+        }
+    }
+
+    static Map<String, DexContracts.Definition> contracts(String[] paths, List<DexContracts.Rule> rules) throws Exception {
+        Map<String, DexContracts.Definition> result = new HashMap<>(); Set<String> seen = new HashSet<>();
+        readFiles(paths, reader -> reader.contracts(result, rules, seen));
+        return result;
+    }
     static final class Node {
         final String name, shape, code;
         final List<String> references;
@@ -35,27 +64,7 @@ final class DexFingerprint {
             Map<String, Set<String>> selections) throws Exception {
         Map<String, Node> result = new HashMap<>();
         Set<String> seen = new HashSet<>();
-        long total = 0;
-        for (String path : paths) try (ZipFile apk = new ZipFile(path)) {
-            Enumeration<? extends ZipEntry> entries = apk.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                if (!entry.getName().endsWith(".dex") || entry.getName().contains("/")) continue;
-                if (entry.getSize() < 112 || entry.getSize() > 64 * 1024 * 1024
-                        || (total += entry.getSize()) > 128 * 1024 * 1024) {
-                    throw new IllegalStateException("DEX size limit");
-                }
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                try (InputStream in = apk.getInputStream(entry)) {
-                    byte[] buffer = new byte[32768]; int count;
-                    while ((count = in.read(buffer)) != -1) {
-                        if (out.size() + count > entry.getSize()) throw new IllegalStateException("DEX size mismatch");
-                        out.write(buffer, 0, count);
-                    }
-                }
-                new Reader(out.toByteArray()).classes(result, shapes, names, seen, selections);
-            }
-        }
+        readFiles(paths, reader -> reader.classes(result, shapes, names, seen, selections));
         return result;
     }
 
@@ -211,6 +220,90 @@ final class DexFingerprint {
             int offset = u32(proto + 8), count = offset == 0 ? 0 : u32(offset);
             for (int i = 0; i < count; i++) name.append(types[u16(offset + 4 + i * 2)]);
             return name.append(')').append(types[u32(proto + 4)]).toString();
+        }
+
+        DexContracts.Field contractField(int index, int flags) {
+            int p = fields + 8 * index;
+            return new DexContracts.Field(types[u16(p)], strings[u32(p + 4)], types[u16(p + 2)], flags);
+        }
+
+        DexContracts.Method contractMethod(int index, int flags, int offset) {
+            int p = methods + 8 * index, proto = protos + 12 * u16(p + 2);
+            DexContracts.Method method = new DexContracts.Method();
+            method.owner = types[u16(p)]; method.name = strings[u32(p + 4)]; method.result = types[u32(proto + 4)];
+            method.flags = flags; method.offset = offset;
+            int parameters = u32(proto + 8), count = parameters == 0 ? 0 : u32(parameters);
+            for (int i = 0; i < count; i++) method.parameters.add(types[u16(parameters + 4 + i * 2)]);
+            return method;
+        }
+
+        void contractCode(DexContracts.Method method) {
+            int offset = method.offset;
+            if (offset == 0) return;
+            int count = u32(offset + 12), start = offset + 16, end = start + count * 2;
+            if (count < 0 || end < start || end > data.length) throw new IllegalStateException("Invalid DEX code");
+            String anchor = "";
+            for (int p = start; p < end;) {
+                int word = u16(p), op = word & 255, width = width(op);
+                // These instructions carry no string/field/class tokens used by contracts.
+                // Whole-code fingerprints still reject them until their operands are modeled.
+                if (op >= 0xfa) width = op <= 0xfb ? 4 : op <= 0xfd ? 3 : 2;
+                if (op == 0 && word != 0) {
+                    if (word == 0x100) width = 4 + 2 * u16(p + 2);
+                    else if (word == 0x200) width = 2 + 4 * u16(p + 2);
+                    else if (word == 0x300) width = 4 + (int) (((long) u16(p + 2) * u32(p + 4) + 1) / 2);
+                    else throw new IllegalStateException("Unknown DEX payload");
+                }
+                if (width <= 0 || p + (long) width * 2 > end) throw new IllegalStateException("Unsupported DEX opcode " + op);
+                if (op == 0x1a || op == 0x1b) {
+                    anchor = strings[op == 0x1a ? u16(p + 2) : u32(p + 2)]; method.strings.add(anchor);
+                } else if (op == 0x1c) method.types.add(types[u16(p + 2)]);
+                else if (op >= 0x52 && op <= 0x6d) {
+                    DexContracts.Field field = contractField(u16(p + 2), 0); field.opcode = op;
+                    method.accesses.add(field); method.accessAnchors.add(anchor);
+                }
+                p += width * 2;
+            }
+        }
+
+        void contracts(Map<String, DexContracts.Definition> result, List<DexContracts.Rule> rules, Set<String> seen) {
+            int count = u32(96), offset = u32(100);
+            for (int i = 0; i < count; i++) {
+                int p = offset + i * 32; DexContracts.Definition definition = new DexContracts.Definition();
+                definition.name = types[u32(p)];
+                definition.flags = u32(p + 4);
+                if (!seen.add(definition.name)) throw new IllegalStateException("Duplicate DEX class " + definition.name);
+                definition.parent = u32(p + 8) == -1 ? "" : types[u32(p + 8)];
+                int interfaces = u32(p + 12), interfaceCount = interfaces == 0 ? 0 : u32(interfaces);
+                for (int j = 0; j < interfaceCount; j++) definition.interfaces.add(types[u16(interfaces + 4 + j * 2)]);
+                int classData = u32(p + 24);
+                if (classData != 0) {
+                    Cursor cursor = new Cursor(classData);
+                    int sf = cursor.leb(), inf = cursor.leb(), dm = cursor.leb(), vm = cursor.leb();
+                    for (int n : new int[]{sf, inf}) {
+                        int index = 0;
+                        for (int j = 0; j < n; j++) { index += cursor.leb(); definition.fields.add(contractField(index, cursor.leb())); }
+                    }
+                    for (int n : new int[]{dm, vm}) {
+                        int index = 0;
+                        for (int j = 0; j < n; j++) {
+                            index += cursor.leb(); int flags = cursor.leb(), body = cursor.leb();
+                            definition.methods.add(contractMethod(index, flags, body));
+                        }
+                    }
+                }
+                List<DexContracts.Rule> possible = new ArrayList<>();
+                for (DexContracts.Rule rule : rules) if (DexContracts.accepts(rule, definition, null, false)) possible.add(rule);
+                if (possible.isEmpty()) continue;
+                try {
+                    for (DexContracts.Method method : definition.methods) {
+                        contractCode(method); definition.strings.addAll(method.strings);
+                    }
+                } catch (IllegalStateException unsupported) { continue; }
+                for (DexContracts.Rule rule : possible) if (DexContracts.accepts(rule, definition, null, true)) {
+                    result.put(definition.name, definition); break;
+                }
+            }
         }
         void value(Part out, Cursor c, int depth) {
             if (depth > 32) throw new IllegalStateException("Deep DEX value");

@@ -11,10 +11,12 @@ final class LauncherSymbols extends ClassLoader {
     final boolean recent;
     final boolean latest;
     private final Map<String, String> classes = new HashMap<>();
+    private final Map<String, String> members = new HashMap<>();
 
     LauncherSymbols(ClassLoader parent, Compatibility.Result compatibility) {
         this(parent, compatibility.bindings);
         classes.putAll(compatibility.classes);
+        members.putAll(compatibility.members);
     }
 
     LauncherSymbols(ClassLoader parent, long version) {
@@ -227,6 +229,14 @@ final class LauncherSymbols extends ClassLoader {
     @Override public Class<?> loadClass(String name) throws ClassNotFoundException {
         return getParent().loadClass(classes.containsKey(name) ? classes.get(name) : name);
     }
+
+    String member(String alias, String slot, String fallback) {
+        String name = members.get(alias + "." + slot);
+        if (name == null && contracts()) throw new IllegalStateException("Missing member contract " + alias + "." + slot);
+        return name == null ? fallback : name;
+    }
+
+    boolean contracts() { return !members.isEmpty(); }
 
     String pick(String legacy, String current) { return modern ? current : legacy; }
     String pick(String legacy, String current, String latest) { return recent ? latest : pick(legacy, current); }

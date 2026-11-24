@@ -119,7 +119,7 @@ final class Profiles {
                 if (!activity.getClass().getName().equals(Compatibility.TARGET + ".home.HomeActivity")) return;
                 home = new WeakReference<>(hook.thisObject);
                 if (!enabled()) return;
-                activeType = (String) XposedHelpers.callMethod(hook.args[0], loader.pick("co", "ad", "y", "Y"));
+                activeType = (String) XposedHelpers.callMethod(hook.args[0], loader.member("yjv", "account_type", loader.pick("co", "ad", "y", "Y")));
                 preferences.edit().putBoolean("incognito", ANONYMOUS.equals(activeType)).apply();
                 Log.i(TAG, "active launcher profile: " + activeType);
             }
@@ -128,8 +128,8 @@ final class Profiles {
             @Override protected void beforeHookedMethod(MethodHookParam hook) {
                 View view = (View) hook.thisObject;
                 Object peer = home.get();
-                // This pinned resource is the native account button in both tab layouts.
-                if (!enabled() || view.getId() != loader.pick(0x7f0b05fb, 2131429037, 0x7f0b06b1, 0x7f0b06c1) || peer == null
+                // Identify the native account button by its view type; resource IDs move between releases.
+                if (!enabled() || !profileButton(view) || peer == null
                         || !(ANONYMOUS.equals(activeType) || "google".equals(activeType))) return;
                 Activity activity = (Activity) XposedHelpers.getObjectField(peer, "b");
                 if (activity.isFinishing() || activity.isDestroyed()
@@ -178,8 +178,7 @@ final class Profiles {
         }));
         hooks.add(XposedBridge.hookMethod(accountSelected, new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
-                // Keep the shared synthetic callback scoped to its profile chooser case.
-                if (XposedHelpers.getIntField(hook.thisObject, loader.pick("b", "$cid")) != loader.pick(19, 5)) return;
+                // Restrict the shared callback to its captured native profile chooser.
                 Object peer = XposedHelpers.getObjectField(hook.thisObject, "a");
                 if (!chooserPeerClass.isInstance(peer)) return;
                 Activity activity = chooserActivity(peer);
@@ -194,6 +193,14 @@ final class Profiles {
                 hook.setResult(XposedHelpers.getStaticObjectField(loader.loadClass("wrb"), "a"));
             }
         }));
+    }
+
+    private static boolean profileButton(View view) {
+        for (int depth = 0; view != null && depth < 4; depth++) {
+            if (view.getClass().getName().equals(Compatibility.TARGET + ".guide.tabs.ProfileChooserButton")) return true;
+            view = view.getParent() instanceof View ? (View) view.getParent() : null;
+        }
+        return false;
     }
 
     private Activity chooserActivity(Object peer) {

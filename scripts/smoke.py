@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import time
 import xml.etree.ElementTree as ET
 
@@ -29,8 +30,28 @@ def resumed(package):
 def fresh_home():
     root("am force-stop " + TARGET)
     root("am start -W -n " + HOME)
-    time.sleep(3)
-    resumed(HOME)
+    # Home may be resumed while contract discovery/content loading is still in
+    # progress. Pixel inspection preserves DPAD focus; accessibility dumps do not.
+    deadline = time.monotonic() + 30
+    while True:
+        try:
+            state = resumed(HOME)
+            token = re.search(r'topResumedActivity=ActivityRecord\{(\S+)', state)[1]
+            record = re.search(r'\* Hist\s+#\d+: ActivityRecord\{' + re.escape(token)
+                               + r'\b[\s\S]*?(?=\n\s*\* (?:Hist|Task|RootTask)|\Z)', state)
+            # Android can show the previous task snapshot before the new window draws.
+            assert record and 'reportedDrawn=true' in record[0]
+            screen("home-ready")
+            visible = subprocess.check_output(['tesseract', str(ARTIFACTS / 'home-ready.png'),
+                                               'stdout', '--psm', '6'], text=True,
+                                              stderr=subprocess.DEVNULL)
+            if 'Your apps' in visible:
+                return
+        except AssertionError:
+            pass
+        if time.monotonic() >= deadline:
+            raise AssertionError('Home did not finish rendering before DPAD input')
+        time.sleep(.3)
 
 
 def check_home(name, timeout=30):

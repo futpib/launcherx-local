@@ -24,6 +24,7 @@ def main():
                         ','.join(sorted(item.get('methods', [])))])
                         for alias, item in profile['classes'].items()) + '\n')
         subprocess.run(['javac', '-d', path, ROOT / 'module/src/local/launcherx/patch/DexFingerprint.java',
+                        ROOT / 'module/src/local/launcherx/patch/DexContracts.java',
                         ROOT / 'scripts/java/FingerprintMatchTool.java'], check=True)
         result = subprocess.run(['java', '-Xmx1g', '-cp', path, 'local.launcherx.patch.FingerprintMatchTool',
                                  rows, args.apk, '--diagnose'], capture_output=True, text=True, check=False)

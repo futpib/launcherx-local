@@ -42,7 +42,7 @@ final class RemoteButtons {
         modern = loader.modern;
         mergedLaunch = loader.latest;
         networkRedirect = loader.recent ? loader.loadClass("basic_network_exit").getDeclaredMethod(
-                loader.latest ? "n" : "b", int.class, Context.class, loader.loadClass("basic_exit_reason")) : null;
+                loader.member("basic_network_exit", "redirect", loader.latest ? "n" : "b"), int.class, Context.class, loader.loadClass("basic_exit_reason")) : null;
         launchManager = loader.loadClass("ibq");
         loader.loadClass("gbp").getDeclaredField("e");
         if (modern) {
@@ -55,8 +55,6 @@ final class RemoteButtons {
             if (launch.getDeclaredField("a").getType() != (mergedLaunch ? Object.class : launchManager)) {
                 throw new IllegalStateException("Unexpected app launch callback");
             }
-            if (mergedLaunch && launch.getDeclaredField("$cid").getType() != int.class)
-                throw new IllegalStateException("Unexpected merged app launch callback");
             basicInternetRule = loader.loadClass("oro").getDeclaredMethod("b", Context.class);
             return;
         }
@@ -127,7 +125,6 @@ final class RemoteButtons {
                 } else {
                     // The legacy merged callback needs an additional case guard.
                     if ((!modern && XposedHelpers.getIntField(hook.thisObject, "e") != 4)
-                            || (mergedLaunch && XposedHelpers.getIntField(hook.thisObject, "$cid") != 3)
                             || !launchManager.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
                             || !"pseudonymous".equals(XposedHelpers.getObjectField(hook.args[0], "e"))) return;
                 }

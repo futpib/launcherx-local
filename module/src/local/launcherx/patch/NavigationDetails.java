@@ -24,7 +24,7 @@ final class NavigationDetails {
         hooks.add(XposedBridge.hookMethod(read, new XC_MethodHook() {
             @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                 if (!enabled.getAsBoolean()) return;
-                Object home = XposedHelpers.callMethod(factory.getConstructor(Object.class).newInstance(context), "c");
+                Object home = XposedHelpers.callMethod(factory.getConstructor(Object.class).newInstance(context), loader.member("hsx", "destination", "c"));
                 Object navigation = XposedHelpers.callMethod(hook.thisObject, "q", home);
                 Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
                 hook.setResult(XposedHelpers.callStaticMethod(cache, "a", navigation, expiry));

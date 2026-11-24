@@ -153,6 +153,11 @@ def negative_apk(directory, kind, emulator_network=False):
             if kind == 'heuristic-mismatch':
                 profile['classes']['isa']['code'] = '0' * 64
             profile_path.write_text(json.dumps(profile))
+    if kind == 'heuristic-mismatch':
+        path = directory / 'module/assets/contracts.json'
+        contract = json.loads(path.read_text())
+        contract['classes']['isa']['strings'] = ['launcherx test: required anchor removed']
+        path.write_text(json.dumps(contract))
     (directory / 'compatibility.json').write_text(json.dumps(config))
     subprocess.run(['python3', str(directory / 'scripts/build.py'), *(['--emulator-network'] if emulator_network else [])], check=True)
     return directory / 'build' / ('apps-emulator' if emulator_network else 'apps') / 'launcherx-local.apk'
@@ -192,7 +197,9 @@ def main():
         start_home('setup-module-reenabled')
         checks.append('re-enabling in LSPosed and restarting automatically restores Incognito Home')
 
-        open_setup('setup-one-control', 'Compatible launcher.')
+        reviewed = json.loads((ROOT / 'compatibility.json').read_text())
+        reviewed_codes = [reviewed['version_code'], *[item['version_code'] for item in reviewed['additional_versions']]]
+        open_setup('setup-one-control', 'Compatible launcher.' if version in reviewed_codes else 'Launcher matched automatically')
         checks.append('settings app has only Choose app content and passive compatibility status')
         cases = [('dex', 'Code mismatch: classes.dex')]
         if version > 837595:
@@ -203,11 +210,11 @@ def main():
                 adb('logcat', '-c')
                 start_home('setup-heuristic-home')
                 logs = adb('logcat', '-d')
-                assert 'compatibility=heuristic' in logs and 'Patch refused' not in logs
+                assert ('compatibility=contracts' if version >= 841183 else 'compatibility=heuristic') in logs and 'Patch refused' not in logs
                 (ARTIFACTS / 'setup-heuristic-logcat.txt').write_text(logs)
                 open_setup('setup-heuristic-status', 'Launcher matched automatically')
-                checks.append('real launcher activates through the heuristic path with its exact profile withheld')
-            cases.insert(0, ('heuristic-mismatch', 'Heuristic mismatch'))
+                checks.append('real launcher activates through automatic matching with its exact profile withheld')
+            cases.insert(0, ('heuristic-mismatch', 'Contract mismatch' if version >= 841183 else 'Heuristic mismatch'))
         for kind, expected in cases:
             with tempfile.TemporaryDirectory(prefix='launcherx-negative-') as directory:
                 bad = negative_apk(Path(directory), kind, args.emulator_network)

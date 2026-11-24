@@ -112,17 +112,16 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
         Method showHome = rootPeer.getDeclaredMethod(loader.pick("h", "f"), boolean.class);
         Method appsOnly = appsOnlyObserver.getDeclaredMethod("b", Object.class);
         Method recovery = accountCallback.getDeclaredMethod("apply", Object.class);
-        rootPeer.getDeclaredField(loader.pick("r", "u"));
-        rootPeer.getDeclaredField(loader.pick("A", "w"));
+        rootPeer.getDeclaredField(loader.member("isn", "anonymous_flag", loader.pick("r", "u")));
+        rootPeer.getDeclaredField(loader.member("isf", "apps_only_flag", loader.pick("A", "w")));
         accountCallback.getDeclaredField("a");
-        accountCallback.getDeclaredField(loader.pick("b", "$cid"));
-        Method localChannels = localHome.getDeclaredMethod(loader.pick("c", "b"));
-        Method errorChannels = localHome.getDeclaredMethod(loader.pick("b", "a"), String.class);
+        Method localChannels = localHome.getDeclaredMethod(loader.member("hsx", "rows", loader.pick("c", "b")));
+        Method errorChannels = localHome.getDeclaredMethod(loader.member("hsx", "error_rows", loader.pick("b", "a")), String.class);
         Method loadDestinations = destinations.getDeclaredMethod("d");
         Method refreshDestinations = destinations.getDeclaredMethod("b");
         localHome.getDeclaredConstructor(Object.class);
-        localHome.getDeclaredMethod(loader.pick("d", "c"));
-        futures.getDeclaredMethod(loader.pick("W", "ae", "r", "n"), Object.class);
+        localHome.getDeclaredMethod(loader.member("hsx", "destination", loader.pick("d", "c")));
+        futures.getDeclaredMethod(loader.member("xgr", "immediate", loader.pick("W", "ae", "r", "n")), Object.class);
         cacheResult.getDeclaredMethod("a", Object.class, instant);
         instant.getDeclaredMethod("ofEpochMilli", long.class);
         channels.getDeclaredConstructor(List.class);
@@ -158,12 +157,12 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
                     @Override protected void beforeHookedMethod(MethodHookParam hook) throws Throwable {
                         if (!anonymous()) return;
                         Object factory = localHome.getConstructor(Object.class).newInstance(context);
-                        Object home = XposedHelpers.callMethod(factory, loader.pick("d", "c"));
+                        Object home = XposedHelpers.callMethod(factory, loader.member("hsx", "destination", loader.pick("d", "c")));
                         if (!"b".equals(hook.method.getName())) {
                             Object expiry = XposedHelpers.callStaticMethod(instant, "ofEpochMilli", Long.MAX_VALUE);
                             home = XposedHelpers.callStaticMethod(cacheResult, "a", home, expiry);
                         }
-                        Object result = XposedHelpers.callStaticMethod(futures, loader.pick("W", "ae", "r", "n"), home);
+                        Object result = XposedHelpers.callStaticMethod(futures, loader.member("xgr", "immediate", loader.pick("W", "ae", "r", "n")), home);
                         // The newer loader may use its prefetched future without calling d().
                         if (loader.modern && "a".equals(hook.method.getName())) {
                             result = XposedHelpers.newInstance(loader.loadClass("xhu"), result);
@@ -205,15 +204,15 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
             hooks.addAll(XposedBridge.hookAllConstructors(rootPeer, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam hook) {
                     if (!anonymous()) return;
-                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("r", "u"), false);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.member("isn", "anonymous_flag", loader.pick("r", "u")), false);
                     event("anonymous profile allowed into GuideHomeFragment");
                 }
             }));
             hooks.add(XposedBridge.hookMethod(showHome, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) {
                     if (!anonymous()) return;
-                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("r", "u"), false);
-                    XposedHelpers.setBooleanField(hook.thisObject, loader.pick("A", "w"), BuildConfig.APPS_ONLY);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.member("isn", "anonymous_flag", loader.pick("r", "u")), false);
+                    XposedHelpers.setBooleanField(hook.thisObject, loader.member("isf", "apps_only_flag", loader.pick("A", "w")), BuildConfig.APPS_ONLY);
                     event("show official guide; appsOnly=" + BuildConfig.APPS_ONLY);
                 }
             }));
@@ -224,9 +223,8 @@ public final class LauncherPatch implements IXposedHookLoadPackage {
             }));
             hooks.add(XposedBridge.hookMethod(recovery, new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam hook) {
-                    // Only this reviewed callback case belongs to no-account recovery.
-                    if (XposedHelpers.getIntField(hook.thisObject, loader.pick("b", "$cid")) == loader.pick(1, 3)
-                            && accountVerifier.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
+                    // The captured verifier identifies the no-account callback despite merged case renumbering.
+                    if (accountVerifier.isInstance(XposedHelpers.getObjectField(hook.thisObject, "a"))
                             && anonymous()) {
                         hook.setResult(null);
                         event("suppressed local no-account recovery to Basic TV");

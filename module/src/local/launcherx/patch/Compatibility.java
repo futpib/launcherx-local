@@ -24,8 +24,13 @@ public final class Compatibility {
         final long version, bindings;
         final String mode;
         final Map<String, String> classes;
+        final Map<String, String> members;
         Result(long version, long bindings, String mode, Map<String, String> classes) {
+            this(version, bindings, mode, classes, Collections.emptyMap());
+        }
+        Result(long version, long bindings, String mode, Map<String, String> classes, Map<String, String> members) {
             this.version = version; this.bindings = bindings; this.mode = mode; this.classes = classes;
+            this.members = members;
         }
     }
 
@@ -57,6 +62,14 @@ public final class Compatibility {
             }
         }
         if (version <= 837595) throw new IllegalStateException("Unsupported launcher version " + version);
+        if (version >= 841183) {
+            DexContracts.Match contracts = HeuristicCompatibility.contracts(context, info.applicationInfo);
+            cachedKey = key;
+            cached = new Result(version, 841183, "contracts", Collections.unmodifiableMap(contracts.classes),
+                    Collections.unmodifiableMap(contracts.members));
+            Log.i("LauncherXLocal", "launcher compatibility: contracts version=" + version + " targets=" + contracts.classes.size());
+            return cached;
+        }
         HeuristicCompatibility.Match match = HeuristicCompatibility.resolve(context, info.applicationInfo, version);
         return remember(key, version, match.bindings, "heuristic", match.classes);
     }

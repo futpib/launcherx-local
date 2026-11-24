@@ -50,6 +50,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
     private final Constructor<?> rowConstructor, rowsConstructor;
     private final Method render, watchConverter;
     private final String[] previewColumns;
+    private int continueWatching;
     private final Runnable refresh = this::load;
     private Handler worker;
     private Object provider;
@@ -137,9 +138,10 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
             Log.w(TAG, "Could not enable new app channels; keeping existing visibility", error);
         }
         try {
+            if (continueWatching == 0) continueWatching = LauncherResources.string(context, "Continue watching");
             List<Object> cards = watchCards();
             if (!cards.isEmpty()) result.add(row("launcherx-local:watch-next",
-                    context.getString(loader.pick(0x7f140654, 2132018634, 0x7f1405cd, 0x7f1405d5)), cards, false));
+                    context.getString(continueWatching), cards, false));
         } catch (Throwable error) {
             Log.w(TAG, "Watch Next unavailable; keeping app rows", error);
         }
@@ -288,7 +290,7 @@ final class LocalContent implements Application.ActivityLifecycleCallbacks {
         set(row, "e", title); set(row, "o", id);
         set(row, "c", preview ? 24 : 11);
         set(row, "d", defaultValue(preview ? "abbi" : "aaff"));
-        XposedHelpers.callMethod(row, loader.pick("bg", "bc", "be", "bd"), cards);
+        XposedHelpers.callMethod(row, loader.member("proto_builder", "append_cards", loader.pick("bg", "bc", "be", "bd")), cards);
         return rowConstructor.newInstance(id, finish(row), null);
     }
 

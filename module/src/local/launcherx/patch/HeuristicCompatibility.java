@@ -20,6 +20,13 @@ import org.json.JSONObject;
 
 /** Require a unique, consistent match for every reviewed class before installing hooks. */
 final class HeuristicCompatibility {
+    static DexContracts.Match contracts(Context context, ApplicationInfo info) throws Exception {
+        JSONObject profile = profile(context, new String[]{"contracts.json", BuildConfig.CONTRACTS_SHA256});
+        List<DexContracts.Rule> rules = ContractProfile.parse(profile);
+        List<String> paths = new ArrayList<>(); paths.add(info.sourceDir);
+        if (info.splitSourceDirs != null) Collections.addAll(paths, info.splitSourceDirs);
+        return DexContracts.match(rules, DexFingerprint.contracts(paths.toArray(new String[0]), rules));
+    }
     static final class Match {
         final long bindings;
         final Map<String, String> classes;

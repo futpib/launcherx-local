@@ -114,7 +114,7 @@ final class ShortcutBackup {
                             Log.i("LauncherXLocal", "Recovered shortcut after stock cleanup: " + code);
                         }
                     }
-                    XposedHelpers.callMethod(builder, loader.pick("aA", "av", "aw", "av"), info);
+                    XposedHelpers.callMethod(builder, loader.member("proto_builder", "append_button", loader.pick("aA", "av", "aw", "av")), info);
                 }
                 Object result = loader.finish(builder);
                 byte[] bytes = encode(result);

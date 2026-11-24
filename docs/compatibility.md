@@ -1,120 +1,80 @@
 # Compatibility and launcher updates
 
-LauncherX Local 0.22 supports the reviewed Google TV Home builds 702401,
-835645, 837595 and 841183. The launcher remains Google's signed APK. The module adapts
-its hooks to the installed code before enabling Incognito Home.
-
-Google Play replaced launcher 835645 with 837595 on the tested TV. Module 0.17
-refused the unfamiliar version, so its Home hooks stopped loading. The new
-bindings include the moved profile, navigation, content and shortcut classes,
-changed methods and resource IDs. Older mappings remain available. This update
-also corrects the distributor fields used for local Watch Next cards on 835645.
-On 837595 it suppresses the native signed-out network-block redirect that could
-interrupt the shortcut chooser after a network reconnect. Other Home navigation
-and account flows remain native.
-
-Version 0.21 also keeps a separate shortcut checkpoint. Compatibility refusal
-still leaves unfamiliar launcher code unhooked, but assignments stripped by
-stock Home can be recovered when compatible hooks return. See
-[binding persistence](key-actions.md#persistence-across-updates).
-
-Google Play subsequently installed **1.0.1018641540 / 841183** on the TV.
-Module 0.21 loaded normally but refused its DEX with `Heuristic mismatch: fyt`.
-That was the first failing alias, not the only changed target: **52 of 86**
-targets had no exact old fingerprint. The update shifted resource IDs, merged
-the app-launch callback into another class and changed several method names.
-Its native shortcut store also pruned the added button definitions while the
-independent checkpoint retained the assignments.
-
-Version 0.22 reviews those changes and improves the matching machinery. The
-local-content renderer is found by its complete method signature, and the
-preview provider by a unique path of field types. This avoids reading an
-unrelated service when obfuscation reuses an old field name. Both searches
-refuse missing or ambiguous matches before installing Home hooks.
+LauncherX Local 0.23 supports Google TV Home 844979 through shared member
+contracts. The same rules match 841183. Earlier reviewed builds 702401, 835645,
+837595 and 841183 retain their exact-code profiles. Google's APK stays signed
+and unmodified.
 
 ## Matching order
 
 1. A reviewed version must have exactly the DEX entries and hashes recorded in
-   `compatibility.json`. A mismatch stops here; it cannot use the heuristic path.
-2. An unfamiliar version must have Google's pinned current signing certificate.
-   If its entire executable code matches a reviewed profile, it uses that
-   profile's bindings. Launcher 837597 has the same four DEX files as 837595
-   and exercises this path in the x86 emulator. Executable split APKs prevent
-   an exact-code match.
-3. A version newer than 837595 with different executable code can use the
-   structural profiles in `module/assets/compatibility-*.json`, trying the
-   newest eligible baseline first. A baseline newer than the installed version
-   is never used. All 86
-   required classes must match uniquely and consistently before any launcher
-   hooks or Home activation are installed. Missing, conflicting or ambiguous
-   targets refuse the patch.
+   `compatibility.json`. A mismatch stops here.
+2. An unfamiliar version must have Google's pinned signing certificate. If its
+   complete executable code matches a reviewed profile, it uses that profile's
+   bindings. This covers the tested 837597 x86 variant of 837595.
+3. Other versions at least 841183 use `module/assets/contracts.json`. Every one
+   of its 85 required classes and every named member must resolve uniquely.
+   Missing, overlapping or ambiguous targets refuse the patch.
+4. Unfamiliar versions between 837595 and 841183 retain the older fingerprint
+   matcher and its eligible baselines. Older unfamiliar builds are refused.
 
-Whole-class structural fingerprints retain class/member layouts, method and field names,
-instruction opcodes and operands, strings, constants, static values and exception
-handlers. They normalize DEX pool indices and obfuscated class names. References
-between profiled classes constrain the matches. The native profile tab layout
-and its peer are included to protect the account-button resource ID; the
-Continue watching string resource is checked independently in English.
+The contracts identify roles through stable diagnostic strings, required method
+signatures, field types, protobuf schema descriptors and references between
+classes. They allow additional fields and methods and changed unrelated bodies.
+They derive renamed helper methods by signature and moved fields from selected
+code paths, including the anonymous-profile flag and remote-button state maps.
+Shared callbacks are scoped by their captured receiver's type instead of a
+numeric synthetic case ID.
 
-The 841183 baseline uses **selected-method contracts** for four merged utility
-classes: the local Home factory, immediate/completed futures, application entry
-points and account type. These retain the class header, every field, static
-values and the exact declarations, bodies and reference links of the selected
-methods. A constructor can be selected by its complete descriptor. Unrelated
-methods and constructor overloads can change without rejecting those targets.
-Other classes still require whole-class matches. These contracts are explicit
-review decisions; the runtime never substitutes a merely similar candidate.
+The profile button is recognized through its native view type. Continue
+watching resolves its native string using the English value and the APK's
+resource table, retaining translations. Neither depends on a fixed resource ID.
 
-This can survive class renaming, pool reordering and changes to unrelated code.
-Changed required bodies, member names, layouts, resource IDs or unsupported DEX
-instructions generally require another review. Dependencies outside the profile
-can also change behavior: a match is evidence of structural compatibility, not
-proof of every runtime behavior or compatibility with an unreleased version.
-Google certificate rotation also requires review. The matcher has bounded DEX
-input sizes and rejects duplicate classes.
+These are explicit contracts, not a similarity score. A method whose name is
+still part of a contract must retain that name; changed required signatures,
+anchors, schemas or relationships need another review. A unique match cannot
+prove unchanged runtime behavior in an unreleased build. Certificate rotation
+also requires review. DEX and resource parsing are bounded; duplicate DEX
+classes are rejected. See [regression evidence](../validation-contracts.json).
 
-The companion status says **Launcher matched automatically; this version has
-not been reviewed** for the heuristic path. Logs distinguish `reviewed`,
-`identical-code` and `heuristic`, with the actual version and selected bindings.
-Every bundled profile digest is compiled into the module so an old loaded process
-cannot silently use a newer installation's profile asset. Restart Google TV
-after updating the module.
+The companion app identifies automatic matches as unreviewed. Logs distinguish
+`reviewed`, `identical-code`, `contracts` and `heuristic` modes. The contract
+asset's digest is compiled into the module, so an old loaded process refuses a
+new installation's different asset. Restart Google TV after updating.
 
-## Reviewing another build
+The separate [shortcut checkpoint](key-actions.md#persistence-across-updates)
+recovers saved assignments that stock Home prunes during a compatibility gap.
+Intentional resets remain reset.
 
-Pull the original base and split APKs from the identified device and record their
-signer, version and hashes. Compare raw DEX declarations and method bodies before
-adding mappings; decompiler-renamed identifiers are not runtime member names.
-Do not enable a version just by changing its version number or expected hash.
+## Checking another build
 
-Inspect all candidates with the same parser and graph matcher used on Android:
+Pull the original base and splits from the device and record their signer,
+version and hashes. Run the same parser and contract matcher used on Android:
+
+```sh
+python3 scripts/match_contracts.py new-base.apk split.apk --output matches.json
+```
+
+The report lists resolved classes and named members or the reason for refusal.
+This host command does not verify the signer, resources or runtime behavior.
+Compare raw DEX declarations and code before changing a contract; decompiler
+renames are not runtime identifiers. Do not enable a version just by changing
+its version number or expected hash.
+
+The older fingerprint tooling remains available for reviewed profiles:
 
 ```sh
 python3 scripts/match_profile.py new-base.apk --output candidates.json
-```
-
-The report lists exact candidates, a bounded list of layout-only candidates,
-all initially missing aliases and the final graph result. Layout-only candidates
-are review leads, never approved bindings. This host command does not check
-Android resources, the APK signer or runtime behavior.
-
-After reviewing the class aliases and indirect dependencies, generate the
-fingerprint asset using the same parser that runs on Android:
-
-```sh
 python3 scripts/fingerprint_profile.py reviewed-base.apk reviewed-bindings.json profile.json \
   --binding-version 841183 --methods reviewed-methods.json
 ```
 
-`reviewed-bindings.json` maps each canonical alias to its reviewed class name.
-The `name` fields in the existing profile record the current mapping. The asset
-contains fingerprints and reference links, not copies of proprietary method code.
-Omit `--methods` for whole-class fingerprints. The optional file maps canonical
-aliases to method names or complete descriptors, as recorded in the 841183
-asset's `methods` entries. A new binding baseline also requires reviewing the
-module's resolver, indirect dependencies and resource checks.
+Whole-class fingerprints retain member names, method bodies, constants and
+exception handlers while normalizing obfuscated class names and pool indices.
+The 841183 fingerprint baseline selects required methods in four merged utility
+classes. Layout-only candidates from `match_profile.py` are review leads.
 
-Build and validate the module:
+Build and check the module:
 
 ```sh
 python3 scripts/build.py
@@ -122,18 +82,16 @@ python3 scripts/verify_apk.py
 python3 -m unittest discover -s tests/ci -v
 ```
 
-The host tests cover renaming, unrelated methods and constructor overloads,
-wrong-type field decoys, ambiguous field paths and methods, changed literals/strings/static
-values/exception handlers, reference disambiguation, ambiguous matches and
-malformed DEX. The rooted `scripts/setup_smoke.py` suite on the latest launcher
-withholds its exact profile to exercise heuristic activation, then checks
-structural and reviewed-hash rejection. The disposable stock-emulator CI suite
-checks rejection of unfamiliar signing certificates. Neither substitutes for
-the real launcher content, profile, shortcut and device checks.
+Host tests cover class/member renaming, unrelated changes, moved field roles,
+reference disambiguation, missing/ambiguous targets, schema-signature changes,
+malformed DEX and resource-ID renumbering. Emulator suites cover Home, content,
+profiles, shortcuts, persistence, Ambient and activation/refusal. The setup
+suite exercises automatic matching, a missing required anchor and a mismatched
+reviewed hash. These checks complement real-device validation.
 
-Use `--emulator-network` for setup, content, profiles, Ambient, all-shortcuts and shortcut
-persistence when running the original ARM launcher on the guarded x86 AVD.
-That fixture's network adapter must never be installed on the physical TV.
+Use `--emulator-network` for suites running the original ARM launcher on the
+isolated x86 AVD. That guarded network fixture must never be installed on the TV.
 
-Parser reference: Android's [DEX format](https://source.android.com/docs/core/runtime/dex-format)
-and [Dalvik bytecode](https://source.android.com/docs/core/runtime/dalvik-bytecode).
+Parser references: Android's [DEX format](https://source.android.com/docs/core/runtime/dex-format),
+[Dalvik bytecode](https://source.android.com/docs/core/runtime/dalvik-bytecode) and
+[resource table structures](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/libs/androidfw/include/androidfw/ResourceTypes.h).

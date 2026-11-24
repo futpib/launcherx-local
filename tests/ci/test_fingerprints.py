@@ -18,6 +18,7 @@ class FingerprintTest(unittest.TestCase):
         cls.host = cls.path / 'host'
         subprocess.run(['javac', '-d', cls.host,
                         ROOT / 'module/src/local/launcherx/patch/DexFingerprint.java',
+                        ROOT / 'module/src/local/launcherx/patch/DexContracts.java',
                         *sorted((ROOT / 'scripts/java').glob('Fingerprint*Tool.java'))], check=True)
 
     @classmethod

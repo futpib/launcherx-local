@@ -27,6 +27,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='launcherx-fingerprints-') as tmp:
         subprocess.run(['javac', '-d', tmp,
                         ROOT / 'module/src/local/launcherx/patch/DexFingerprint.java',
+                        ROOT / 'module/src/local/launcherx/patch/DexContracts.java',
                         ROOT / 'scripts/java/FingerprintTool.java'], check=True)
         output = subprocess.check_output(['java', '-Xmx1g', '-cp', tmp,
                                           'local.launcherx.patch.FingerprintTool', str(args.apk),

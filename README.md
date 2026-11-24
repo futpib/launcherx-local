@@ -2,10 +2,10 @@
 
 Use the official Google TV Home with **Incognito as the default profile**, installed
 apps, Continue watching, app-published content rows, and an app-store picker.
-Version **0.22** supports Google TV Home **841183** and improves target discovery:
-typed member lookup, selected-method fingerprints for merged utility classes,
-multiple matching baselines and complete missing-target diagnostics. Earlier
-reviewed builds remain supported. See [compatibility matching](docs/compatibility.md).
+Version **0.23** supports Google TV Home **844979** using shared compatibility
+rules that also match **841183**. Hooks tolerate class and helper renaming,
+moved fields, unrelated code changes and resource-ID shifts. Earlier reviewed
+builds remain supported. See [compatibility matching](docs/compatibility.md).
 Version **0.21** preserves remote-button assignments across launcher and module
 updates. A separate local checkpoint restores assignments that stock Home prunes
 while the module cannot load; intentional resets remain reset. See
@@ -47,21 +47,18 @@ and launcher compatibility status. No ADB commands are needed.
   [`compatibility.json`](compatibility.json).
 - Google-signed variants with identical executable code also use the reviewed
   bindings; **837597** is the tested x86 variant of **837595**.
-- Later Google-signed builds can use structural matching if all required classes
-  match uniquely. This is conditional compatibility, not a guarantee for future updates.
+- Later Google-signed builds can use shared member contracts if every required
+  class and member matches uniquely; **844979** is tested. This is conditional compatibility, not a guarantee for future updates.
 - Tested on a Xiaomi **MiTV-MOEU0**, Android 14, ARM32, and an isolated Google TV
   Android 14 emulator running the same original launcher APK.
 - Tested framework: **Magisk 30.7**, Zygisk enabled, **LSPosed 1.9.2 / 7024**.
 - Owner user only. Version **0.6** supports choosing Incognito while retaining
   Google accounts; the authenticated switching round trip remains untested.
 
-Version **0.22** is installed on the physical TV running **841183**. Incognito
-Home, local rows, profiles, app launching, shortcut controls, the store picker
-and Ambient's entry menu passed checks using ADB input. The independent checkpoint
-recovered the assignments stock Home had pruned; all six matched after a launcher
-restart. The original SmartTube task was resumed. See
-[TV validation](validation-tv-target-discovery.json) and
-[matching and regression validation](validation-target-discovery.json).
+Version **0.23** is installed on the physical TV running **844979**. See
+[TV validation](validation-tv-contracts.json) and
+[matching and regression validation](validation-contracts.json) for the checks
+and their limits. Earlier deployment records remain in the repository.
 
 Version **0.21** was installed on the physical TV running **837595**. Its existing
 bindings were preserved byte-for-byte and captured in the independent checkpoint.

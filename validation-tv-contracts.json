@@ -1,0 +1,56 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-24",
+  "module_version": "0.23",
+  "production_apk_sha256": "aaff8b2c1ebf4c46086f81117a2c13d18b696ea0339f2b2ab239d273a2263ce4",
+  "device": {
+    "model": "MiTV-MOEU0",
+    "android": 14,
+    "architecture": "ARM32",
+    "launcher_version_name": "1.0.1022477184",
+    "launcher_version_code": 844979
+  },
+  "compatibility": {
+    "mode": "contracts",
+    "required_classes": 85,
+    "named_members": 24,
+    "new_version_specific_mapping": false
+  },
+  "checks": [
+    "Production APK installed over 0.22; final 0.23 build installed and device SHA-256 verified",
+    "Both Home processes loaded automatic contract matches for 844979",
+    "Incognito Home rendered apps, Continue watching and app-published content; logs reported 10 local rows",
+    "DPAD opened the native profile chooser and selecting Incognito returned to Home",
+    "ADB YouTube long press opened the native shortcut chooser with restore controls and Send key",
+    "All six saved button assignments recovered from the pre-install checkpoint and matched after launcher restart",
+    "Native and independent checkpoint assignments match after restart",
+    "DPAD launched SmartTube from the native app row and resumed the original playback task 707",
+    "No patch refusal, launcher fatal exception or local-content error in the captured restart interval",
+    "Final production build installed, matched in both processes, and retained every native/checkpoint assignment; injected YouTube short press resumed original SmartTube playback task 707"
+  ],
+  "bindings": {
+    "keys": [
+      313,
+      190,
+      193,
+      194,
+      351,
+      352
+    ],
+    "before_native_sha256": "4c6e0728fe2f5b230b0343772dd8e845399de1c45bec2d9cea5ff4126b9899dd",
+    "checkpoint_before_sha256": "1eab06d23c8c50a69c0825186bc932c60f0dc2c204a0680816e0c20b69ea4cf2",
+    "after_native_sha256": "c087549f389e37befd56d24f4bd0fb7095a0ee3279e976814260ed2392c2a104",
+    "checkpoint_after_sha256": "c087549f389e37befd56d24f4bd0fb7095a0ee3279e976814260ed2392c2a104"
+  },
+  "cleanup": {
+    "original_smarttube_task_observed_resumed": 707,
+    "tv_rebooted": false
+  },
+  "limits": [
+    "Input was injected through ADB; physical remote presses and audible playback were not tested",
+    "No authenticated Google account round trip, prolonged standby or TV reboot was tested",
+    "Content mutation, intentional-reset and compatibility-refusal tests use the isolated emulator",
+    "Future changes to required signatures, schemas or behavior can still need review"
+  ],
+  "evidence_directory": "artifacts/home-update-20261124"
+}

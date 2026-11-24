@@ -60,6 +60,19 @@ def read(path=STORE + '/data/*/content'):
     return adb('exec-out', '/debug_ramdisk/su -c ' + shlex.quote('cat ' + path), binary=True)
 
 
+def wait_events(predicate):
+    # After an APK replacement the key broker verifies the launcher on its first
+    # request. Wait for actual receiver delivery instead of assuming a warm broker.
+    deadline = time.monotonic() + 10
+    while True:
+        observed = events()
+        if predicate(observed):
+            return observed
+        if time.monotonic() >= deadline:
+            raise AssertionError('Key action was not delivered: ' + observed)
+        time.sleep(.1)
+
+
 def checkpoint(expected):
     deadline = time.monotonic() + 15
     while time.monotonic() < deadline:
@@ -88,7 +101,17 @@ def gap(refused, apk, name):
     print(adb('install', '--no-incremental', '-r', apk), flush=True)
     adb('logcat', '-c')
     fresh_home()
-    return assignments(read())
+    expected = assignments(before)
+    deadline = time.monotonic() + 20
+    while True:
+        restored = read()
+        actual = assignments(restored)
+        if actual == expected:
+            (ARTIFACTS / (name + '-restored.pb')).write_bytes(restored)
+            return actual
+        if time.monotonic() >= deadline:
+            raise AssertionError(('Shortcut recovery did not finish', actual, expected))
+        time.sleep(.2)
 
 
 def main():
@@ -134,13 +157,13 @@ def main():
             receiver()
             for code, expected in [(193, 'KEYCODE_SPACE'), (194, 'KEYCODE_F')]:
                 send(code, 'short')
-                assert expected in events()
+                wait_events(lambda value: expected in value)
             before = events()
             send(351, 'short')
             foreground('persistence-no-action', ACTIVITY)
             assert events() == before
             send(313, 'short')
-            assert events() != before
+            wait_events(lambda value: value != before)
             checks.append('Recovered apps launch; custom keys and Play/Pause reach the fixture; No action stays inert')
             print(checks[-1], flush=True)
             restore(193, 'Netflix')

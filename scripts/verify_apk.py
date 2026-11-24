@@ -32,6 +32,9 @@ def verify(directory):
     assert package and package[1] == "local.launcherx.patch", badging
     assert int(package[2]) == receipt["version_code"] and package[3] == receipt["version_name"]
     with zipfile.ZipFile(apk) as archive:
+        contracts = archive.read('assets/contracts.json')
+        assert contracts == (ROOT / 'module/assets/contracts.json').read_bytes()
+        assert receipt['contracts_sha256'] == hashlib.sha256(contracts).hexdigest()
         profile = archive.read("assets/compatibility-837595.json")
         assert profile == (ROOT / "module/assets/compatibility-837595.json").read_bytes()
         assert receipt["fingerprint_sha256"] == hashlib.sha256(profile).hexdigest()

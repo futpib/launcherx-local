@@ -81,7 +81,7 @@ public final class SetupActivity extends Activity {
                 Compatibility.Result compatibility = Compatibility.resolve(this);
                 boolean enabled = getPackageManager().getComponentEnabledSetting(new ComponentName(
                         TARGET, TARGET + ".home.HomeActivity")) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-                message = ("heuristic".equals(compatibility.mode)
+                message = (("heuristic".equals(compatibility.mode) || "contracts".equals(compatibility.mode))
                         ? "Launcher matched automatically; this version has not been reviewed. Home is "
                         : "Compatible launcher. Home is ") + (enabled ? "selected" : "not selected")
                         + ".";

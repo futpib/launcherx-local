@@ -95,8 +95,8 @@ final class NativeShortcuts {
         listenerClass.getDeclaredMethod("c", loader.loadClass("gcf"), infoClass);
         if (!loader.modern) listenerClass.getDeclaredField("j");
         else {
-            listenerClass.getDeclaredField("m");
-            listenerClass.getDeclaredField("h").getType().getDeclaredMethod("a", KeyEvent.class);
+            listenerClass.getDeclaredField(loader.member("llx", "buttons", "m"));
+            listenerClass.getDeclaredField(loader.member("lma", "key_helper", "h")).getType().getDeclaredMethod("a", KeyEvent.class);
             callbackClass.getDeclaredField("a");
             callbackClass.getDeclaredField("b");
         }
@@ -176,10 +176,10 @@ final class NativeShortcuts {
                     int code = key(info);
                     if (code == 189 || code == 190) {
                         Object changed = XposedHelpers.callMethod(info, "toBuilder");
-                        XposedHelpers.callMethod(changed, loader.pick("az", "au", "av", "au"), keyMode);
+                        XposedHelpers.callMethod(changed, loader.member("proto_builder", "button_mode", loader.pick("az", "au", "av", "au")), keyMode);
                         info = loader.finish(changed);
                     }
-                    XposedHelpers.callMethod(builder, loader.pick("aA", "av", "aw", "av"), info);
+                    XposedHelpers.callMethod(builder, loader.member("proto_builder", "append_button", loader.pick("aA", "av", "aw", "av")), info);
                 }
                 for (int code : OEM_KEYS) {
                     Object info = loader.modern
@@ -187,7 +187,7 @@ final class NativeShortcuts {
                                     int.class, Integer.class, String.class}, code, null, label(code))
                             : XposedHelpers.callMethod(nativeSetup, "i", new Class<?>[] {
                                     Context.class, int.class, Integer.class, String.class}, context, code, null, label(code));
-                    XposedHelpers.callMethod(builder, loader.pick("aA", "av", "aw", "av"), info);
+                    XposedHelpers.callMethod(builder, loader.member("proto_builder", "append_button", loader.pick("aA", "av", "aw", "av")), info);
                 }
                 XposedHelpers.setObjectField(nativeSetup, "b", loader.finish(builder));
                 setup = nativeSetup;
@@ -215,7 +215,7 @@ final class NativeShortcuts {
                 // Resolve the real listener before accepting responsibility for an OEM key.
                 // If construction or expansion fails, Xiaomi receives no acknowledgement
                 // and executes its original handler after the broadcast completes.
-                Object entry = XposedHelpers.callStaticMethod(loader.loadClass("uzs"), loader.pick("v", "j", "o", "e"),
+                Object entry = XposedHelpers.callStaticMethod(loader.loadClass("uzs"), loader.member("uzs", "entry", loader.pick("v", "j", "o", "e")),
                         context, loader.loadClass("lmb"));
                 XposedHelpers.callMethod(entry, loader.pick("at", "E", "D"));
                 if (setup == null) {
@@ -249,14 +249,14 @@ final class NativeShortcuts {
                         && (event.getKeyCode() == 189 || event.getKeyCode() == 190)) {
                     // The newer callback inlines the anonymous YouTube gate. Use a
                     // generic button only during this dispatch; keep the saved mode.
-                    Object state = XposedHelpers.callStaticMethod(loader.loadClass("xgr"), loader.pick("an", "an", "A", "w"),
+                    Object state = XposedHelpers.callStaticMethod(loader.loadClass("xgr"), loader.member("xgr", "completed", loader.pick("an", "an", "A", "w")),
                             XposedHelpers.getObjectField(hook.thisObject, "b"));
                     Object account = XposedHelpers.getObjectField(state, "c");
                     if (account != null && "pseudonymous".equals(XposedHelpers.getObjectField(account, "e"))) {
                         Object listener = XposedHelpers.getObjectField(hook.thisObject, "a");
-                        Object id = XposedHelpers.callMethod(XposedHelpers.getObjectField(listener, "h"), "a", event);
+                        Object id = XposedHelpers.callMethod(XposedHelpers.getObjectField(listener, loader.member("lma", "key_helper", "h")), "a", event);
                         @SuppressWarnings("unchecked")
-                        Map<Object, Object> buttons = (Map<Object, Object>) XposedHelpers.getObjectField(listener, "m");
+                        Map<Object, Object> buttons = (Map<Object, Object>) XposedHelpers.getObjectField(listener, loader.member("llx", "buttons", "m"));
                         Object info = buttons.get(id);
                         if (info != null && XposedHelpers.getIntField(info, "g") == 3) {
                             YoutubeMode mode = new YoutubeMode(buttons, id, info, generic(info));
@@ -266,7 +266,7 @@ final class NativeShortcuts {
                     }
                 }
                 if (supported(event.getKeyCode()) && event.isCanceled() && enabled(context)) {
-                    hook.setResult(XposedHelpers.callStaticMethod(loader.loadClass("xgr"), loader.pick("W", "ae", "r", "n"), false));
+                    hook.setResult(XposedHelpers.callStaticMethod(loader.loadClass("xgr"), loader.member("xgr", "immediate", loader.pick("W", "ae", "r", "n")), false));
                 }
             }
             @Override protected void afterHookedMethod(MethodHookParam hook) {
@@ -291,7 +291,7 @@ final class NativeShortcuts {
                 Object info = hook.args[1];
                 int code = key(info);
                 if (!enabled(context)) return;
-                Object state = ((Map<?, ?>) XposedHelpers.getObjectField(hook.thisObject, loader.pick("k", "i")))
+                Object state = ((Map<?, ?>) XposedHelpers.getObjectField(hook.thisObject, loader.member("lma", "states", loader.pick("k", "i"))))
                         .get(XposedHelpers.getObjectField(info, "f"));
                 Integer target = keyAction(state);
                 if (target != null && supported(code)) {
@@ -379,7 +379,7 @@ final class NativeShortcuts {
                 XposedHelpers.setIntField(value, "g", 3);
                 XposedHelpers.setObjectField(value, "h", XposedHelpers.getObjectField(empty, "h"));
                 XposedHelpers.setObjectField(value, "i", XposedHelpers.getObjectField(empty, "i"));
-                XposedHelpers.callMethod(builder, loader.pick("az", "au", "av", "au"), XposedHelpers.callStaticMethod(loader.loadClass("tzf"), "b", 3));
+                XposedHelpers.callMethod(builder, loader.member("proto_builder", "button_mode", loader.pick("az", "au", "av", "au")), XposedHelpers.callStaticMethod(loader.loadClass("tzf"), "b", 3));
                 hook.args[0] = loader.finish(builder);
             }
             @Override protected void afterHookedMethod(MethodHookParam hook) {

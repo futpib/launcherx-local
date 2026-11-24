@@ -1,0 +1,291 @@
+{
+  "result": "passed_with_coverage_limits",
+  "verified_date": "2026-11-24",
+  "module_version": "0.23",
+  "production_apk_sha256": "aaff8b2c1ebf4c46086f81117a2c13d18b696ea0339f2b2ab239d273a2263ce4",
+  "contract_asset_sha256": "e869aee7daa4754f58992f192b697357a09cbae556afa1643dea9a21a610af2d",
+  "cross_version_matches": [
+    {
+      "version_code": 841183,
+      "apk_sha256": "22f23f5f5e831aade46a6808ba8f9834cab8bb1eb4459e62ca52e95a0743ed44",
+      "dex_sha256": {
+        "classes.dex": "c92cb198ad704a8c466246b1c2bc3e12007944b4399efa8258eb8a3458f2f8b8",
+        "classes2.dex": "3c476138bb55c3cc6fe6ccddb808854a008e00bd460e77837e440d291f72b47f",
+        "classes3.dex": "328b6824c321db80309303a3e2e8534cb3f0f763cfeae6d4c5403b6387890885",
+        "classes4.dex": "59dc41d5c4a44087a62a8aea0549ea580acd76a2759e60e045dd04743f3501f6"
+      },
+      "classes": 85,
+      "named_members": 24,
+      "members": {
+        "basic_network_exit.redirect": "n",
+        "hsx.constructor": "<init>",
+        "hsx.destination": "c",
+        "hsx.error_rows": "a",
+        "hsx.rows": "b",
+        "isf.apps_only_flag": "w",
+        "isf.update": "b",
+        "isn.anonymous_flag": "u",
+        "isn.constructor": "<init>",
+        "llx.buttons": "m",
+        "llx.dispatch": "a",
+        "lma.a": "a",
+        "lma.b": "b",
+        "lma.c": "c",
+        "lma.key_helper": "h",
+        "lma.onReceive": "onReceive",
+        "lma.states": "i",
+        "proto_builder.append_button": "av",
+        "proto_builder.append_cards": "bd",
+        "proto_builder.button_mode": "au",
+        "uzs.entry": "e",
+        "xgr.completed": "w",
+        "xgr.immediate": "n",
+        "yjv.account_type": "Y"
+      }
+    },
+    {
+      "version_code": 844979,
+      "apk_sha256": "dd8456333f06243dd75c59ec56731216a1c8f03c6cbec5592abfec10d273e1b9",
+      "dex_sha256": {
+        "classes.dex": "5c0a0f17692f14f62c6f200ca3448a9e5a88304a9d1f4907d64cc06344e844ff",
+        "classes2.dex": "39b01ea0537f168f867675b005d5d4a1374b63483e7c13b1af39196520bad2d9",
+        "classes3.dex": "fb7a2e884653da23a1367b481021c227dd3bf90263278d37fb2783a7eece8a1e",
+        "classes4.dex": "e87269888f7317325350a694e33af5f848ab03013166b5103d3b66f0c73d5a3d"
+      },
+      "classes": 85,
+      "named_members": 24,
+      "members": {
+        "basic_network_exit.redirect": "e",
+        "hsx.constructor": "<init>",
+        "hsx.destination": "J",
+        "hsx.error_rows": "H",
+        "hsx.rows": "I",
+        "isf.apps_only_flag": "z",
+        "isf.update": "b",
+        "isn.anonymous_flag": "w",
+        "isn.constructor": "<init>",
+        "llx.buttons": "n",
+        "llx.dispatch": "a",
+        "lma.a": "a",
+        "lma.b": "b",
+        "lma.c": "c",
+        "lma.key_helper": "i",
+        "lma.onReceive": "onReceive",
+        "lma.states": "j",
+        "proto_builder.append_button": "av",
+        "proto_builder.append_cards": "bd",
+        "proto_builder.button_mode": "au",
+        "uzs.entry": "j",
+        "xgr.completed": "C",
+        "xgr.immediate": "t",
+        "yjv.account_type": "L"
+      }
+    }
+  ],
+  "resource_compatibility": [
+    {
+      "apk": "artifacts/launcher-original.apk",
+      "continue_watching_ids": [
+        "0x7f140654"
+      ],
+      "production_resource_parser_covers_id": true,
+      "native_profile_button_type_present": true
+    },
+    {
+      "apk": "artifacts/tv-launcher-upgrade/835645/base.apk",
+      "continue_watching_ids": [
+        "0x7f1405ca"
+      ],
+      "production_resource_parser_covers_id": true,
+      "native_profile_button_type_present": true
+    },
+    {
+      "apk": "artifacts/launcher-837595/base.apk",
+      "continue_watching_ids": [
+        "0x7f1405cd"
+      ],
+      "production_resource_parser_covers_id": true,
+      "native_profile_button_type_present": true
+    },
+    {
+      "apk": "artifacts/target-discovery-20261114/apks/base.apk",
+      "continue_watching_ids": [
+        "0x7f1405d5"
+      ],
+      "production_resource_parser_covers_id": true,
+      "native_profile_button_type_present": true
+    },
+    {
+      "apk": "artifacts/home-update-20261124/launcher/base.apk",
+      "continue_watching_ids": [
+        "0x7f1405e3"
+      ],
+      "production_resource_parser_covers_id": true,
+      "native_profile_button_type_present": true
+    }
+  ],
+  "diagnostic_fix": "Missing contract targets are reported before graph propagation; unresolved targets report candidate counts instead of dumping potentially thousands of class names. The negative activation suite checks the resulting setup UI.",
+  "host_checks": [
+    "22 tests passed: DEX fingerprint regressions, semantic contracts, member discovery, release versioning and resource parsing",
+    "The same production contract asset uniquely matched 85 classes and 24 member slots in both original Google APKs",
+    "Renamed classes and methods, added unrelated fields/code and moved fields accepted; missing anchors, incompatible signatures and ambiguity rejected",
+    "Resource ranges survive renumbering; malformed headers rejected; the native profile view type and unique Continue watching resource were verified in five original APKs",
+    "Production APK signature, receipt, packaged assets and profile digests verified",
+    "Host contract command rejects unsupported profile format; Python compilation and git diff checks passed"
+  ],
+  "emulator": {
+    "launcher_version_code": 844979,
+    "fixture": "Rooted Google TV API 34 x86 with ARM translation; original TV APK and splits; guarded module network adapter",
+    "final_apk_sha256": "c251a19a08b309384a04e8cfc250d083538e31770d7971c8bac4d1c83e4b8028",
+    "runs": {
+      "all-shortcuts": {
+        "result": "passed",
+        "module_version": "0.23",
+        "apk_sha256": "a88afbebfc82c979d9707d1a1ee62c26b424c024d8a148bbd91c5f72e94d0da4",
+        "checks": [
+          "Star: native long-press chooser saves and short press launches TV Bro",
+          "YouTube: native long-press chooser saves and short press launches TV Bro",
+          "Netflix: native long-press chooser saves and short press launches TV Bro",
+          "Prime Video: native long-press chooser saves and short press launches TV Bro",
+          "Live TV: native long-press chooser saves and short press launches TV Bro",
+          "Xiaomi TV+: native long-press chooser saves and short press launches TV Bro",
+          "All six native assignments survive launcher process restart",
+          "Cancelling restoration keeps the custom assignment",
+          "Restoring YouTube returns its native action and preserves the other five bindings",
+          "A cancelled key-up does not launch a saved app",
+          "Restore all clears custom bindings, restores native star/YouTube and selects OEM fallback paths"
+        ],
+        "physical_tv_tested": false,
+        "accounts": 0,
+        "limitations": [
+          "KeyEvent receiver injection does not exercise the physical remote or Xiaomi bridge.",
+          "OEM default branches were selected; actual Xiaomi app/fallback launches require the TV.",
+          "Authenticated and managed-profile paths were not exercised."
+        ],
+        "cleanup": "Previous native shortcut store restored; test helper removed."
+      },
+      "persistence": {
+        "result": "passed",
+        "module_version": "0.23",
+        "apk_sha256": "a88afbebfc82c979d9707d1a1ee62c26b424c024d8a148bbd91c5f72e94d0da4",
+        "checks": [
+          "Native chooser saved apps, media/custom keys and No action; checkpoint matches all assignments",
+          "Real unhooked Home pruned OEM/YouTube bindings; restoring module recovered every action and survived restart",
+          "Recovered apps launch; custom keys and Play/Pause reach the fixture; No action stays inert",
+          "An individually restored default is not resurrected after another compatibility gap",
+          "Restore all clears the checkpoint actions and remains reset across stock cleanup"
+        ],
+        "limits": [
+          "Real Google TV x86 emulator; receiver-injected events, not a physical remote",
+          "Compatibility refusal was forced on the installed launcher; no Play Store update was downloaded"
+        ],
+        "cleanup": "Original native store and independent checkpoint restored; test fixtures removed"
+      },
+      "ambient": {
+        "apk_sha256": "a88afbebfc82c979d9707d1a1ee62c26b424c024d8a148bbd91c5f72e94d0da4",
+        "result": "passed",
+        "checks": [
+          "Android cursor probe preserves identity, locks, extras and other account modes",
+          "ordinary root caller still sees mode 2; unauthorized shell query remains rejected",
+          "native Ambient menu opens with Start now and Settings, without setup error",
+          "native Start now binds the real Backdrop dream service",
+          "Home exits the screensaver and returns to Incognito with unchanged account state"
+        ],
+        "physical_tv_tested": false,
+        "limit": "Full settings editor needs valid Cast device credentials; tested separately on TV."
+      },
+      "setup": {
+        "result": "passed",
+        "apk_sha256": "c251a19a08b309384a04e8cfc250d083538e31770d7971c8bac4d1c83e4b8028",
+        "checks": [
+          "Basic TV automatically becomes Incognito Home when the module loads",
+          "disabling in LSPosed and restarting restores stock signed-out setup UI with zero accounts",
+          "re-enabling in LSPosed and restarting automatically restores Incognito Home",
+          "settings app has only Choose app content and passive compatibility status",
+          "real launcher activates through automatic matching with its exact profile withheld",
+          "heuristic-mismatch mismatch refuses hooks, automatic activation and channel changes",
+          "dex mismatch refuses hooks, automatic activation and channel changes"
+        ],
+        "physical_tv_tested": false,
+        "fixture": "isolated emulator; actual LSPosed UI; negative module metadata variants"
+      },
+      "final-smoke": {
+        "result": "passed",
+        "apk_sha256": "c251a19a08b309384a04e8cfc250d083538e31770d7971c8bac4d1c83e4b8028",
+        "accounts": 0,
+        "reboot": false,
+        "emulator_network": true,
+        "checks": [
+          "clean official Home",
+          "native DPAD app launch",
+          "Home return",
+          "process restart",
+          "no launcher fatal exception"
+        ],
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      }
+    },
+    "earlier_0_23_candidate_runs": {
+      "content": {
+        "result": "passed",
+        "module_version": "0.23",
+        "apk_sha256": "b2dd15ebffd6d38414b17f7e4048a3a665aab8958ecee362fcc4b9ac9377da9d",
+        "emulator_network": true,
+        "publisher_sha256": "8cf30038484ff71d4c08da198c737e6705acd9eac0f7c02fa32494d9d6ec478e",
+        "accounts": 0,
+        "checks": [
+          "empty providers keep apps-only Home",
+          "all existing preview channels enabled automatically on first discovery",
+          "remote-controlled setup chooser hides only the selected preview channel",
+          "both native rows, artwork, episode metadata, hidden/invalid/duplicate filtering",
+          "DPAD opens both provider deep links with extras intact",
+          "non-film Watch Next clip renders and opens through native resume card",
+          "provider updates refresh visible Home without a process restart",
+          "updated resume position and playback extras",
+          "deletions made while away are reflected on Home resume",
+          "channel visibility changes remove and restore rows live",
+          "newly published channel enabled and rendered live without reviving hidden channels",
+          "external channel hide survives launcher restart",
+          "rows and playback links work with launcher IPv4/IPv6 egress blocked",
+          "populated rows and explicit channel hides survive emulator reboot",
+          "deleting the last entries removes empty rows live"
+        ],
+        "physical_tv_tested": false,
+        "fixture": "isolated Google TV API 34 emulator; original launcher APK; real TvProvider test publisher; playback receiver verifies links, not video playback"
+      },
+      "profiles": {
+        "result": "passed",
+        "apk_sha256": "26ab83f8e1ac9073fe193e76bbf4ab7e968ba5e4adb7a17a4b47e0d77322cc26",
+        "checks": [
+          "first-run Incognito default and native chooser entry",
+          "native DPAD Incognito selection returns to Home",
+          "native Add account launches real Google Play Services sign-in",
+          "cancelled sign-in leaves Incognito selected and creates no account",
+          "Incognito selection survives launcher restart",
+          "Incognito selection and chooser survive emulator reboot",
+          "no launcher fatal exception in uninterrupted remote sequences"
+        ],
+        "accounts": 0,
+        "physical_tv_tested": false,
+        "authenticated_google_roundtrip_tested": false,
+        "fixture": "Google TV API 34 x86 with ARM translation; original TV APK"
+      }
+    }
+  },
+  "initial_failure": {
+    "test": "shortcut persistence custom key delivery",
+    "cause": "The test read receiver state before the cold key broker completed launcher verification",
+    "reproduction": "Restored Space arrived at approximately 2.48 seconds from sending; the first observation at 2.08 seconds was too early",
+    "test_fix": "Poll actual delivery with a ten-second deadline; also wait up to twenty seconds for asynchronous native-store recovery instead of reading immediately after Home resumes. Wait for rendered Home pixels before sending DPAD input as well. Timing failures occurred before the expected operation completed; no production workaround."
+  },
+  "limits": [
+    "A contract match cannot prove unchanged behavior in unreleased Home builds; required signature, schema, anchor or behavior changes can need review",
+    "841183 was matched by the shared contracts on the host; its older runtime suites were not repeated in this run",
+    "Content and profile suites ran on earlier 0.23 candidate builds; shortcut, persistence and Ambient suites preceded the final diagnostic-only change. Exact APK hashes are recorded for each run; setup/refusal and Home smoke tests use the final build",
+    "Key events were injected; physical remote presses, audible playback and authenticated Google account switching were not tested",
+    "Cold key-service startup includes launcher verification; warmed key latency was not measured in this run",
+    "No remote CI or push was performed"
+  ],
+  "physical_tv_validation": "validation-tv-contracts.json",
+  "evidence_directory": "artifacts/home-update-20261124"
+}
